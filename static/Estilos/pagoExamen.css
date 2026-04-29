@@ -1,0 +1,31 @@
+/* Fondo general */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+/* Regresar botón */
+#regresar-PagPrincipal {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    background: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in-out;
+}
+
+#regresar-PagPrincipal:hover {
+    background: #c82333;
+}

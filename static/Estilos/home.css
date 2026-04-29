@@ -1,0 +1,162 @@
+:root {
+    --fondo-oscuro: #0e0e0e;
+    --navbar-gradiente: linear-gradient(to right, #1c1c1c, #292929);
+    --texto-claro: #f5f5f5;
+    --dorado: #f2c94c;
+    --boton-salida: #dc3545;
+    --boton-salida-hover: #bb2d3b;
+    --azul-boton: #0d6efd;
+    --azul-hover: #0a58ca;
+}
+ 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--fondo-oscuro);
+    color: var(--texto-claro);
+    background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* NAVBAR */
+.navbar {
+    background: var(--navbar-gradiente);
+    color: var(--texto-claro);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--dorado);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
+    font-size: 18px;
+    position: sticky;
+    top: 0px;
+    z-index: 10;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo-unam {
+    height: 85px;
+    width: auto;
+}
+
+.titulo-navbar {
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--dorado);
+}
+
+/* BOTÓN CERRAR SESIÓN */
+.logout-button {
+    background-color: var(--boton-salida);
+    color: white;
+    font-size: 18px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+}
+
+.logout-button:hover {
+    background-color: var(--boton-salida-hover);
+}
+
+/* CONTENIDO */
+.main-wrapper {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.titulo {
+    font-size: 46px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    color: var(--dorado);
+    margin-top: -50px;
+}
+
+.subtitulo {
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: #ccc;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.card {
+    width: 220px;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 18px;
+    transition: transform 0.25s, background-color 0.25s, box-shadow 0.25s;
+    background-color: #f2c94c;
+    color: #000;
+    border: none;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.card:hover {
+    background-color: #e0b93f;
+    box-shadow: 0 10px 24px rgba(242, 201, 76, 0.25);
+    transform: translateY(-5px);
+}
+
+.admin-card {
+    border: 2px solid rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .navbar-left {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .titulo-navbar {
+        font-size: 22px;
+    }
+
+    .titulo {
+        font-size: 38px;
+    }
+
+    .container {
+        gap: 20px;
+    }
+
+    .card {
+        width: 90%;
+        max-width: 320px;
+    }
+}

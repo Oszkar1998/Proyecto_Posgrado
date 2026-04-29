@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar usuarios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
+    <style>
+        .tabla-usuarios {
+            width: 100%;
+            color: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .tabla-usuarios th,
+        .tabla-usuarios td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .tabla-usuarios th {
+            border-bottom: 2px solid #d6bb1f;
+        }
+
+        .tabla-usuarios td {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .no-editable {
+            color: #888;
+            font-style: italic;
+        }
+
+        .editar-link {
+            color: #f2d200;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .editar-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-login">
+        <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM">
+    </header>
+
+    <div class="auth-box" style="width: 750px; max-width: 95%;">
+        <div class="form-container">
+            <h2>👥 Administrar usuarios</h2>
+
+            <table class="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Correo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user['id'] }}</td>
+                        <td>{{ user['email'] }}</td>
+                        <td>
+                            {% if user['id'] == current_user_id %}
+                                <span class="no-editable">No editable</span>
+                            {% else %}
+                                <a class="editar-link" href="{{ url_for('edit_user', user_id=user['id']) }}">
+                                    Editar privilegios
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p style="margin-top: 20px;">
+                <a href="{{ url_for('home') }}">Volver al menú principal</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

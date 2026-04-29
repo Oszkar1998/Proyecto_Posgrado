@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar usuario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
+    <script>
+        function togglePermissions() {
+            const isAdmin = document.getElementById("is_admin").checked;
+            const permissions = document.querySelectorAll("input[name='permissions']");
+            const section = document.getElementById("permissions_section");
+
+            section.style.display = isAdmin ? "none" : "block";
+
+            permissions.forEach(p => {
+                p.disabled = isAdmin;
+                if (isAdmin) p.checked = false;
+            });
+        }
+
+        window.onload = togglePermissions;
+    </script>
+</head>
+<body>
+    <header class="header-login">
+        <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM">
+    </header>
+
+    <div class="auth-box" style="width: 650px; max-width: 95%;">
+        <div class="form-container">
+            <h2>✏️ Editar privilegios</h2>
+            <p><strong>Usuario:</strong> {{ user['email'] }}</p>
+
+            <form method="POST">
+                <div class="admin-box" style="color:white; text-align:left; margin-top:15px;">
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="is_admin"
+                            name="is_admin"
+                            value="1"
+                            onchange="togglePermissions()"
+                            {% if 'admin' in current_roles %}checked{% endif %}
+                        >
+                        Este usuario será administrador y tendrá todos los privilegios
+                    </label>
+                </div>
+
+                <div id="permissions_section" style="margin-top:15px; color:white; text-align:left;">
+                    <p>Selecciona los permisos:</p>
+                    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px 20px;">
+                        {% for permission in all_permissions %}
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="permissions"
+                                    value="{{ permission['name'] }}"
+                                    {% if permission['name'] in current_permissions %}checked{% endif %}
+                                >
+                                {{ permission['name'] }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" style="margin-top:20px;">Guardar cambios</button>
+            </form>
+
+            <p><a href="{{ url_for('manage_users') }}">Volver a usuarios</a></p>
+        </div>
+    </div>
+
+    {% if error %}
+    <p class="mensaje-error">{{ error }}</p>
+    {% endif %}
+</body>
+</html>

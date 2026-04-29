@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Página Principal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/home.css') }}">
+    <link rel="icon" href="https://www.unam.mx/sites/default/files/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- Barra superior -->
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM" class="logo-unam">
+            <span class="titulo-navbar">Facultad de Ingeniería - POSGRADO</span>
+        </div>
+        
+        <!-- Boton para menú principal -->
+        <button class="logout-button" onclick="window.location.href='/logout'">
+            🚪 Cerrar Sesión
+        </button>
+    </header>
+
+    <!-- Contenido principal -->
+    <div class="main-wrapper">
+        <h1 class="titulo">Bienvenido</h1>
+        <p class="subtitulo">Selecciona una opción para comenzar</p>
+
+
+        <div class="container">
+            {% if 'superadmin' in roles or 'admin' in roles or 'revision' in permissions %}
+                <a href="{{ url_for('revision.index') }}" class="card">📑 REVISIÓN</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'examen' in permissions %}
+                <a href="{{ url_for('examen.index') }}" class="card">📝 EXAMEN</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'dgae' in permissions %}
+                <a href="{{ url_for('dgae.dgae') }}" class="card">🏛️ DGAE</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'dgae_grado' in permissions %}
+                <a href="{{ url_for('dgaeGrado.index') }}" class="card">🏛️ DGAE GRADO</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'votos_puei' in permissions %}
+                <a href="{{ url_for('votosOficio.index') }}" class="card">🗳️ VOTOS (PUEI)</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'actas_grado' in permissions %}
+                <a href="{{ url_for('actas_grado.index') }}" class="card">📜 ACTAS GRADO</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles or 'admin' in roles or 'candidatura' in permissions %}
+                <a href="{{ url_for('candidatura.index') }}" class="card">👤 CANDIDATURA</a>
+            {% endif %}
+            
+            {% if 'superadmin' in roles or 'admin' in roles or 'pago_examen' in permissions %}
+                <a href="{{ url_for('pagoExamen.index') }}" class="card">🧾 PAGO EXAMEN</a>
+            {% endif %}
+            
+            {% if 'superadmin' in roles or 'admin' in roles or 'captura' in permissions %}
+                <a href="{{ url_for('captura.index') }}" class="card">🖥️ CAPTURA</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles %}
+                <a href="{{ url_for('register') }}" class="card admin-card">👤 CREAR USUARIO</a>
+            {% endif %}
+
+            {% if 'superadmin' in roles %}
+                <a href="{{ url_for('manage_users') }}" class="card admin-card">⚙️ ADMINISTRAR USUARIOS</a>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+</body>
+</html>

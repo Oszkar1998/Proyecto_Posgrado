@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captura</title>
+
+  <link rel="stylesheet" href="/static/Estilos/captura.css" />
+  <script src="/static/js/captura.js" defer></script>
+
+</head>
+
+<body>
+
+  <!-- Botón Menú principal -->
+  <header class="header">
+    <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
+      <span>🏠 Menú Principal</span>
+    </div>
+  </header>
+
+  <!-- CONTENIDO -->
+  <main class="container-captura">
+    <h1 class="titulo">CAPTURA</h1>
+    <p class="subtitulo">Selecciona el módulo que deseas capturar</p>
+
+    <div class="grid-opciones">
+      <!-- Opción 1 -->
+      <div class="card-opcion" onclick="mostrarMenuVotos()">
+        <div class="icono">🗳️</div>
+        <div class="texto">
+          <h2>VOTOS</h2>
+          <p>Captura y gestión de votos</p>
+        </div>
+      </div>
+
+      <!-- Opción 2 -->
+      <div class="card-opcion" onclick="mostrarMenuCandidatura()">
+        <div class="icono">👤</div>
+        <div class="texto">
+          <h2>CANDIDATURA</h2>
+          <p>Captura y gestión de candidatura</p>
+        </div>
+      </div>
+
+      <!-- Opción 3 -->
+      <div class="card-opcion" onclick="mostrarMenuActasGrado()">
+        <div class="icono">📄</div>
+        <div class="texto">
+          <h2>ACTAS GRADO</h2>
+          <p>Captura y gestión de actas</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Modal menú VOTOS -->
+  <div id="modal-menu-votos" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content">
+      <h2>VOTOS (PUEI)</h2>
+      <p>Selecciona una opción</p>
+
+      <div class="menu-votos-grid">
+        <button type="button" onclick="abrirVotos('capturar')">CAPTURAR DATOS</button>
+        <button type="button" onclick="abrirVotos('buscar')">BUSQUEDA POR NOMBRE</button>
+        <button type="button" onclick="abrirVotos('modificar')">MODIFICAR DATOS</button>
+      </div>
+
+      <button type="button" class="btn-cerrar" onclick="cerrarMenuVotos()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal menú CANDIDATURA -->
+  <div id="modal-menu-candidatura" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content">
+      <h2>CANDIDATURA</h2>
+      <p>Selecciona una opción</p>
+
+      <div class="menu-votos-grid">
+        <button type="button" onclick="abrirCandidatura('capturar')">CAPTURAR DATOS</button>
+        <button type="button" onclick="abrirCandidatura('buscar')">BUSQUEDA POR NOMBRE</button>
+        <button type="button" onclick="abrirCandidatura('modificar')">MODIFICAR DATOS</button>
+      </div>
+
+      <button type="button" class="btn-cerrar" onclick="cerrarMenuCandidatura()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal menú ACTAS GRADO -->
+  <div id="modal-menu-actas" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content">
+      <h2>ACTAS GRADO</h2>
+      <p>Selecciona una opción</p>
+
+      <div class="menu-votos-grid">
+        <button type="button" onclick="abrirActasGrado('capturar')">CAPTURAR DATOS</button>
+        <button type="button" onclick="abrirActasGrado('modificar')">MODIFICAR DATOS</button>
+      </div>
+
+      <button type="button" class="btn-cerrar" onclick="cerrarMenuActasGrado()">Cerrar</button>
+    </div>
+  </div>
+
+
+</body>
+</html>

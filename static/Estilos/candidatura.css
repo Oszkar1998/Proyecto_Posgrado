@@ -1,0 +1,526 @@
+/* Fondo general */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+/* Contenedor principal */
+.container {
+    margin-top: 150px;
+    background-color: rgba(255, 255, 255, 0.05); /* Transparente */
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+/* Título */
+.container h2 {
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: #facc15; /* Dorado */
+    font-weight: bold;
+}
+
+/* Etiquetas */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #f6c343;
+    text-align: left;
+}
+
+/* Input */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #1f2937;
+    color: #f3f4f6;
+    font-size: 16px;
+}
+
+input[type="text"]::placeholder {
+    color: #9ca3af;
+}
+
+input[type="text"]:focus {
+    border-color: #facc15;
+    outline: none;
+}
+
+/* Botón */
+button[type="submit"],
+#btn-documento-1,
+#btn-documento-2,
+#btn-doc2-sinX,
+#btn-doc2-conX {
+    background-color: #facc15;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button[type="submit"]:hover,
+#btn-documento-1:hover,
+#btn-documento-2:hover,
+#btn-doc2-sinX:hover,
+#btn-doc2-conX:hover {
+    background-color: #eab308;
+    transform: scale(1.03);
+}
+
+/* Botones ocultos y adicionales */
+#botones-expediente,
+#botones-opciones-doc2 {
+    display: none;
+    margin-top: 30px;
+}
+
+/* Regresar botón */
+#regresar-PagPrincipal {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    background: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in-out;
+}
+
+#regresar-PagPrincipal:hover {
+    background: #c82333;
+}
+
+/* Mensaje de estado de validación */
+.estado-validacion {
+  margin-top: 6px;
+  font-size: 14px;
+  text-align: left;
+  transition: color .2s ease, opacity .2s ease;
+  opacity: 0.95;
+  color: #eab308;
+}
+
+.estado-validacion.info  { color: #c3dafe; }   /* azul claro */
+.estado-validacion.ok    { color: #34d399; }   /* verde */
+.estado-validacion.warn  { color: #fbbf24; }   /* ámbar */
+.estado-validacion.error { color: #f87171; }   /* rojo */
+
+
+
+/* ===================== BARRA SUPERIOR (3 botones) ===================== */
+.barra-superior{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+  padding: 18px 20px;
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+.derecha{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin: 0 auto;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+
+/* botones superiores */
+#capturar-container,
+#busquedaNombre-container,
+#modificarDatos-container{
+  background: #f6c343;
+  color: #000;
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+  transition: background .2s ease, transform .2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 210px;
+  text-align: center;
+}
+#capturar-container:hover,
+#busquedaNombre-container:hover,
+#modificarDatos-container:hover{
+  background: #eab308;
+  transform: translateY(-1px);
+}
+
+/* Tu botón de menú principal estaba en absolute, cámbialo a fixed para que no choque */
+#regresar-PagPrincipal{
+  position: fixed;   /* <-- importante */
+  top: 18px;
+  left: 20px;
+  z-index: 60;
+}
+
+/* ===================== MODALES (PARA QUE NO SE VEAN SIEMPRE) ===================== */
+#modal-capturar,
+#modal-busquedaNombre,
+#modal-modificarDatos{
+  position: fixed;
+  inset: 0;
+  display: none;              /* <-- clave: ocultos por defecto */
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* contenedores internos */
+#modal-capturar .modal-content,
+#modal-busquedaNombre .modal-content2,
+#modal-modificarDatos .modal-content3{
+  width: min(680px, 95%);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 22px;
+  color: #f6c343;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.45);
+}
+
+/* inputs dentro de modales */
+#modal-capturar input, #modal-capturar select,
+#modal-busquedaNombre input, #modal-busquedaNombre select,
+#modal-modificarDatos input, #modal-modificarDatos select{
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 14px;
+  font-size: 15px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+/* títulos pegados arriba al scrollear dentro del modal */
+#modal-capturar h2,
+#modal-busquedaNombre h2,
+#modal-modificarDatos h2{
+  margin-top: 0;
+  color: #facc15;
+}
+
+/* scroll bonito */
+#modal-capturar .modal-content::-webkit-scrollbar,
+#modal-busquedaNombre .modal-content2::-webkit-scrollbar,
+#modal-modificarDatos .modal-content3::-webkit-scrollbar{
+  width: 8px;
+}
+#modal-capturar .modal-content::-webkit-scrollbar-thumb,
+#modal-busquedaNombre .modal-content2::-webkit-scrollbar-thumb,
+#modal-modificarDatos .modal-content3::-webkit-scrollbar-thumb{
+  background: #f6c343;
+  border-radius: 10px;
+}
+
+/* ===================== CONSULTA: deja espacio para la barra fija ===================== */
+.container{
+  margin-top: 160px; /* para que no quede debajo de la barra */
+}
+
+/* ===========================
+   MODALES - ESTILO TIPO VOTOS
+   =========================== */
+
+/* Fondo del modal (los 3 comparten) */
+#modal-capturar,
+#modal-busquedaNombre,
+#modal-modificarDatos{
+  position: fixed;
+  inset: 0;
+  display: none;                 /* se abre por JS -> display:flex */
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+  padding: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(2px);
+}
+
+/* Caja interna */
+#modal-capturar .modal-content,
+#modal-busquedaNombre .modal-content2,
+#modal-modificarDatos .modal-content3{
+  width: min(560px, 92%);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  border-radius: 18px;
+
+  padding: 22px 22px 18px;
+  color: #f6c343;
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.12);
+}
+
+/* Scroll bonito */
+#modal-capturar .modal-content::-webkit-scrollbar,
+#modal-busquedaNombre .modal-content2::-webkit-scrollbar,
+#modal-modificarDatos .modal-content3::-webkit-scrollbar{
+  width: 8px;
+}
+#modal-capturar .modal-content::-webkit-scrollbar-thumb,
+#modal-busquedaNombre .modal-content2::-webkit-scrollbar-thumb,
+#modal-modificarDatos .modal-content3::-webkit-scrollbar-thumb{
+  background: #f6c343;
+  border-radius: 10px;
+}
+#modal-capturar .modal-content::-webkit-scrollbar-track,
+#modal-busquedaNombre .modal-content2::-webkit-scrollbar-track,
+#modal-modificarDatos .modal-content3::-webkit-scrollbar-track{
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+}
+
+/* Título sticky como votos */
+#modal-capturar h2,
+#modal-busquedaNombre h2,
+#modal-modificarDatos h2{
+  position: sticky;
+  top: 0;
+  margin: 0 0 16px 0;
+  padding: 14px 0 14px;
+  text-align: center;
+
+  background: rgba(0,0,0,0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+
+  color: #f6c343;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+/* Labels */
+#modal-capturar label,
+#modal-busquedaNombre label,
+#modal-modificarDatos label{
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #f6c343;
+  text-align: left;
+}
+
+/* Inputs / selects */
+#modal-capturar input, #modal-capturar select,
+#modal-busquedaNombre input, #modal-busquedaNombre select,
+#modal-modificarDatos input, #modal-modificarDatos select{
+  width: 100%;
+  padding: 12px;
+  margin: 0 0 10px;
+  font-size: 15px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #1f2937;
+  color: #f3f4f6;
+}
+
+#modal-capturar input::placeholder,
+#modal-busquedaNombre input::placeholder,
+#modal-modificarDatos input::placeholder{
+  color: #9ca3af;
+}
+
+#modal-capturar input:focus, #modal-capturar select:focus,
+#modal-busquedaNombre input:focus, #modal-busquedaNombre select:focus,
+#modal-modificarDatos input:focus, #modal-modificarDatos select:focus{
+  outline: none;
+  border-color: #f6c343;
+  box-shadow: 0 0 6px rgba(246,195,67,0.55);
+}
+
+/* Botones dentro de modales (base) */
+#modal-capturar button,
+#modal-busquedaNombre button,
+#modal-modificarDatos button{
+  padding: 10px 16px;
+  margin: 10px 6px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+#modal-capturar button:hover,
+#modal-busquedaNombre button:hover,
+#modal-modificarDatos button:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* CAPTURAR: Guardar verde / Cancelar rojo */
+#modal-capturar button:first-of-type{ background:#28a745; color:#fff; }
+#modal-capturar button:last-of-type{ background:#dc3545; color:#fff; }
+
+/* BUSCAR: Buscar verde / Cancelar rojo */
+#modal-busquedaNombre button:first-of-type{ background:#28a745; color:#fff; }
+#modal-busquedaNombre button:last-of-type{ background:#dc3545; color:#fff; }
+
+/* MODIFICAR: (tú tienes 2 botones arriba: Cargar/Cerrar) */
+#modal-modificarDatos button:first-of-type{ background:#28a745; color:#fff; }
+#modal-modificarDatos button:last-of-type{ background:#dc3545; color:#fff; }
+
+/* Si quieres que el botón "Guardar Cambios" se vea especial (el que está dentro de mod_form_fields) */
+#modal-modificarDatos #mod_form_fields button{
+  background:#28a745;
+  color:#fff;
+}
+#modal-modificarDatos #mod_form_fields button:hover{
+  background:#23923d;
+}
+
+/* Resultados de búsqueda (cuando pintes resultados) */
+#bus_resultados{
+  margin-top: 14px;
+  text-align: left;
+}
+
+.resultado-item{
+  background: rgba(31,42,55,0.85);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  margin-bottom: 10px;
+}
+.resultado-item strong{
+  display: block;
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #facc15;
+}
+
+/* Responsive */
+@media (max-width: 520px){
+  #modal-capturar .modal-content,
+  #modal-busquedaNombre .modal-content2,
+  #modal-modificarDatos .modal-content3{
+    width: 94%;
+    padding: 18px 16px 14px;
+  }
+}
+
+#folio-container{
+  background:#f6c343;
+  color:#000;
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-left: 200px;
+  display:inline-flex;
+  align-items:center;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+}
+
+/* ===== MODAL FOLIO (ACTA) ===== */
+.modal-folio{
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 290px;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+
+  /* esto evita que se vea “borroso” el contenido */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* OJO: aquí sí aplicamos estilos a TU .modal-content2 pero dentro del modal-folio */
+.modal-folio .modal-content2{
+  width: min(420px, 92%);
+  max-height: 80vh;
+  overflow: auto;
+
+  background: rgba(0,0,0,0.85);   /* más sólido = menos “borroso” */
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  border-radius: 18px;
+  padding: 22px;
+  color: #f6c343;
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.12);
+}
+
+.modal-folio .modal-content2 h2{
+  margin: 0 0 14px 0;
+  text-align: center;
+  color: #facc15;
+  font-weight: 800;
+}
+
+.modal-folio input[type="number"]{
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 14px;
+  font-size: 15px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #1f2937;
+  color: #f3f4f6;
+}
+
+.modal-folio button{
+  padding: 10px 16px;
+  margin: 10px 6px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.modal-folio button:first-of-type{ background:#28a745; color:#fff; }
+.modal-folio button:last-of-type{ background:#dc3545; color:#fff; }

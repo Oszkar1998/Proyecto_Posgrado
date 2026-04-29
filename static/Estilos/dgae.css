@@ -1,0 +1,176 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Evitar scroll innecesario */
+html, body {
+    height: 100%;
+    overflow: hidden; /* 🔥 quita barras de scroll */
+}
+
+/* Fondo general */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+}
+
+/* Botón regresar */
+#regresar-PagPrincipal {
+    background: #dc3545;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+#regresar-PagPrincipal:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* ===== CONTENEDOR ===== */
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Tarjeta */
+.card {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 35px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+/* Título */
+.card h1 {
+    font-size: 24px;
+    color: #facc15;
+    margin-bottom: 10px;
+}
+
+/* Descripción */
+.descripcion {
+    font-size: 14px;
+    color: #d1d5db;
+    margin-bottom: 25px;
+}
+
+/* ===== INPUT ===== */
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #f6c343;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background-color: #1f2937;
+    color: #f3f4f6;
+    font-size: 16px;
+}
+
+.input-group input::placeholder {
+    color: #9ca3af;
+}
+
+.input-group input:focus {
+    border-color: #facc15;
+    outline: none;
+}
+
+/* ===== MENSAJES ===== */
+.estado-validacion {
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: left;
+    color: #eab308;
+    transition: 0.2s;
+}
+
+.estado-validacion.info  { color: #93c5fd; }
+.estado-validacion.ok    { color: #34d399; }
+.estado-validacion.warn  { color: #fbbf24; }
+.estado-validacion.error { color: #f87171; }
+
+/* ===== BOTONES ===== */
+.botones-expediente {
+    display: none;
+    margin-top: 25px;
+}
+
+.botones-expediente button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Sub-opciones */
+.botones-opciones-doc2 {
+    display: none;
+    margin-top: 10px;
+}
+
+/* Botones generales */
+button {
+    background-color: #facc15;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #eab308;
+    transform: scale(1.03);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .card {
+        padding: 25px;
+    }
+
+    .card h1 {
+        font-size: 20px;
+    }
+}

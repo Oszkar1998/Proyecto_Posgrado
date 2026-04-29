@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consulta de Documentos de Posgrado</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/examen.css') }}" />
+    <script src="{{ url_for('static', filename='js/examen.js') }}" defer></script>
+</head>
+
+<body>
+
+    <!-- Barra superior -->
+    <header class="topbar">
+        <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
+            <span>🏠 Menú Principal </span>
+        </div>
+
+        <div class="top-actions">
+            <button id="btn-modificar-datos" type="button" title="Editar datos ya guardados">
+                ✏️ Modificar Datos
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="container">
+        <section class="card">
+            <h1>📘 Consulta de Documentos de Posgrado</h1>
+            <p class="descripcion">Ingrese el número de cuenta para consultar y generar documentos.</p>
+
+            <form id="login-form" autocomplete="off">
+                <div class="input-group">
+                    <label for="numeroDeCuenta">Número de Cuenta</label>
+                    <input
+                        type="text"
+                        id="numeroDeCuenta"
+                        name="numeroDeCuenta"
+                        maxlength="9"
+                        inputmode="numeric"
+                        pattern="[0-9]{9}"
+                        placeholder="Ejemplo: 123456789"
+                        required
+                    />
+                </div>
+            </form>
+
+            <div id="botones-expediente" class="botones-expediente">
+                <button id="btn-documento-5" type="button" data-tipo="5">📄 Citatorio</button>
+                <button id="btn-documento-6" type="button" data-tipo="6">🖋️ Protesta</button>
+                <button id="btn-documento-2" type="button" data-tipo="2">🏅 Medalla</button>
+                <button id="btn-documento-3" type="button" data-tipo="3">📑 Mención Honorífica</button>
+                <button id="btn-documento-7" type="button" data-tipo="7">📝 Acta</button>
+                <button id="btn-documento-4" type="button" data-tipo="4">📚 Todas</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal fecha/hora y datos -->
+    <div class="modal" id="modal-fecha-hora">
+        <div class="modal-content">
+            <h2>Programar Datos</h2>
+
+            <p id="nombre-alumno" class="nombre-alumno"></p>
+
+            <label for="fechaExamen">Fecha</label>
+            <input type="date" id="fechaExamen" name="fechaExamen" required>
+
+            <label for="horaExamen">Hora</label>
+            <input type="time" id="horaExamen" name="horaExamen" required>
+
+            <h3>Datos para Acta</h3>
+            <input type="text" id="ingreso" name="ingreso" placeholder="Ingreso (ej. 2024-1)">
+            <input type="text" id="termino" name="termino" placeholder="Término (ej. 2025-2)">
+            <input type="text" id="promedio" name="promedio" placeholder="Promedio (ej. 9.25)">
+            <input type="text" id="folio" name="folio" placeholder="Folio (ej. 001125048E)">
+
+            <label for="modalidadSede">Sede del examen</label>
+            <div class="select-wrapper">
+                <select id="modalidadSede" name="modalidadSede" required>
+                    <option value="" disabled selected>SELECCIONE LA SEDE</option>
+                    <option value="en la Aula Virtual Universitaria">Aula Virtual Universitaria</option>
+                    <option value="en la Facultad de Ingeniería">Facultad de Ingeniería</option>
+                    <option value="en el Instituto de Ciencias Aplicadas y Tecnología">Instituto de Ciencias Aplicadas y Tecnología</option>
+                    <option value="en el Instituto de Energías Renovables">Instituto de Energías Renovables</option>
+                    <option value="en el Instituto de Ingeniería">Instituto de Ingeniería</option>
+                    <option value="en el Instituto de Matemáticas Aplicadas y Sistemas">Instituto de Matemáticas Aplicadas y Sistemas</option>
+                    <option value="en el Instituto Mexicano de Tecnología del Agua">Instituto Mexicano de Tecnología del Agua</option>
+                </select>
+            </div>
+
+            <h3 id="titulo-tutor">Tutor</h3>
+            <input type="text" id="tutor" name="tutor" placeholder="Tutor">
+
+            <h3 id="titulo-sinodales">Sinodales</h3>
+            <input type="text" id="presidente" name="presidente" placeholder="Presidente">
+            <input type="text" id="vocal1" name="vocal1" placeholder="Primer vocal">
+            <input type="text" id="vocal2" name="vocal2" placeholder="Segundo vocal">
+            <input type="text" id="vocal3" name="vocal3" placeholder="Tercer vocal">
+            <input type="text" id="secretario" name="secretario" placeholder="Secretario">
+
+            <div class="modal-actions">
+                <button type="button" onclick="guardarFechaHora()">✅ Confirmar</button>
+                <button type="button" onclick="cerrarModalFechaHora()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal selección de plan -->
+    <div id="modalSeleccionPlan" class="modal">
+        <div class="modal-content">
+            <h2>Selecciona el plan o nivel</h2>
+            <p id="resumenProgramas" class="modal-resumen"></p>
+            <div id="opcionesPlanes" class="opciones-planes"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn cancel" onclick="cerrarModalSeleccion()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODULO DE REVISIÓN</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/revision.css') }}">
+    <script src="{{ url_for('static', filename='js/revision.js') }}" defer></script>
+</head>
+
+<body>
+    <!-- Barra superior -->
+    <header class="topbar">
+        <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
+            <span>🏠 Menú Principal </span>
+        </div>
+
+        <div class="top-actions">
+            <button id="contador-container" type="button" onclick="mostrarModalContador()">
+                📜 NÚMERO DE OFICIO: <span id="contador-valor">0</span>
+            </button>
+
+            <button id="coordinador-container" type="button" onclick="mostrarModalCoordinador()">
+                🤵‍♂️🤵‍♀️ COORDINADOR
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="container">
+        <section class="card">
+            <h1>📜 Búsqueda de Documentos</h1>
+            <p class="descripcion">Ingrese el número de cuenta del alumno o alumna (9 dígitos).</p>
+
+            <form id="searchForm" method="POST" autocomplete="off">
+                <div class="input-group">
+                    <label for="numDeCuenta">Número de Cuenta</label>
+                    <input
+                        type="text"
+                        id="numDeCuenta"
+                        name="numDeCuenta"
+                        placeholder="Ejemplo: 123456789"
+                        maxlength="9"
+                        inputmode="numeric"
+                        pattern="[0-9]{9}"
+                        required
+                    >
+                </div>
+            </form>
+        </section>
+
+        <p id="hint" class="hint-text">
+            Escribe tu número de cuenta (9 dígitos). Validaremos automáticamente.
+        </p>
+    </main>
+
+    <!-- Modal contador -->
+    <div class="modal-contador" id="modal-contador">
+        <div class="modal-content2">
+            <h2>Actualizar Contador</h2>
+            <input type="number" id="nuevoContador" min="1" required>
+            <div class="modal-actions">
+                <button type="button" onclick="actualizarContador()">✅ Guardar</button>
+                <button type="button" onclick="cerrarModalContador()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal coordinador -->
+    <div class="modal-coordinador" id="modal-coordinador">
+        <div class="modal-content3">
+            <h2>Actualizar Coordinador</h2>
+            <input type="text" id="nombreCoordinador" placeholder="Nombre completo">
+            <select id="sexoCoordinador">
+                <option value="">Selecciona el sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+            </select>
+            <div class="modal-actions">
+                <button type="button" onclick="actualizarCoordinador()">✅ Guardar</button>
+                <button type="button" onclick="cerrarModalCoordinador()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmación usuario no encontrado -->
+    <div id="modal-confirmar-nuevo" class="modal">
+        <div class="modal-content">
+            <h2>⚠ Usuario no encontrado</h2>
+            <p>¿Deseas registrar un nuevo usuario con este número de cuenta?</p>
+            <div class="modal-actions">
+                <button type="button" onclick="mostrarModalNuevoUsuario()">✅ Sí, registrar</button>
+                <button type="button" onclick="cerrarModalConfirmacion()">❌ No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal nuevo usuario -->
+    <div id="modalNuevoUsuario" class="modal-nuevo-usuario">
+        <div class="modal-content">
+            <h2>Registrar Nuevo Usuario</h2>
+            <form id="nuevoUsuarioForm">
+                <input type="text" id="nuevoNombre" placeholder="Nombre completo" required>
+                <input type="text" id="nuevoNumCuenta" placeholder="Número de cuenta" required disabled>
+                <input type="text" id="nuevoPlan" placeholder="Plan de estudios" required>
+                <input type="text" id="nuevoClave" placeholder="Clave" required>
+
+                <select id="nuevoPrograma" required>
+                    <option value="">-- Selecciona programa --</option>
+                    <option value="Especialidad">Especialidad</option>
+                    <option value="Maestria">Maestría</option>
+                    <option value="Doctorado">Doctorado</option>
+                </select>
+
+                <select id="nuevoGenero" required>
+                    <option value="">-- Selecciona género --</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="X">No binario</option>
+                </select>
+
+                <div class="modal-actions">
+                    <button type="submit">✅ Registrar</button>
+                    <button type="button" onclick="cerrarModalNuevoUsuario()">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal selección de plan -->
+    <div id="modalSeleccionPlan" class="modal">
+        <div class="modal-content">
+            <h2>Selecciona el plan para generar documentos</h2>
+            <p id="resumenProgramas" class="modal-resumen"></p>
+            <div id="opcionesPlanes"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn cancel" onclick="cerrarModalSeleccion()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Evita scroll lateral */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ===== BODY ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    width: 100%;
+    padding: 20px 30px 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Botón menú */
+#regresar-PagPrincipal {
+    background: #dc3545;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
+    transition: 0.25s;
+}
+
+#regresar-PagPrincipal:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+/* ===== CONTENEDOR ===== */
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ===== TARJETA ===== */
+.card {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 35px 40px;
+    border-radius: 18px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+/* ===== TEXTO ===== */
+.card h1 {
+    font-size: 22px;
+    color: #facc15;
+    margin-bottom: 10px;
+}
+
+.descripcion {
+    font-size: 14px;
+    color: #d1d5db;
+    margin-bottom: 25px;
+}
+
+/* ===== INPUT ===== */
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #f6c343;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #555;
+    background-color: #1f2937;
+    color: #f3f4f6;
+    font-size: 15px;
+}
+
+.input-group input::placeholder {
+    color: #9ca3af;
+}
+
+.input-group input:focus {
+    border-color: #facc15;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+}
+
+/* ===== MENSAJES ===== */
+.estado-validacion {
+    margin-top: 6px;
+    font-size: 14px;
+    text-align: left;
+    opacity: 0.95;
+}
+
+.estado-validacion.info  { color: #93c5fd; }
+.estado-validacion.ok    { color: #34d399; }
+.estado-validacion.warn  { color: #fbbf24; }
+.estado-validacion.error { color: #f87171; }
+
+/* ===== BOTONES ===== */
+.botones-expediente,
+.botones-opciones-virtual,
+.botones-opciones-presencial {
+    display: none;
+    margin-top: 20px;
+}
+
+/* Grid bonito */
+.botones-expediente {
+    display: none;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.botones-expediente button {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Sub-opciones */
+.botones-opciones-virtual,
+.botones-opciones-presencial {
+    display: none;
+    margin-top: 15px;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Botones generales */
+button {
+    background-color: #facc15;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+button:hover {
+    background-color: #eab308;
+    transform: translateY(-1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .card {
+        padding: 25px;
+    }
+
+    .card h1 {
+        font-size: 20px;
+    }
+}

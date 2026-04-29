@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actas Grado</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/actasGrado.css') }}">
+    <script src="{{ url_for('static', filename='js/actasGrado.js') }}"></script>
+</head>
+
+<body>
+    <!-- Boton para menú principal -->
+    <header class="header">
+        <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
+            <span>🏠 Menú Principal </span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h1 style="margin-top: 3px; font-size: 28px; color: #f7c948;">📜 Búsqueda de Actas</h1>
+            <p class="descripcion">
+                Puede buscar actas ingresando el número de cuenta, el folio, un rango de fechas, el nombre de un <strong>sinodal</strong> o una combinación de ellos. <br>
+                ● Si ingresa <strong>número de cuenta y folio</strong>, se mostrará directamente el acta correspondiente. <br>
+                ● Si ingresa <strong>solo uno</strong> (número de cuenta o folio), se mostrará una lista con las coincidencias encontradas para que elija la que desea consultar. <br>
+                ● Si ingresa <strong>Sinodal</strong>, se listarán todas las actas donde aparezca ese nombre en el jurado. <br>
+                ● Si ingresa <strong>una fecha de inicio y una fecha final</strong>, se mostrarán todas las actas cuyo registro se encuentre dentro de ese rango. <br>
+                ● Puede combinar <strong>Número de Cuenta, Folio o Sinodal</strong> con un rango de fechas para acotar resultados.
+            </p>
+
+            <form id="searchForm" method="POST">
+                <div class="input-group">
+                    <label for="numDeCuenta">Número de Cuenta:</label>
+                    <input type="text" id="numDeCuenta" name="numDeCuenta" placeholder="Ejemplo: 123456789" maxlength="9" inputmode="numeric">
+               
+                    <label for="folio">Folio:</label>
+                    <input type="text" id="folio" name="folio" placeholder="Ejemplo: FOLIO-ABC123">
+
+                    <label for="nombreAlumno">Nombre del Alumno:</label>
+                    <input type="text" id="nombreAlumno" name="nombreAlumno" placeholder="Ejemplo: JUAN PÉREZ">
+
+                    <label for="sinodal">Sinodal:</label>
+                    <input type="text" id="sinodal" name="sinodal" placeholder="Ejemplo: DR. MARÍA PÉREZ LÓPEZ">
+
+                    <label for="fechaInicio">Fecha Inicio:</label>
+                    <input type="date" id="fechaInicio" name="fechaInicio">
+
+                    <label for="fechaFin">Fecha Fin:</label>
+                    <input type="date" id="fechaFin" name="fechaFin">
+                </div>
+
+                <button type="submit" class="btn">🔍 Obtener Documentos</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL: CAPTURA DE DATOS (ACTAS GRADO) ================= -->
+    <div id="modal-capturar-acta" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content" style="max-width:720px; width:95%; max-height:85vh; overflow:auto;">
+        <h2 style="color:#f7c948; margin-top:0;">CAPTURA DE DATOS</h2>
+        <p style="margin-top:-6px;">Ingresa los datos del acta y adjunta el PDF.</p>
+
+        <form id="formCapturaActa" method="POST"
+            action="{{ url_for('actas_grado.guardar_acta') }}"
+            enctype="multipart/form-data">
+
+        <div class="input-group">
+            <label for="folioCap">Folio *</label>
+            <input type="text" id="folioCap" name="folio" required placeholder="Ej: FOLIO-ABC123">
+
+            <label for="cuentaCap">Número de cuenta *</label>
+            <input type="text" id="cuentaCap" name="numCuenta" required maxlength="9" inputmode="numeric" placeholder="Ej: 123456789">
+
+            <label for="nombreCap">Nombre completo *</label>
+            <input type="text" id="nombreCap" name="nombreCompleto" required placeholder="Ej: JUAN PÉREZ">
+
+            <label for="gradoCap">Grado *</label>
+            <input type="text" id="gradoCap" name="grado" required placeholder="Ej: MAESTRÍA / DOCTORADO">
+
+            <label for="semIngCap">Semestre ingreso *</label>
+            <input type="text" id="semIngCap" name="semestreIngreso" required placeholder="Ej: 2022-1">
+
+            <label for="semEgrCap">Semestre egreso *</label>
+            <input type="text" id="semEgrCap" name="semestreEgreso" required placeholder="Ej: 2024-2">
+
+            <label for="promCap">Promedio</label>
+            <input type="text" id="promCap" name="promedio" placeholder="Ej: 9.3">
+
+            <label for="planCap">Plan de estudios</label>
+            <input type="text" id="planCap" name="planEstudios" placeholder="Ej: 2020">
+
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <div>
+                <label for="diaCap">Día *</label>
+                <input type="number" id="diaCap" name="dia" required min="1" max="31" placeholder="24">
+            </div>
+            <div>
+                <label for="mesCap">Mes *</label>
+                <input type="number" id="mesCap" name="mes" required min="1" max="12" placeholder="2">
+            </div>
+            <div>
+                <label for="anioCap">Año *</label>
+                <input type="number" id="anioCap" name="anio" required min="1900" max="2100" placeholder="2026">
+            </div>
+            </div>
+
+            <label for="nacCap">Nacionalidad</label>
+            <input type="text" id="nacCap" name="nacionalidad" placeholder="Ej: MEXICANA">
+
+            <label for="resCap">Resultado *</label>
+            <input type="text" id="resCap" name="resultado" required placeholder="Ej: APROBADO">
+
+            <label for="presCap">Presidente *</label>
+            <input type="text" id="presCap" name="presidente" required>
+
+            <label for="secCap">Secretario *</label>
+            <input type="text" id="secCap" name="secretario" required>
+
+            <label for="v1Cap">Vocal 1 *</label>
+            <input type="text" id="v1Cap" name="vocal1" required>
+
+            <label for="v2Cap">Vocal 2</label>
+            <input type="text" id="v2Cap" name="vocal2">
+
+            <label for="v3Cap">Vocal 3</label>
+            <input type="text" id="v3Cap" name="vocal3">
+
+            <label for="sexoCap">Sexo *</label>
+            <select id="sexoCap" name="sexo" required>
+            <option value="">Seleccione…</option>
+            <option value="M">M</option>
+            <option value="F">F</option>
+            </select>
+
+            <label for="pdfCap">Acta PDF *</label>
+            <input type="file" id="pdfCap" name="actaPDF" accept="application/pdf" required>
+            <small style="opacity:.8;">Solo PDF. Evita escaneos muy pesados.</small>
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+            <button type="submit" class="btn" style="width:200px;">💾 Guardar</button>
+            <button type="button" class="btn" style="background:#d9534f; width:200px;"
+                    onclick="cerrarModal('modal-capturar-acta')">✖ Cancelar</button>
+        </div>
+        </form>
+    </div>
+    </div>
+
+    
+    <!-- ================= MODAL: MODIFICAR DATOS (ACTAS GRADO) ================= -->
+    <div id="modal-modificar-acta" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content" style="max-width:720px; width:95%; max-height:85vh; overflow:auto;">
+        <h2 style="color:#f7c948; margin-top:0;">MODIFICAR DATOS</h2>
+        <p style="margin-top:-6px;">Busca por <strong>Número de cuenta</strong> y <strong>Folio</strong>, luego edita y guarda.</p>
+
+        <!-- Buscar -->
+        <form id="formBuscarModificarActa" method="POST" action="{{ url_for('actas_grado.get_acta_json') }}">
+        <div class="input-group">
+            <label>Número de cuenta *</label>
+            <input type="text" name="numCuenta" id="mod_numCuenta_buscar" maxlength="9" inputmode="numeric" required>
+
+            <label>Folio *</label>
+            <input type="text" name="folio" id="mod_folio_buscar" required>
+
+            <button type="button" class="btn" style="width:200px;" onclick="buscarActaParaModificar()">🔎 Buscar</button>
+        </div>
+        </form>
+
+        <hr style="opacity:.2; margin:18px 0;">
+
+        <!-- Editar -->
+        <form id="formGuardarModificarActa" method="POST"
+            action="{{ url_for('actas_grado.actualizar_acta') }}"
+            enctype="multipart/form-data">
+
+        <!-- Llave oculta -->
+        <input type="hidden" name="old_numCuenta" id="old_numCuenta">
+        <input type="hidden" name="old_folio" id="old_folio">
+
+        <div class="input-group">
+            <label>Folio *</label>
+            <input type="text" name="folio" id="mod_folio" required>
+
+            <label>Número de cuenta *</label>
+            <input type="text" name="numCuenta" id="mod_numCuenta" maxlength="9" inputmode="numeric" required>
+
+            <label>Nombre completo *</label>
+            <input type="text" name="nombreCompleto" id="mod_nombreCompleto" required>
+
+            <label>Grado *</label>
+            <input type="text" name="grado" id="mod_grado" required>
+
+            <label>Semestre ingreso *</label>
+            <input type="text" name="semestreIngreso" id="mod_semestreIngreso" required>
+
+            <label>Semestre egreso *</label>
+            <input type="text" name="semestreEgreso" id="mod_semestreEgreso" required>
+
+            <label>Promedio</label>
+            <input type="text" name="promedio" id="mod_promedio">
+
+            <label>Plan de estudios</label>
+            <input type="text" name="planEstudios" id="mod_planEstudios">
+
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <div>
+                <label>Día *</label>
+                <input type="number" name="dia" id="mod_dia" min="1" max="31" required>
+            </div>
+            <div>
+                <label>Mes *</label>
+                <input type="number" name="mes" id="mod_mes" min="1" max="12" required>
+            </div>
+            <div>
+                <label>Año *</label>
+                <input type="number" name="anio" id="mod_anio" min="1900" max="2100" required>
+            </div>
+            </div>
+
+            <label>Nacionalidad</label>
+            <input type="text" name="nacionalidad" id="mod_nacionalidad">
+
+            <label>Resultado *</label>
+            <input type="text" name="resultado" id="mod_resultado" required>
+
+            <label>Presidente *</label>
+            <input type="text" name="presidente" id="mod_presidente" required>
+
+            <label>Secretario *</label>
+            <input type="text" name="secretario" id="mod_secretario" required>
+
+            <label>Vocal 1 *</label>
+            <input type="text" name="vocal1" id="mod_vocal1" required>
+
+            <label>Vocal 2</label>
+            <input type="text" name="vocal2" id="mod_vocal2">
+
+            <label>Vocal 3</label>
+            <input type="text" name="vocal3" id="mod_vocal3">
+
+            <label>Sexo *</label>
+            <select name="sexo" id="mod_sexo" required>
+            <option value="">Seleccione…</option>
+            <option value="M">M</option>
+            <option value="F">F</option>
+            </select>
+
+            <label>Reemplazar PDF (opcional)</label>
+            <input type="file" name="actaPDF" id="mod_pdf" accept="application/pdf">
+            <small style="opacity:.8;">Si no subes PDF, se conserva el actual.</small>
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+            <button type="submit" class="btn" style="width:220px;">💾 Guardar Cambios</button>
+            <button type="button" class="btn" style="background:#d9534f; width:200px;"
+                    onclick="cerrarModal('modal-modificar-acta')">✖ Cancelar</button>
+        </div>
+        </form>
+    </div>
+    </div>
+
+    
+    {% if mensaje %}
+    <div class="alerta">{{ mensaje }}</div>
+    {% endif %}
+
+    {% if resultados %}
+        <div class="resultados">
+            <h2>{{ resultados|length }} resultado(s) encontrado(s):</h2>
+            <ul>
+                {% for folio, numCuenta, nombre in resultados %}
+                    {% set enlace = url_for("actas_grado.ver_pdf", num_cuenta=numCuenta, folio=folio) %}
+                    <li>
+                        <strong>{{ nombre }}</strong> - Cuenta: {{ numCuenta }} - Folio: {{ folio }}
+                        <button class="btn abrir-acta" data-url="{{ enlace }}">Ver Acta 📄</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-overlay" class="flash-overlay" style="display:flex;">
+        <div class="flash-box">
+            {% for category, msg in messages %}
+            <div class="flash-msg {{ category }}">{{ msg }}</div>
+            {% endfor %}
+            <button type="button" class="flash-btn" onclick="cerrarFlash()">OK</button>
+        </div>
+        </div>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>
