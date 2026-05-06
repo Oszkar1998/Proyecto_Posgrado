@@ -1204,7 +1204,8 @@ def modificMombreSinodal(cadena):
         "LIC": "Lic.",
         "QFB": "QFB",
         "MTRO": "Mtro.",
-        "PROF": "Prof."
+        "PROF": "Prof.",
+        "MA": "M.A."
     }
 
     partes = cadena.strip().split()

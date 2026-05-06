@@ -451,3 +451,63 @@ def actualizar_acta():
 
     flash("✅ Cambios guardados correctamente.", "success")
     return redirect(url_for("actas_grado.index"))
+
+@actas_grado_bp.route("/guardar_fecha_extra", methods=["POST"])
+def guardar_fecha_extra():
+    numCuenta = (request.form.get("numCuenta") or "").strip()
+    folio = (request.form.get("folio") or "").strip()
+    fecha = (request.form.get("fecha") or "").strip()
+    campo = (request.form.get("campo") or "").strip()
+
+    if not numCuenta or not folio or not fecha or not campo:
+        flash("❌ Debes ingresar número de cuenta, folio y fecha.", "error")
+        return redirect(url_for("actas_grado.index"))
+
+    if campo not in ["pagoSinodales", "dgaeEntregaCarpeta"]:
+        flash("❌ Campo no válido.", "error")
+        return redirect(url_for("actas_grado.index"))
+
+    try:
+        numCuenta_int = int(numCuenta)
+    except ValueError:
+        flash("❌ El número de cuenta debe ser numérico.", "error")
+        return redirect(url_for("actas_grado.index", open=campo))
+
+    conn = sqlite3.connect(direccionBase)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nombreCompleto
+        FROM actasGrado
+        WHERE numCuenta = ? AND folio = ?
+        LIMIT 1
+    """, (numCuenta_int, folio))
+
+    acta = cursor.fetchone()
+
+    if not acta:
+        conn.close()
+        flash("❌ No se encontró ningún registro con ese número de cuenta y folio.", "error")
+        return redirect(url_for("actas_grado.index", open=campo))
+
+    if campo == "pagoSinodales":
+        cursor.execute("""
+            UPDATE actasGrado
+            SET pagoSinodales = ?
+            WHERE numCuenta = ? AND folio = ?
+        """, (fecha, numCuenta_int, folio))
+        mensaje = "✅ Fecha de pago de sinodales guardada correctamente."
+
+    else:
+        cursor.execute("""
+            UPDATE actasGrado
+            SET dgaeEntregaCarpeta = ?
+            WHERE numCuenta = ? AND folio = ?
+        """, (fecha, numCuenta_int, folio))
+        mensaje = "✅ Fecha de entrega de carpeta DGAE guardada correctamente."
+
+    conn.commit()
+    conn.close()
+
+    flash(mensaje, "success")
+    return redirect(url_for("actas_grado.index"))

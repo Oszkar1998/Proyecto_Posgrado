@@ -264,6 +264,61 @@
     </div>
     </div>
 
+    <!-- ================= MODAL: FECHAS EXTRA ACTAS GRADO ================= -->
+    <div id="modal-fecha-extra-acta" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content" style="max-width:560px; width:95%;">
+
+        <h2 id="tituloFechaExtra" style="color:#f7c948; margin-top:0;">
+        REGISTRAR FECHA
+        </h2>
+
+        <p id="descripcionFechaExtra" style="margin-top:-6px;">
+        Ingresa número de cuenta, folio y fecha.
+        </p>
+
+        <form id="formFechaExtraActa" method="POST"
+            action="{{ url_for('actas_grado.guardar_fecha_extra') }}">
+
+        <input type="hidden" name="campo" id="campoFechaExtra">
+
+        <div class="input-group">
+            <label for="fechaExtraNumCuenta">Número de cuenta *</label>
+            <input type="text"
+                id="fechaExtraNumCuenta"
+                name="numCuenta"
+                maxlength="9"
+                inputmode="numeric"
+                required
+                placeholder="Ej: 123456789">
+
+            <label for="fechaExtraFolio">Folio *</label>
+            <input type="text"
+                id="fechaExtraFolio"
+                name="folio"
+                required
+                placeholder="Ej: FOLIO-ABC123">
+
+            <label for="fechaExtraFecha">Fecha *</label>
+            <input type="date"
+                id="fechaExtraFecha"
+                name="fecha"
+                required>
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+            <button type="submit" class="btn" style="width:220px;">💾 Guardar Fecha</button>
+
+            <button type="button"
+                    class="btn"
+                    style="background:#d9534f; width:180px;"
+                    onclick="cerrarModal('modal-fecha-extra-acta')">
+            ✖ Cancelar
+            </button>
+        </div>
+        </form>
+
+    </div>
+    </div>
     
     {% if mensaje %}
     <div class="alerta">{{ mensaje }}</div>

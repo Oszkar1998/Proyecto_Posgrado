@@ -15,6 +15,32 @@ function cerrarFlash() {
   if (f) f.style.display = "none";
 }
 
+function abrirModalFechaExtra(campo) {
+  const modal = document.getElementById("modal-fecha-extra-acta");
+  const inputCampo = document.getElementById("campoFechaExtra");
+  const titulo = document.getElementById("tituloFechaExtra");
+  const descripcion = document.getElementById("descripcionFechaExtra");
+
+  if (!modal || !inputCampo || !titulo || !descripcion) {
+    alert("No existe el modal de fecha extra en el HTML.");
+    return;
+  }
+
+  inputCampo.value = campo;
+
+  if (campo === "pagoSinodales") {
+    titulo.textContent = "PAGO SINODALES";
+    descripcion.textContent = "Ingresa número de cuenta, folio y la fecha de pago de sinodales.";
+  }
+
+  if (campo === "dgaeEntregaCarpeta") {
+    titulo.textContent = "DGAE ENTREGA CARPETA";
+    descripcion.textContent = "Ingresa número de cuenta, folio y la fecha de entrega de carpeta a DGAE.";
+  }
+
+  abrirModal("modal-fecha-extra-acta");
+}
+
 /**
  * Busca un acta (numCuenta + folio) y rellena el formulario de modificación.
  * Requiere backend: POST /actasGrado/get_acta (JSON) -> retorna los campos.
@@ -120,6 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (open === "capturar") abrirModal("modal-capturar-acta");
   if (open === "buscar") abrirModal("modal-buscar-acta");
   if (open === "modificar") abrirModal("modal-modificar-acta");
+  if (open === "pagoSinodales") abrirModalFechaExtra("pagoSinodales");
+  if (open === "dgaeEntregaCarpeta") abrirModalFechaExtra("dgaeEntregaCarpeta");
 
   // 3) Cerrar con ESC
   document.addEventListener("keydown", (e) => {
@@ -127,12 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarModal("modal-capturar-acta");
     cerrarModal("modal-buscar-acta");
     cerrarModal("modal-modificar-acta");
+    cerrarModal("modal-fecha-extra-acta");
     cerrarFlash();
   });
 
   // 4) Click fuera para cerrar modales + flash
   document.addEventListener("click", (e) => {
-    ["modal-capturar-acta", "modal-buscar-acta", "modal-modificar-acta"].forEach((id) => {
+    ["modal-capturar-acta", "modal-buscar-acta", "modal-modificar-acta", "modal-fecha-extra-acta"].forEach((id) => {
       const m = document.getElementById(id);
       if (m && m.style.display === "flex" && e.target === m) cerrarModal(id);
     });
