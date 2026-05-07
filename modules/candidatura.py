@@ -234,19 +234,26 @@ def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
     elif modalidadSedepos == "En el Instituto de Energías Renovables":
         modalidadSedepos = "Instituto de Energías Renovables"
 
+
+    # ETIQUETA
     pdf.set_font("Arial", size=12)
     pdf.set_xy(18, 80)
-    pdf.multi_cell(20, 5, "Lugar: ", align="C")
+    pdf.cell(25, 5, "Lugar:")
+    # VALOR
     pdf.set_font("Arial", size=12, style="B")
-    pdf.set_xy(8, 80)
-    pdf.multi_cell(100, 5, modalidadSedepos, align="C")
+    pdf.set_xy(32, 80)
+    pdf.multi_cell(140, 5, modalidadSedepos, align="L")
 
+
+    fechaHora = f"{diaExa} de {mesExa} de {anoExa}, a las {horaExamenPos} hrs."
+    # ETIQUETA
     pdf.set_font("Arial", size=12)
-    pdf.ln(2)
-    pdf.multi_cell(50, 5, "Fecha y Hora: ", align="C")
+    pdf.set_xy(18, 92)
+    pdf.cell(40, 5, "Fecha y Hora:")
+    # VALOR
     pdf.set_font("Arial", size=12, style="B")
-    pdf.set_xy(40, 87)
-    pdf.multi_cell(100, 5, diaExa + " de " + mesExa + " de " + anoExa + ", a las " + horaExamenPos + " hrs.", align="C")
+    pdf.set_xy(47, 92)
+    pdf.multi_cell(120, 5, fechaHora, align="L")
 
     pdf.set_font("Arial", size=12)
     pdf.ln(10)
