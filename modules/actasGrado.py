@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Blueprint, render_template, request, url_for, send_file, abort, redirect, flash
+from flask import Blueprint, render_template, request, url_for, send_file, abort, redirect, flash, jsonify
 import io
 from datetime import datetime
 from auth import permission_required
@@ -511,3 +511,75 @@ def guardar_fecha_extra():
 
     flash(mensaje, "success")
     return redirect(url_for("actas_grado.index"))
+
+@actas_grado_bp.route("/buscar_pago_sinodales", methods=["POST"])
+def buscar_pago_sinodales():
+    data = request.get_json(silent=True) or {}
+
+    sinodal = (data.get("sinodal") or "").strip().lower()
+    fecha_inicio = (data.get("fechaInicio") or "").strip()
+    fecha_fin = (data.get("fechaFin") or "").strip()
+
+    if not sinodal:
+        return jsonify({"ok": False, "error": "Ingresa el nombre del sinodal."}), 400
+
+    f_ini = f_fin = None
+    if fecha_inicio and fecha_fin:
+        try:
+            f_ini = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+            f_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"ok": False, "error": "Formato de fecha inválido."}), 400
+
+    conn = sqlite3.connect(direccionBase)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT folio, numCuenta, nombreCompleto, dia, mes, anio,
+               presidente, secretario, vocal1, vocal2, vocal3,
+               pagoSinodales
+        FROM actasGrado
+    """)
+
+    filas = cursor.fetchall()
+    conn.close()
+
+    resultados = []
+
+    for fila in filas:
+        jurado = [
+            fila["presidente"],
+            fila["secretario"],
+            fila["vocal1"],
+            fila["vocal2"],
+            fila["vocal3"]
+        ]
+
+        coincide_sinodal = any(sinodal in str(nombre or "").lower() for nombre in jurado)
+
+        if not coincide_sinodal:
+            continue
+
+        if f_ini and f_fin:
+            try:
+                fecha_acta = datetime(int(fila["anio"]), int(fila["mes"]), int(fila["dia"]))
+                if not (f_ini <= fecha_acta <= f_fin):
+                    continue
+            except Exception:
+                continue
+        
+        # SOLO mostrar si ya tiene fecha de pago
+        if not fila["pagoSinodales"]:
+            continue
+
+        resultados.append({
+            "folio": fila["folio"],
+            "numCuenta": fila["numCuenta"],
+            "nombreCompleto": fila["nombreCompleto"],
+            "fechaActa": f'{fila["dia"]}/{fila["mes"]}/{fila["anio"]}',
+            "pagoSinodales": fila["pagoSinodales"]
+        })
+
+    return jsonify({"ok": True, "resultados": resultados})
+

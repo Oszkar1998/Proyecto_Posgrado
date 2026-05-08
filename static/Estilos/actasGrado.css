@@ -277,3 +277,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
 }
+
+#descripcionFechaExtra {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+#seccionBusquedaPagoSinodales p {
+    color: #ffffff !important;
+    font-weight: 400 !important;
+}
+
+#seccionBusquedaPagoSinodales label {
+    color: #f7c948 !important;
+}

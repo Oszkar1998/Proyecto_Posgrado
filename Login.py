@@ -23,7 +23,7 @@ from modules.pagoExamen import pagoExamen_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-cambiar-en-produccion")
-
+ 
 # Registrar Blueprints
 app.register_blueprint(actas_grado_bp, url_prefix='/actasGrado')
 app.register_blueprint(revision_bp, url_prefix='/revision')

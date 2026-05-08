@@ -20,6 +20,7 @@ function abrirModalFechaExtra(campo) {
   const inputCampo = document.getElementById("campoFechaExtra");
   const titulo = document.getElementById("tituloFechaExtra");
   const descripcion = document.getElementById("descripcionFechaExtra");
+  const opcionesPago = document.getElementById("opcionesPagoSinodales");
 
   if (!modal || !inputCampo || !titulo || !descripcion) {
     alert("No existe el modal de fecha extra en el HTML.");
@@ -30,15 +31,122 @@ function abrirModalFechaExtra(campo) {
 
   if (campo === "pagoSinodales") {
     titulo.textContent = "PAGO SINODALES";
-    descripcion.textContent = "Ingresa número de cuenta, folio y la fecha de pago de sinodales.";
+    descripcion.textContent = "";
+    if (opcionesPago) opcionesPago.style.display = "grid";
+
+    const pago = document.getElementById("seccionPagoFecha");
+    const busqueda = document.getElementById("seccionBusquedaPagoSinodales");
+
+    if (pago) pago.style.display = "none";
+    if (busqueda) busqueda.style.display = "none";
   }
 
   if (campo === "dgaeEntregaCarpeta") {
     titulo.textContent = "DGAE ENTREGA CARPETA";
     descripcion.textContent = "Ingresa número de cuenta, folio y la fecha de entrega de carpeta a DGAE.";
+    if (opcionesPago) opcionesPago.style.display = "none";
+    mostrarSeccionPagoSinodales("pago");
   }
 
   abrirModal("modal-fecha-extra-acta");
+}
+
+function mostrarSeccionPagoSinodales(seccion) {
+  const pago = document.getElementById("seccionPagoFecha");
+  const busqueda = document.getElementById("seccionBusquedaPagoSinodales");
+  const descripcion = document.getElementById("descripcionFechaExtra");
+
+  if (!pago || !busqueda) return;
+
+  if (seccion === "pago") {
+    pago.style.display = "block";
+    busqueda.style.display = "none";
+    if (descripcion) descripcion.textContent = "Ingresa número de cuenta, folio y la fecha de pago de sinodales.";
+  }
+
+  if (seccion === "busqueda") {
+    pago.style.display = "none";
+    busqueda.style.display = "block";
+    if (descripcion) descripcion.textContent = "";
+  }
+}
+
+async function buscarPagoSinodales() {
+  const sinodal = document.getElementById("buscarSinodalPago").value.trim();
+  const fechaInicio = document.getElementById("buscarPagoFechaInicio").value;
+  const fechaFin = document.getElementById("buscarPagoFechaFin").value;
+  const contenedor = document.getElementById("resultadosPagoSinodales");
+
+  contenedor.innerHTML = "";
+
+  if (!sinodal) {
+    contenedor.innerHTML = `<p style="color:#ff8080;">Ingresa el nombre del sinodal.</p>`;
+    return;
+  }
+
+  if ((fechaInicio && !fechaFin) || (!fechaInicio && fechaFin)) {
+    contenedor.innerHTML = `<p style="color:#ff8080;">Si usas rango de fechas, coloca inicio y fin.</p>`;
+    return;
+  }
+
+  let resp;
+  let data;
+
+  try {
+    resp = await fetch("/actasGrado/buscar_pago_sinodales", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        sinodal,
+        fechaInicio,
+        fechaFin
+      })
+    });
+
+    data = await resp.json();
+  } catch (error) {
+    contenedor.innerHTML = `<p style="color:#ff8080;">Error al conectar con el servidor.</p>`;
+    return;
+  }
+
+  if (!resp.ok || !data.ok) {
+    contenedor.innerHTML = `<p style="color:#ff8080;">${data.error || "Error en la búsqueda."}</p>`;
+    return;
+  }
+
+  if (data.resultados.length === 0) {
+    contenedor.innerHTML = `<p style="color:#f7c948;">No se encontraron coincidencias.</p>`;
+    return;
+  }
+
+  let html = `
+    <h3 style="color:#f7c948;">${data.resultados.length} resultado(s)</h3>
+    <div style="max-height:260px; overflow:auto;">
+  `;
+
+  data.resultados.forEach(r => {
+    html += `
+      <div style="
+        background:#1f2a37;
+        border:1px solid rgba(247,201,72,.25);
+        border-radius:10px;
+        padding:12px;
+        margin-bottom:10px;
+        color:white;
+      ">
+        <strong>${r.nombreCompleto}</strong><br>
+        Cuenta: ${r.numCuenta}<br>
+        Folio: ${r.folio}<br>
+        Fecha del acta: ${r.fechaActa}<br>
+        Pago sinodales: <strong>${r.pagoSinodales}</strong>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  contenedor.innerHTML = html;
 }
 
 /**
