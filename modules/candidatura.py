@@ -57,6 +57,17 @@ def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int
     pdf.multi_cell(150, 5, "ACTA DE CANDIDATURA AL GRADO DE " + grado, align="C")
     
 
+    if modalidadSedepos == "Facultad de Ingeniería":
+        modalidadSedepos = "En la Facultad de Ingeniería"
+    elif modalidadSedepos == "Aula Virtual Universitaria":
+        modalidadSedepos = "En la Aula Virtual Universitaria"
+    elif modalidadSedepos == "Instituto de Ingeniería":
+        modalidadSedepos = "En el Instituto de Ingeniería"
+    elif modalidadSedepos == "Instituto de Ciencias Aplicadas y Tecnología":
+        modalidadSedepos = "Instituto de Ciencias Aplicadas y Tecnología"
+    elif modalidadSedepos == "Instituto de Energías Renovables":
+        modalidadSedepos = "En el Instituto de Energías Renovables"
+
     parrafo_html = (
         f"<p>{modalidadSedepos} de la Universidad Nacional Autónoma de México, siendo las "
         f"<b>{horaExamenPos} horas</b> del dia <b>{diaExa} de {mesExa} de {anoExa},</b> se presentó:</p>"
