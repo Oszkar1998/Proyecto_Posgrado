@@ -81,13 +81,6 @@ document.addEventListener("keydown", function (event) {
     }
 });
 
-// 🔹 Cerrar el modal al hacer clic fuera del contenido
-document.getElementById("modal-capturar").addEventListener("click", function (event) {
-    if (event.target === this) {
-        cerrarModalCapturar();
-    }
-});
-
 // 🔹 Guardar nuevo Captura de Datos
 function actualizarCapturar() {
     const data = {
@@ -156,13 +149,6 @@ function cerrarModalBusquedaNombre() {
 // 🔹 Cerrar el modal si se presiona ESC
 document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
-        cerrarModalBusquedaNombre();
-    }
-});
-
-// 🔹 Cerrar el modal al hacer clic fuera del contenido
-document.getElementById("modal-busquedaNombre").addEventListener("click", function (event) {
-    if (event.target === this) {
         cerrarModalBusquedaNombre();
     }
 });
@@ -280,13 +266,6 @@ function cerrarModalModificarDatos() {
 // 🔹 Cerrar el modal si se presiona ESC
 document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
-        cerrarModalModificarDatos();
-    }
-});
-
-// 🔹 Cerrar el modal al hacer clic fuera del contenido
-document.getElementById("modal-modificarDatos").addEventListener("click", function (event) {
-    if (event.target === this) {
         cerrarModalModificarDatos();
     }
 });

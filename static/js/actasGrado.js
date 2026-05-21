@@ -1,4 +1,3 @@
-// static/js/actasGrado.js (LIMPIO)
 
 function abrirModal(id) {
   const m = document.getElementById(id);
@@ -137,10 +136,11 @@ async function buscarPagoSinodales() {
         color:white;
       ">
         <strong>${r.nombreCompleto}</strong><br>
-        Cuenta: ${r.numCuenta}<br>
-        Folio: ${r.folio}<br>
-        Fecha del acta: ${r.fechaActa}<br>
-        Pago sinodales: <strong>${r.pagoSinodales}</strong>
+        Nùmero de Cuenta: <strong>${r.numCuenta}</strong><br>
+        Folio: <strong>${r.folio}</strong><br>
+        Fecha del Acta: <strong>${r.fechaActa}</strong><br>
+        Fecha Examen: <strong>${r.pagoSinodales}</strong><br>
+        Fecha Entrega DGAE: <strong>${r.dgaeEntregaCarpeta}</strong>
       </div>
     `;
   });
@@ -265,16 +265,5 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarModal("modal-modificar-acta");
     cerrarModal("modal-fecha-extra-acta");
     cerrarFlash();
-  });
-
-  // 4) Click fuera para cerrar modales + flash
-  document.addEventListener("click", (e) => {
-    ["modal-capturar-acta", "modal-buscar-acta", "modal-modificar-acta", "modal-fecha-extra-acta"].forEach((id) => {
-      const m = document.getElementById(id);
-      if (m && m.style.display === "flex" && e.target === m) cerrarModal(id);
-    });
-
-    const f = document.getElementById("flash-overlay");
-    if (f && f.style.display === "flex" && e.target === f) cerrarFlash();
   });
 });

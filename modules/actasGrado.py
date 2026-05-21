@@ -538,7 +538,7 @@ def buscar_pago_sinodales():
     cursor.execute("""
         SELECT folio, numCuenta, nombreCompleto, dia, mes, anio,
                presidente, secretario, vocal1, vocal2, vocal3,
-               pagoSinodales
+               pagoSinodales, dgaeEntregaCarpeta
         FROM actasGrado
     """)
 
@@ -578,7 +578,8 @@ def buscar_pago_sinodales():
             "numCuenta": fila["numCuenta"],
             "nombreCompleto": fila["nombreCompleto"],
             "fechaActa": f'{fila["dia"]}/{fila["mes"]}/{fila["anio"]}',
-            "pagoSinodales": fila["pagoSinodales"]
+            "pagoSinodales": fila["pagoSinodales"],
+            "dgaeEntregaCarpeta": fila["dgaeEntregaCarpeta"],
         })
 
     return jsonify({"ok": True, "resultados": resultados})

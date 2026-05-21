@@ -330,31 +330,6 @@ async function guardarCambiosCandidatura() {
   }
 }
 
-// ✅ Cerrar modales al hacer clic fuera del contenido (igual que votos)
-document.addEventListener("DOMContentLoaded", () => {
-  const mCapt = document.getElementById("modal-capturar");
-  const mBus  = document.getElementById("modal-busquedaNombre");
-  const mMod  = document.getElementById("modal-modificarDatos");
-
-  if (mCapt) {
-    mCapt.addEventListener("click", (event) => {
-      if (event.target === mCapt) cerrarModalCapturar();
-    });
-  }
-
-  if (mBus) {
-    mBus.addEventListener("click", (event) => {
-      if (event.target === mBus) cerrarModalBusquedaNombre();
-    });
-  }
-
-  if (mMod) {
-    mMod.addEventListener("click", (event) => {
-      if (event.target === mMod) cerrarModalModificarDatos();
-    });
-  }
-});
-
 async function guardarCapturaCandidatura() {
   const payload = {
     nombre_completo: document.getElementById("cap_nombre_completo").value.trim(),
