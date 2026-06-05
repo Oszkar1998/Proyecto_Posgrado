@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnPresencialNinguna = document.getElementById("btn-presencial-ninguna");
 
     let cuentaValidada = "";
+    let seleccionIdGlobal = "";
     let debounceId = null;
 
     inicializarUI();
@@ -53,51 +54,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (btnVirtualTodasX) {
-            btnVirtualTodasX.addEventListener("click", () => {
-                abrirDocumento("virtual_todas_x");
-            });
+            btnVirtualTodasX.addEventListener("click", () => abrirDocumento("virtual_todas_x"));
         }
 
         if (btnVirtualMencion) {
-            btnVirtualMencion.addEventListener("click", () => {
-                abrirDocumento("virtual_sin_mencion_honorifica");
-            });
+            btnVirtualMencion.addEventListener("click", () => abrirDocumento("virtual_sin_mencion_honorifica"));
         }
 
         if (btnVirtualMedalla) {
-            btnVirtualMedalla.addEventListener("click", () => {
-                abrirDocumento("virtual_sin_medalla_alfonso_caso");
-            });
+            btnVirtualMedalla.addEventListener("click", () => abrirDocumento("virtual_sin_medalla_alfonso_caso"));
         }
 
         if (btnVirtualNinguna) {
-            btnVirtualNinguna.addEventListener("click", () => {
-                abrirDocumento("virtual_sin_mencion_y_medalla");
-            });
+            btnVirtualNinguna.addEventListener("click", () => abrirDocumento("virtual_sin_mencion_y_medalla"));
         }
 
         if (btnPresencialTodasX) {
-            btnPresencialTodasX.addEventListener("click", () => {
-                abrirDocumento("presencial_todas_x");
-            });
+            btnPresencialTodasX.addEventListener("click", () => abrirDocumento("presencial_todas_x"));
         }
 
         if (btnPresencialMencion) {
-            btnPresencialMencion.addEventListener("click", () => {
-                abrirDocumento("presencial_sin_mencion_honorifica");
-            });
+            btnPresencialMencion.addEventListener("click", () => abrirDocumento("presencial_sin_mencion_honorifica"));
         }
 
         if (btnPresencialMedalla) {
-            btnPresencialMedalla.addEventListener("click", () => {
-                abrirDocumento("presencial_sin_medalla_alfonso_caso");
-            });
+            btnPresencialMedalla.addEventListener("click", () => abrirDocumento("presencial_sin_medalla_alfonso_caso"));
         }
 
         if (btnPresencialNinguna) {
-            btnPresencialNinguna.addEventListener("click", () => {
-                abrirDocumento("presencial_sin_mencion_y_medalla");
-            });
+            btnPresencialNinguna.addEventListener("click", () => abrirDocumento("presencial_sin_mencion_y_medalla"));
         }
     }
 
@@ -109,10 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function mostrarFlex(elemento) {
         if (elemento) elemento.style.display = "flex";
-    }
-
-    function mostrarBlock(elemento) {
-        if (elemento) elemento.style.display = "block";
     }
 
     function ocultar(elemento) {
@@ -128,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ocultar(contBotones);
         ocultarOpcionesSecundarias();
         cuentaValidada = "";
+        seleccionIdGlobal = "";
     }
 
     function normalizarCuenta(valor) {
@@ -152,20 +134,93 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await response.json();
 
-            if (data.success) {
-                cuentaValidada = numeroDeCuenta;
-                setEstado("ok", "Cuenta validada correctamente.");
-                mostrarFlex(contBotones);
-            } else {
+            if (!data.success) {
                 limpiarUI();
                 setEstado("error", data.error || "No se pudo validar la cuenta.");
+                return;
             }
+
+            if (data.multiples && data.multiples.length > 1) {
+                cuentaValidada = numeroDeCuenta;
+                seleccionIdGlobal = "";
+                ocultar(contBotones);
+                ocultarOpcionesSecundarias();
+                mostrarModalSeleccion(data.multiples, data.resumen || "");
+                setEstado("warn", "Selecciona el plan que deseas usar.");
+                return;
+            }
+
+            cuentaValidada = numeroDeCuenta;
+            setEstado("ok", "Cuenta validada correctamente.");
+            mostrarFlex(contBotones);
+
         } catch (error) {
             console.error(error);
             limpiarUI();
             setEstado("error", "Error de red al validar la cuenta.");
         }
     }
+
+    function mostrarModalSeleccion(opciones, resumenTexto) {
+        let modal = document.getElementById("modalSeleccionPlanGrado");
+
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "modalSeleccionPlanGrado";
+            modal.className = "modal";
+
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Selecciona el plan para generar DGAE Grado</h2>
+                    <p id="resumenProgramasGrado"></p>
+                    <div id="opcionesPlanesGrado" class="opciones-planes"></div>
+                    <button type="button" id="cerrarModalSeleccionGrado">Cerrar</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const btnCerrar = document.getElementById("cerrarModalSeleccionGrado");
+            if (btnCerrar) {
+                btnCerrar.addEventListener("click", cerrarModalSeleccion);
+            }
+        }
+
+        const contenedor = document.getElementById("opcionesPlanesGrado");
+        const resumen = document.getElementById("resumenProgramasGrado");
+
+        if (!contenedor || !resumen) return;
+
+        contenedor.innerHTML = "";
+        resumen.textContent = resumenTexto || "";
+
+        opciones.forEach(op => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = `${op.programa} · plan ${op.planEstudios} · ${op.especializacion || ""}`;
+
+            btn.addEventListener("click", () => {
+                seleccionIdGlobal = String(op.id);
+                cerrarModalSeleccion();
+                setEstado("ok", `Plan seleccionado: ${op.programa} · ${op.planEstudios}`);
+                mostrarFlex(contBotones);
+                ocultarOpcionesSecundarias();
+            });
+
+            contenedor.appendChild(btn);
+        });
+
+        modal.style.display = "flex";
+    }
+
+    function cerrarModalSeleccion() {
+        const modal = document.getElementById("modalSeleccionPlanGrado");
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    window.cerrarModalSeleccionGrado = cerrarModalSeleccion;
 
     function manejarInputCuenta() {
         if (!inputCuenta) return;
@@ -223,15 +278,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setEstado("info", "Generando documento...");
 
+        const body = new URLSearchParams({
+            numeroDeCuenta,
+            tipoDocumento
+        });
+
+        if (seleccionIdGlobal) {
+            body.append("seleccion_id", seleccionIdGlobal);
+        }
+
         fetch("/dgaeGrado/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: new URLSearchParams({
-                numeroDeCuenta,
-                tipoDocumento
-            })
+            body: body
         })
             .then(response => response.json())
             .then(data => {

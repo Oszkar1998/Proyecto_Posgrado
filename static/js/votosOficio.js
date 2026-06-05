@@ -271,7 +271,8 @@ document.addEventListener("keydown", function (event) {
 });
 
 function buscarDatosModificar() {
-  const numeroCuenta = document.getElementById("numeroCuentaModificar").value;
+  const numeroCuenta = document.getElementById("numeroCuentaModificar").value.trim();
+
   fetch("/votosOficio/obtener_datos", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -279,40 +280,17 @@ function buscarDatosModificar() {
   })
   .then(response => response.json())
   .then(data => {
-    const form = document.getElementById("datosModificarForm");
-    form.innerHTML = `
-      <input type="hidden" id="mod-id" value="${data.id}" />
-      <input type="hidden" id="mod-sexo" value="${data.sexo}" />
-      <input type="hidden" id="mod-numeroCuenta" value="${data.numeroCuenta}" />
+    if (!data.success) {
+      alert(data.error || "No se encontraron datos.");
+      return;
+    }
 
-      <label>Nombre Completo:</label>
-      <input type="text" id="mod-nombre" value="${data.nombreCompleto || ''}" />
-      <label>Plan de Estudios:</label>
-      <input type="text" id="mod-planEstudios" value="${data.planEstudios || ''}" />
-      <label>Especialización:</label>
-      <input type="text" id="mod-especializacion" value="${data.especializacion || ''}" />
-      <label>Tesina o Título:</label>
-      <input type="text" id="mod-tituloTesina" value="${data.tituloTesina || ''}" />
-      <label>Tutor:</label>
-      <input type="text" id="mod-tutor" value="${data.tutor || ''}" />
-      <select id="mod-sexoTutor">
-        <option value="">Seleccionar</option>
-        <option value="M" ${data.sexoTutor === 'M' ? 'selected' : ''}>Masculino</option>
-        <option value="F" ${data.sexoTutor === 'F' ? 'selected' : ''}>Femenino</option>
-      </select>
-      <label>Presidente:</label>
-      <input type="text" id="mod-presidente" value="${data.presidente || ''}" />
-      <label>Secretario:</label>
-      <input type="text" id="mod-secretario" value="${data.secretario || ''}" />
-      <label>Vocal 1:</label>
-      <input type="text" id="mod-vocal1" value="${data.vocal1 || ''}" />
-      <label>Vocal 2:</label>
-      <input type="text" id="mod-vocal2" value="${data.vocal2 || ''}" />
-      <label>Vocal 3:</label>
-      <input type="text" id="mod-vocal3" value="${data.vocal3 || ''}" />
-      <label>Modalidad:</label>
-      <input type="text" id="mod-modalidad" value="${data.modalidad || ''}" />
-    `;
+    if (data.multiples && data.multiples.length > 1) {
+      mostrarOpcionesModificar(data.multiples);
+      return;
+    }
+
+    pintarFormularioModificar(data);
   })
   .catch(err => alert("No se encontraron datos con ese número de cuenta."));
 }
@@ -650,3 +628,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 })();
+
+function mostrarOpcionesModificar(opciones) {
+  const form = document.getElementById("datosModificarForm");
+
+  form.innerHTML = `
+    <h3 style="color:#f6c343;">Selecciona el plan que deseas modificar</h3>
+  `;
+
+  opciones.forEach(op => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = `${op.nombreCompleto} · plan ${op.planEstudios} · ${op.especializacion || ""}`;
+    btn.onclick = () => cargarRegistroModificarPorId(op.id);
+    form.appendChild(btn);
+  });
+}
+
+function cargarRegistroModificarPorId(id) {
+  fetch("/votosOficio/obtener_datos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      alert(data.error || "No se pudo cargar el registro.");
+      return;
+    }
+
+    pintarFormularioModificar(data);
+  })
+  .catch(err => alert("No se pudo cargar el registro seleccionado."));
+}
+
+function pintarFormularioModificar(data) {
+  const form = document.getElementById("datosModificarForm");
+
+  form.innerHTML = `
+    <input type="hidden" id="mod-id" value="${data.id}" />
+    <input type="hidden" id="mod-sexo" value="${data.sexo}" />
+    <input type="hidden" id="mod-numeroCuenta" value="${data.numeroCuenta}" />
+
+    <label>Nombre Completo:</label>
+    <input type="text" id="mod-nombre" value="${data.nombreCompleto || ''}" />
+    <label>Plan de Estudios:</label>
+    <input type="text" id="mod-planEstudios" value="${data.planEstudios || ''}" />
+    <label>Especialización:</label>
+    <input type="text" id="mod-especializacion" value="${data.especializacion || ''}" />
+    <label>Tesina o Título:</label>
+    <input type="text" id="mod-tituloTesina" value="${data.tituloTesina || ''}" />
+    <label>Tutor:</label>
+    <input type="text" id="mod-tutor" value="${data.tutor || ''}" />
+    <select id="mod-sexoTutor">
+      <option value="">Seleccionar</option>
+      <option value="M" ${data.sexoTutor === 'M' ? 'selected' : ''}>Masculino</option>
+      <option value="F" ${data.sexoTutor === 'F' ? 'selected' : ''}>Femenino</option>
+    </select>
+    <label>Presidente:</label>
+    <input type="text" id="mod-presidente" value="${data.presidente || ''}" />
+    <label>Secretario:</label>
+    <input type="text" id="mod-secretario" value="${data.secretario || ''}" />
+    <label>Vocal 1:</label>
+    <input type="text" id="mod-vocal1" value="${data.vocal1 || ''}" />
+    <label>Vocal 2:</label>
+    <input type="text" id="mod-vocal2" value="${data.vocal2 || ''}" />
+    <label>Vocal 3:</label>
+    <input type="text" id="mod-vocal3" value="${data.vocal3 || ''}" />
+    <label>Modalidad:</label>
+    <input type="text" id="mod-modalidad" value="${data.modalidad || ''}" />
+  `;
+}

@@ -3,8 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalFechaHora = document.getElementById("modal-fecha-hora");
     const modalSeleccionPlan = document.getElementById("modalSeleccionPlan");
     const botonesExpediente = document.getElementById("botones-expediente");
+    const planAlumno = document.getElementById("plan-alumno");
     const nombreAlumno = document.getElementById("nombre-alumno");
     const btnModificar = document.getElementById("btn-modificar-datos");
+
+    window.planEstudiosGlobal = "";
+    window.modoModificarGlobal = false;     
 
     window.numeroDeCuentaGlobal = "";
     window.seleccionIdGlobal = "";
@@ -24,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nombreAlumno) {
             nombreAlumno.textContent = "";
             nombreAlumno.style.display = "none";
+        }
+
+        if (planAlumno) {
+            planAlumno.textContent = "";
+            planAlumno.style.display = "none";
         }
 
         crearStatusSiNoExiste();
@@ -186,6 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         bloqueoValidacion = true;
         cuentaValidada = "";
+
+        window.planEstudiosGlobal = "";
+        window.modoModificarGlobal = false;
+
         window.numeroDeCuentaGlobal = "";
         window.seleccionIdGlobal = "";
 
@@ -211,6 +224,10 @@ document.addEventListener("DOMContentLoaded", () => {
         inputCuenta.value = valor;
 
         ocultarBotonesExpediente();
+
+        window.planEstudiosGlobal = "";
+        window.modoModificarGlobal = false;
+
         window.numeroDeCuentaGlobal = "";
         window.seleccionIdGlobal = "";
         cuentaValidada = "";
@@ -319,48 +336,53 @@ document.addEventListener("DOMContentLoaded", () => {
         const cuenta = (prompt("Ingresa el número de cuenta para modificar:") || "").trim();
         if (!cuenta) return;
 
+        window.modoModificarGlobal = true;
+        window.numeroDeCuentaGlobal = cuenta;
+        window.seleccionIdGlobal = "";
+        window.planEstudiosGlobal = "";
+
+        if (inputCuenta) inputCuenta.value = cuenta;
+
         try {
-            const response = await fetch(`/examen/datos?numeroDeCuenta=${encodeURIComponent(cuenta)}`);
+            const body = new URLSearchParams({
+                numeroDeCuenta: cuenta
+            });
+
+            const response = await fetch("/examen/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: body.toString()
+            });
+
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No hay datos guardados para este número.");
+                alert(data.error || "No se encontró el alumno.");
                 return;
             }
 
-            const campos = data.campos || {};
+            if (data.multiples && data.multiples.length > 1) {
+                mostrarModalSeleccion(data.multiples, data.resumen || "");
+                setStatus("Selecciona el plan que deseas modificar.");
+                return;
+            }
 
-            window.numeroDeCuentaGlobal = cuenta;
-            window.seleccionIdGlobal = "";
+            if (data.planEstudios) {
+                window.planEstudiosGlobal = String(data.planEstudios);
 
-            if (inputCuenta) inputCuenta.value = cuenta;
+                const planAlumno = document.getElementById("plan-alumno");
+                if (planAlumno) {
+                    planAlumno.textContent = `Plan de estudios: ${window.planEstudiosGlobal}`;
+                    planAlumno.style.display = "block";
+                }
 
-            toggleSinodales(true);
+                await cargarDatosParaModificar();
+                return;
+            }
 
-            [
-                "fechaExamen",
-                "horaExamen",
-                "ingreso",
-                "termino",
-                "promedio",
-                "folio",
-                "tutor",
-                "presidente",
-                "vocal1",
-                "vocal2",
-                "vocal3",
-                "secretario"
-            ].forEach((id) => {
-                const el = document.getElementById(id);
-                if (el) el.value = campos[id] || "";
-            });
-
-            const sede = document.getElementById("modalidadSede");
-            if (sede) sede.value = campos.modalidadSede || "";
-
-            mostrarNombreAlumno("");
-            abrirModal("modal-fecha-hora");
-            setStatus("Editando datos guardados...");
+            alert("Para modificar este registro falta seleccionar el plan de estudios.");
         } catch (error) {
             console.error(error);
             alert("No se pudo cargar la información para modificar.");
@@ -409,7 +431,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 vocal2: vocal2,
                 vocal3: vocal3,
                 secretario: secretario,
-                modalidadSede: modalidadSede
+                modalidadSede: modalidadSede,
+                planEstudios: window.planEstudiosGlobal
             });
 
             if (window.seleccionIdGlobal) {
@@ -505,11 +528,25 @@ document.addEventListener("DOMContentLoaded", () => {
         opciones.forEach((op) => {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "btn";
-            btn.textContent = `${op.programa} · plan ${op.planEstudios}${op.especializacion ? " · " + op.especializacion : ""}`;
+
+            const programaClase = (op.programa || "").toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+
+            btn.className = `opcion-plan ${programaClase}`;
+
+            btn.innerHTML = `
+                <span class="icono-plan">🎓</span>
+                <span>
+                    <span class="nivel-plan">${op.programa} · plan ${op.planEstudios}</span>
+                    <span class="nombre-plan">${op.especializacion || ""}</span>
+                </span>
+                <span class="flecha-plan">›</span>
+            `;
 
             btn.addEventListener("click", () => {
-                seleccionarPlan(op.id);
+                window.planEstudiosGlobal = String(op.planEstudios);
+                seleccionarPlan(op.id, op.planEstudios);
             });
 
             contenedor.appendChild(btn);
@@ -522,7 +559,8 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModal("modalSeleccionPlan");
     };
 
-    async function seleccionarPlan(seleccionId) {
+    async function seleccionarPlan(seleccionId, planEstudios){
+        
         if (!window.numeroDeCuentaGlobal) {
             alert("No se encontró el número de cuenta.");
             return;
@@ -530,6 +568,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             window.seleccionIdGlobal = String(seleccionId);
+            window.planEstudiosGlobal = String(planEstudios || window.planEstudiosGlobal || "");
+
+            const planAlumno = document.getElementById("plan-alumno");
+            if (planAlumno) {
+                planAlumno.textContent = `Plan de estudios: ${window.planEstudiosGlobal}`;
+                planAlumno.style.display = "block";
+            }
 
             const body = new URLSearchParams({
                 numeroDeCuenta: window.numeroDeCuentaGlobal,
@@ -553,6 +598,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             cerrarModal("modalSeleccionPlan");
             mostrarNombreAlumno(data.nombreCompleto || "");
+        
+            if (window.modoModificarGlobal) {
+                await cargarDatosParaModificar();
+                return;
+            }
 
             if (data.tipo_modal === "omit_modal") {
                 mostrarBotonesExpediente();
@@ -575,6 +625,53 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error(error);
             alert("Ocurrió un error al seleccionar el plan.");
+        }
+    }
+
+    async function cargarDatosParaModificar() {
+        try {
+            const response = await fetch(
+                `/examen/datos?numeroDeCuenta=${encodeURIComponent(window.numeroDeCuentaGlobal)}&planEstudios=${encodeURIComponent(window.planEstudiosGlobal)}`
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+                alert(data.error || "No hay datos guardados para este plan.");
+                window.modoModificarGlobal = false;
+                return;
+            }
+
+            const campos = data.campos || {};
+
+            toggleSinodales(true);
+
+            [
+                "fechaExamen",
+                "horaExamen",
+                "ingreso",
+                "termino",
+                "promedio",
+                "folio",
+                "tutor",
+                "presidente",
+                "vocal1",
+                "vocal2",
+                "vocal3",
+                "secretario"
+            ].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.value = campos[id] || "";
+            });
+
+            const sede = document.getElementById("modalidadSede");
+            if (sede) sede.value = campos.modalidadSede || "";
+
+            abrirModal("modal-fecha-hora");
+            setStatus("Editando datos guardados del plan seleccionado.");
+        } catch (error) {
+            console.error(error);
+            alert("No se pudo cargar la información para modificar.");
         }
     }
 });

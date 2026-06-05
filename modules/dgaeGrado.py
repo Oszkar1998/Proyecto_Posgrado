@@ -6,17 +6,13 @@ from datetime import datetime
 from fpdf import FPDF
 import os
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 dgaeGrado_bp = Blueprint('dgaeGrado', __name__, template_folder='../templates')
 
-# Variables Globales
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/DocumentosGenerados/"
-
 os.makedirs(direccionPDF, exist_ok=True)
 
-
+#################################################################################################################################
 def fecha_texto():
     meses = {
         1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
@@ -39,6 +35,46 @@ def buscar_alumno(numero_cuenta):
     row = cur.fetchone()
     conn.close()
     return row
+
+def listar_registros_grado(numero_cuenta):
+    conn = sqlite3.connect(direccionBase)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+        FROM posgrado
+        WHERE numeroCuenta = ?
+        ORDER BY planEstudios
+    """, (numero_cuenta,))
+    filas = cur.fetchall()
+    conn.close()
+    return filas
+
+def buscar_alumno_por_id(registro_id):
+    conn = sqlite3.connect(direccionBase)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+        FROM posgrado
+        WHERE id = ?
+        LIMIT 1
+    """, (registro_id,))
+    row = cur.fetchone()
+    conn.close()
+    return row
+
+def inferir_programa_grado(plan):
+    plan = int(plan)
+
+    if 3000 <= plan <= 3999:
+        return "Especialidad"
+
+    if 4000 <= plan <= 4999:
+        return "Maestría"
+
+    if 5000 <= plan <= 5999:
+        return "Doctorado"
+
+    return "Desconocido"
 
 def limpiar_texto(valor):
     return str(valor).strip() if valor is not None else ""
@@ -426,50 +462,70 @@ def index():
 
     numero = (request.form.get("numeroDeCuenta") or "").strip()
     tipo_doc = (request.form.get("tipoDocumento") or "").strip()
+    seleccion_id = request.form.get("seleccion_id")
 
     if not numero or not numero.isdigit() or len(numero) != 9:
         return jsonify(success=False, error="Número de cuenta inválido. Debe tener 9 dígitos."), 400
-
-    alumno = buscar_alumno(numero)
-    if not alumno:
-        return jsonify(success=False, error="No se encontró el número de cuenta en la base de datos."), 404
-
-    # Solo validación
-    if not tipo_doc:
-        return jsonify(success=True, msg="Cuenta válida.")
-
-    numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = alumno
 
     tipos_validos = {
         "presencial_todas_x",
         "presencial_sin_mencion_honorifica",
         "presencial_sin_medalla_alfonso_caso",
         "presencial_sin_mencion_y_medalla",
-
         "virtual_todas_x",
         "virtual_sin_mencion_honorifica",
         "virtual_sin_medalla_alfonso_caso",
         "virtual_sin_mencion_y_medalla",
     }
 
+    if seleccion_id:
+        alumno = buscar_alumno_por_id(int(seleccion_id))
+
+        if not alumno:
+            return jsonify(success=False, error="Selección inválida."), 404
+
+        _id, numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = alumno
+
+    else:
+        filas = listar_registros_grado(numero)
+
+        if not filas:
+            return jsonify(success=False, error="No se encontró el número de cuenta en la base de datos."), 404
+
+        if len(filas) > 1:
+            opciones = []
+
+            for rid, cuenta, nombre, plan, espec, modalidad in filas:
+                opciones.append({
+                    "id": rid,
+                    "numeroCuenta": cuenta,
+                    "nombre": nombre,
+                    "planEstudios": int(plan),
+                    "programa": inferir_programa_grado(plan),
+                    "especializacion": espec or ""
+                })
+
+            return jsonify({
+                "success": True,
+                "multiples": opciones,
+                "resumen": "Este alumno tiene más de un plan. Selecciona cuál usar para DGAE Grado."
+            })
+
+        _id, numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = filas[0]
+
+    if not tipo_doc:
+        return jsonify(success=True, msg="Cuenta válida.")
+
     if tipo_doc not in tipos_validos:
         return jsonify(success=False, error="Tipo de documento no reconocido."), 400
-
-    pdf_buffer = generar_acuse_graduacion(
-        tipo_doc=tipo_doc,
-        numero_cuenta=limpiar_texto(numero_cuenta),
-        nombre_alumno=limpiar_texto(nombre_completo),
-        plan_estudios=limpiar_texto(plan_estudios),
-        especializacion=limpiar_texto(especializacion),
-        modalidad=limpiar_texto(modalidad)
-    )
 
     return jsonify(
         success=True,
         documento=url_for(
             "dgaeGrado.ver_documento",
             numeroDeCuenta=numero,
-            tipoDocumento=tipo_doc
+            tipoDocumento=tipo_doc,
+            seleccion_id=seleccion_id or _id
         )
     )
 
@@ -478,14 +534,10 @@ def index():
 def ver_documento():
     numero = (request.args.get("numeroDeCuenta") or "").strip()
     tipo_doc = (request.args.get("tipoDocumento") or "").strip()
+    seleccion_id = request.args.get("seleccion_id")
 
     if not numero or not numero.isdigit() or len(numero) != 9:
         return "Número de cuenta inválido.", 400
-
-    alumno = buscar_alumno(numero)
-
-    if not alumno:
-        return "No se encontró el número de cuenta.", 404
 
     tipos_validos = {
         "presencial_todas_x",
@@ -501,7 +553,24 @@ def ver_documento():
     if tipo_doc not in tipos_validos:
         return "Tipo de documento no reconocido.", 400
 
-    numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = alumno
+    if seleccion_id:
+        alumno = buscar_alumno_por_id(int(seleccion_id))
+
+        if not alumno:
+            return "Selección inválida.", 404
+
+        _id, numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = alumno
+
+    else:
+        filas = listar_registros_grado(numero)
+
+        if not filas:
+            return "No se encontró el número de cuenta.", 404
+
+        if len(filas) > 1:
+            return "Esta cuenta tiene más de un plan. Selecciona uno primero.", 400
+
+        _id, numero_cuenta, nombre_completo, plan_estudios, especializacion, modalidad = filas[0]
 
     pdf_buffer = generar_acuse_graduacion(
         tipo_doc=tipo_doc,

@@ -6,14 +6,9 @@ from flask import Blueprint, jsonify, redirect, render_template, request, send_f
 from fpdf import FPDF
 
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 revision_bp = Blueprint('revision', __name__, template_folder='../templates')
-
-# Variables Globales 
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/" 
-direccionPDF = "static/Documentos/"
-
 
 ############################## FUNCIONES NORMALES SIN HTML ##############################
 def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, trabajo, presidente, secretario, vocal1, vocal2, vocal3, modalidad):

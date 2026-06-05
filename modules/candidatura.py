@@ -4,14 +4,11 @@ import sqlite3
 from datetime import datetime
 from fpdf import FPDF
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 candidatura_bp = Blueprint('candidatura', __name__, template_folder='../templates')
 
-# Variables Globales 
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/Documentos/"
-
+#################################################################################################################################
 def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int) -> str:
 
     filename = "ActaCandidatura.pdf"

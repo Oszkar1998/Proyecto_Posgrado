@@ -4,14 +4,9 @@ import sqlite3
 from datetime import datetime
 from fpdf import FPDF
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 dgae_bp = Blueprint('dgae', __name__, template_folder='../templates')
-
-# Variables Globales 
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/Documentos/"
-
 
 ############################## FUNCIONES NORMALES SIN HTML ##############################
 def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion,tipo, modalidad):
@@ -1512,47 +1507,127 @@ def _buscar_alumno(numero_cuenta: str):
     conn.close()
     return row
 
+def _infer_programa(plan):
+    plan = int(plan)
+    if 3000 <= plan <= 3999:
+        return "especialidad"
+    if 4000 <= plan <= 4999:
+        return "maestria"
+    if 5000 <= plan <= 5999:
+        return "doctorado"
+    return "desconocido"
+
+def _listar_registros_dgae(numero_cuenta):
+    conn = sqlite3.connect(direccionBase)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+               tituloTesina, modalidad
+        FROM posgrado
+        WHERE numeroCuenta = ?
+        ORDER BY planEstudios
+    """, (numero_cuenta,))
+
+    filas = cur.fetchall()
+    conn.close()
+    return filas
+
+def _obtener_registro_dgae_por_id(reg_id):
+    conn = sqlite3.connect(direccionBase)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+               tituloTesina, modalidad
+        FROM posgrado
+        WHERE id = ?
+        LIMIT 1
+    """, (reg_id,))
+
+    fila = cur.fetchone()
+    conn.close()
+    return fila
 
 #################################################################################################################################
 @dgae_bp.route("/", methods=["GET", "POST"])
 @permission_required("dgae")
 def dgae():
     if request.method == "GET":
-        # Entrega el HTML tal cual
-        return render_template("dgae.html")  # tu plantilla actual
-    # POST
+        return render_template("dgae.html")
+
     numero = (request.form.get("numeroDeCuenta") or "").strip()
     tipo_doc = (request.form.get("tipoDocumento") or "").strip()
+    seleccion_id = request.form.get("seleccion_id")
 
     # Validaciones básicas
     if not numero or not numero.isdigit() or len(numero) != 9:
         return jsonify(success=False, error="Número de cuenta inválido (9 dígitos)."), 400
-    
-    alum = _buscar_alumno(numero)
-    if not alum:
-        return jsonify(success=False, error="No se encontró la cuenta en POSGRADO.")
 
-    # Desempaquetar campos
-    No_cuenta_str = alum[0]
-    Nomb_alu      = alum[1]
-    try:
-        clave_int = int(alum[2])  # planEstudios (clave numérica)
-    except Exception:
-        return jsonify(success=False, error="El plan de estudios no es numérico.")
-    Plan_estudios = alum[3] or ""  # especializacion (texto para el PDF)
-    modalidad     = alum[4] or ""  # "Tesina" | "Examen General de Conocimiento" | etc.
+    # Si el usuario ya eligió un plan específico
+    if seleccion_id:
+        fila = _obtener_registro_dgae_por_id(int(seleccion_id))
+
+        if not fila:
+            return jsonify(success=False, error="Selección inválida.")
+
+        _id, No_cuenta_str, Nomb_alu, clave_int, Plan_estudios, _titulo, modalidad = fila
+
+        try:
+            clave_int = int(clave_int)
+        except Exception:
+            return jsonify(success=False, error="El plan de estudios no es numérico.")
+
+        Plan_estudios = Plan_estudios or ""
+        modalidad = modalidad or ""
+
+    else:
+        # Buscar todos los registros de esa cuenta
+        filas = _listar_registros_dgae(numero)
+
+        if not filas:
+            return jsonify(success=False, error="No se encontró la cuenta en POSGRADO.")
+
+        # Si hay más de un registro y todavía no selecciona plan, mandar opciones al JS
+        if len(filas) > 1:
+            opciones = []
+
+            for rid, cuenta, nombre, plan, espec, titulo, modalidad in filas:
+                opciones.append({
+                    "id": rid,
+                    "numeroCuenta": cuenta,
+                    "nombre": nombre,
+                    "planEstudios": int(plan),
+                    "programa": _infer_programa(plan).capitalize(),
+                    "especializacion": espec or ""
+                })
+
+            return jsonify({
+                "success": True,
+                "multiples": opciones,
+                "resumen": "Este alumno tiene más de un plan. Selecciona cuál usar para DGAE."
+            })
+
+        # Si solo hay un registro, usar ese directamente
+        _id, No_cuenta_str, Nomb_alu, clave_int, Plan_estudios, _titulo, modalidad = filas[0]
+
+        try:
+            clave_int = int(clave_int)
+        except Exception:
+            return jsonify(success=False, error="El plan de estudios no es numérico.")
+
+        Plan_estudios = Plan_estudios or ""
+        modalidad = modalidad or ""
 
     programa, grado = _determinar_programa_y_grado(clave_int)
+
     if not programa:
         return jsonify(success=False, error="El plan está fuera de rango (3000–5999).")
 
-    # --- Si NO piden aún documento, es sólo validación automática del input ---
+    # Si todavía no se pide documento, solo validar y mostrar botones
     if not tipo_doc:
         return jsonify(success=True, msg="Cuenta válida en POSGRADO.")
 
-    # Mapear botones de la UI -> parámetros esperados por tus funciones PDF
-    #   opcion: "1" -> documentos de 1 hoja ; "2" -> de 2 hojas
-    #   tipo:   "1" -> sin antecedente UNAM ; "2" -> con antecedente UNAM
     tipos_documento = {
         "documento1": ("1", "2"),
         "documento2_sinX": ("2", "1"),
@@ -1560,32 +1635,55 @@ def dgae():
     }
 
     config = tipos_documento.get(tipo_doc)
+
     if not config:
         return jsonify(success=False, error="Tipo de documento no reconocido."), 400
 
     opcion, tipo = config
-
-    # Ejecutar la función según el grado detectado por la CLAVE (3000–5999)
     clave_str = str(clave_int)
 
     try:
         if grado == "Especialidad":
-            # Usa tus funciones existentes (ya aceptan modalidad)  :contentReference[oaicite:2]{index=2}
-            especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            especialidad(
+                No_cuenta_str,
+                Plan_estudios,
+                clave_str,
+                Nomb_alu,
+                programa,
+                opcion,
+                tipo,
+                modalidad
+            )
         elif grado == "Maestría":
-            maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            maestria(
+                No_cuenta_str,
+                Plan_estudios,
+                clave_str,
+                Nomb_alu,
+                programa,
+                opcion,
+                tipo,
+                modalidad
+            )
         elif grado == "Doctorado":
-            doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            doctorado(
+                No_cuenta_str,
+                Plan_estudios,
+                clave_str,
+                Nomb_alu,
+                programa,
+                opcion,
+                tipo,
+                modalidad
+            )
         else:
             return jsonify(success=False, error="Grado no identificado.")
     except Exception as e:
         return jsonify(success=False, error=f"Error al generar PDF: {e}")
 
-    # Tu código de generación guarda siempre como DocumentoDGAE.pdf en /static/Documentos  :contentReference[oaicite:3]{index=3}
     return jsonify(success=True, documentos=["DocumentoDGAE.pdf"])
         
 @dgae_bp.after_request
-@permission_required("dgae")
 def disable_cache(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"

@@ -74,8 +74,8 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, gener
 
 ########## DOCUMENTOS ##########
 def generar_citatorio(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero):
-    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str)
-    idPos, numeroCuentaPos, nombreCompletoPos, planEstudiosPos, especializacionPos, tituloTesinaPos, tutorPos, presidentePos, secretarioPos, vocal1Pos, vocal2Pos, vocal3Pos, sexoPos, modalidadPos, sexoTutor = obtnerDatosPosgrado(No_cuenta_str)
+    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str, clave_str)
+    idPos, numeroCuentaPos, nombreCompletoPos, planEstudiosPos, especializacionPos, tituloTesinaPos, tutorPos, presidentePos, secretarioPos, vocal1Pos, vocal2Pos, vocal3Pos, sexoPos, modalidadPos, sexoTutor = obtnerDatosPosgrado(No_cuenta_str, clave_str)
     
     # 👉 Usar siempre los sinodales de POSGRADO (evitamos depender de examenDatos)
     presidente = presidentePos
@@ -266,17 +266,18 @@ def generar_citatorio(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pr
         pdf.set_xy(20, 173)
         pdf.multi_cell(0, 5, "TERCER VOCAL:", align="L")
 
+        
         # Nombres del jurado
         pdf.set_xy(62, 133)
-        pdf.multi_cell(0, 5, presidentePos, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(presidentePos), align="L")
         pdf.set_xy(62, 143)
-        pdf.multi_cell(0, 5, secretarioPos, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(secretarioPos), align="L")
         pdf.set_xy(62, 153)
-        pdf.multi_cell(0, 5, vocal1Pos, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal1Pos), align="L")
         pdf.set_xy(62, 163)
-        pdf.multi_cell(0, 5, vocal2Pos, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal2Pos), align="L")
         pdf.set_xy(62, 173)
-        pdf.multi_cell(0, 5, vocal3Pos, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal3Pos), align="L")
 
         # Firma
         pdf.set_xy(156.5, 123)
@@ -404,7 +405,7 @@ def documento_medalla(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pro
     pdf.multi_cell(0, 5, "NOMBRE Y FIRMA DEL SECRETARIO", align="C")
 
 def generar_protesta(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad):  
-    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str)
+    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str, clave_str)
     
     diaEXA, mesEXA, añoEXA = fecha(fecha_examen)
     dia, mes, año = fechaActual()
@@ -523,7 +524,7 @@ def generar_protesta(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pro
     pdf.multi_cell(175, 5, "EL PRESIDENTE DEL JURADO", align="L")
 
 def documentos_Menciones(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero):
-    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str)
+    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str, clave_str)
     diaEXA, mesEXA, añoEXA= fecha(fecha_examen)
     
     if grado == "ESPECIALIDAD":
@@ -776,8 +777,8 @@ def documentos_Menciones(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, 
 
 def generar_acta(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero):
     # Recupera todo lo capturado en el modal (incluye los 4 nuevos campos)
-    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str)
-    idPos, numeroCuentaPos, nombreCompletoPos, planEstudiosPos, especializacionPos, tituloTesinaPos, tutorPos, presidentePos, secretarioPos, vocal1Pos, vocal2Pos, vocal3Pos, sexoPos, modalidadPos, sexoTutor = obtnerDatosPosgrado(No_cuenta_str)
+    fecha_examen, hora_examen, presidente, vocal1, vocal2, vocal3, secretario, ingreso, termino, promedio, folio, modalidadSede = obtener_examen_por_cuenta(No_cuenta_str, clave_str)
+    idPos, numeroCuentaPos, nombreCompletoPos, planEstudiosPos, especializacionPos, tituloTesinaPos, tutorPos, presidentePos, secretarioPos, vocal1Pos, vocal2Pos, vocal3Pos, sexoPos, modalidadPos, sexoTutor = obtnerDatosPosgrado(No_cuenta_str, clave_str)
 
     if grado == "ESPECIALIDAD":
         grado = "ESPECIALISTA EN"
@@ -1170,11 +1171,21 @@ def creacionDocumento(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
         genero = "elle alumne"
 
     # 📌 **Determinar el tipo de programa**
-    if programa.lower() == "especialidad":
+    programa_normalizado = (programa or "").lower()
+    programa_normalizado = (
+        programa_normalizado
+        .replace("á", "a")
+        .replace("é", "e")
+        .replace("í", "i")
+        .replace("ó", "o")
+        .replace("ú", "u")
+    )
+
+    if programa_normalizado == "especialidad":
         funcion_generadora = especialidad
-    elif programa.lower() == "maestria":
+    elif programa_normalizado == "maestria":
         funcion_generadora = maestria
-    elif programa.lower() == "doctorado":
+    elif programa_normalizado == "doctorado":
         funcion_generadora = doctorado
     else:
         return jsonify({"success": False, "error": "Programa académico no reconocido."})
@@ -1193,7 +1204,6 @@ def creacionDocumento(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
     return jsonify({"success": True, "documentos": documentos, "pdf_url": url_documento})
 
 def modificMombreSinodal(cadena):
-    # Lista de títulos válidos y su forma correcta
     titulos_validos = {
         "DR": "Dr.",
         "DRA": "Dra.",
@@ -1208,23 +1218,20 @@ def modificMombreSinodal(cadena):
         "MA": "M.A."
     }
 
+    if not cadena:
+        return ""
+
     partes = cadena.strip().split()
     titulo_formateado = []
     nombre_partes = []
-    
+
     for palabra in partes:
-        
         palabra_sin_punto = palabra.replace(".", "").upper()
-        
+
         if palabra_sin_punto in titulos_validos:
-            # Usa el valor tal como está definido en el diccionario (ya bien capitalizado)
             titulo_formateado.append(titulos_validos[palabra_sin_punto])
-        elif palabra.isupper():
-            # Para nombres completos en mayúsculas como "SOSA", aplicar capitalización
-            nombre_partes.append(palabra.capitalize())
         else:
-            # Si ya tiene forma capitalizada, mantenerlo
-            nombre_partes.append(palabra)
+            nombre_partes.append(palabra.lower().title())
 
     return " ".join(titulo_formateado + nombre_partes)
 
@@ -1241,23 +1248,29 @@ def formatear_titulo(texto):
 
     return " ".join(resultado)
 
-def guardar_examen_por_cuenta(numero_cuenta, fecha, hora, ingreso, termino, promedio, folio, modalidad_sede):
+def guardar_examen_por_cuenta(numero_cuenta, plan_estudios, fecha, hora, ingreso, termino, promedio, folio, modalidad_sede):
     """
-    Solo guarda en examenDatos:
-    numeroCuenta, fecha, hora, ingreso, termino, promedio, folio, modalidadSede.
-    Nada de sinodales.
+    Guarda datos de examen por alumno y plan de estudios.
+    La llave correcta es: numeroCuenta + planEstudios.
     """
     numero_cuenta = (numero_cuenta or "").strip()
+
     if not numero_cuenta:
         raise ValueError("numeroCuenta vacío")
 
+    if not plan_estudios:
+        raise ValueError("planEstudios vacío")
+
+    plan_estudios = int(plan_estudios)
+
     conn = sqlite3.connect(direccionBase)
     cur = conn.cursor()
+
     cur.execute("""
       INSERT INTO examenDatos
-        (numeroCuenta, fecha, hora, ingreso, termino, promedio, folio, modalidadSede)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(numeroCuenta) DO UPDATE SET
+        (numeroCuenta, planEstudios, fecha, hora, ingreso, termino, promedio, folio, modalidadSede)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(numeroCuenta, planEstudios) DO UPDATE SET
         fecha=excluded.fecha,
         hora=excluded.hora,
         ingreso=excluded.ingreso,
@@ -1265,22 +1278,40 @@ def guardar_examen_por_cuenta(numero_cuenta, fecha, hora, ingreso, termino, prom
         promedio=excluded.promedio,
         folio=excluded.folio,
         modalidadSede=excluded.modalidadSede
-    """, (numero_cuenta, fecha, hora, ingreso, termino, promedio, folio, modalidad_sede))
+    """, (
+        numero_cuenta,
+        plan_estudios,
+        fecha,
+        hora,
+        ingreso,
+        termino,
+        promedio,
+        folio,
+        modalidad_sede
+    ))
+
     conn.commit()
     conn.close()
 
-def obtener_examen_por_cuenta(numero_cuenta):
+def obtener_examen_por_cuenta(numero_cuenta, plan_estudios):
+    """
+    Obtiene datos de examen usando numeroCuenta + planEstudios.
+    """
     conn = sqlite3.connect(direccionBase)
     cur = conn.cursor()
+
     cur.execute("""
       SELECT fecha, hora, presidente, vocal1, vocal2, vocal3, secretario,
              ingreso, termino, promedio, folio, modalidadSede
       FROM examenDatos
       WHERE numeroCuenta = ?
-    """, (numero_cuenta,))
+        AND planEstudios = ?
+      LIMIT 1
+    """, (numero_cuenta, int(plan_estudios)))
+
     row = cur.fetchone()
     conn.close()
-    return row  # None si no existe
+    return row
 
 def _infer_programa(plan: int) -> str:
     if 3000 <= plan <= 3999:
@@ -1319,7 +1350,7 @@ def _obtener_registro_por_id(reg_id: int):
     conn.close()
     return fila
 
-def obtnerDatosPosgrado(numero_cuenta: str):
+def obtnerDatosPosgrado(numero_cuenta: str, plan_estudios):
     conn = sqlite3.connect(direccionBase)
     cursor = conn.cursor()
     cursor.execute("""
@@ -1328,31 +1359,43 @@ def obtnerDatosPosgrado(numero_cuenta: str):
                sexo, modalidad, sexoTutor
         FROM posgrado
         WHERE numeroCuenta = ?
-        ORDER BY id DESC
+          AND planEstudios = ?
         LIMIT 1
-    """, (numero_cuenta,))
+    """, (numero_cuenta, int(plan_estudios)))
     fila = cursor.fetchone()
     conn.close()
 
     return fila
 
-def actualizar_jurado_y_tutor(numero_cuenta, tutor, presidente, secretario, vocal1, vocal2, vocal3):
+def actualizar_jurado_y_tutor(numero_cuenta, plan_estudios, tutor, presidente, secretario, vocal1, vocal2, vocal3):
     """
-    Actualiza en POSGRADO (solo el último registro de esa cuenta)
-    el tutor y los sinodales.
+    Actualiza en POSGRADO el tutor y los sinodales
+    del registro exacto: numeroCuenta + planEstudios.
     """
     conn = sqlite3.connect(direccionBase)
     cur = conn.cursor()
+
     cur.execute("""
         UPDATE posgrado
-        SET tutor = ?, presidente = ?, secretario = ?, vocal1 = ?, vocal2 = ?, vocal3 = ?
-        WHERE id = (
-            SELECT id FROM posgrado
-            WHERE numeroCuenta = ?
-            ORDER BY id DESC
-            LIMIT 1
-        )
-    """, (tutor, presidente, secretario, vocal1, vocal2, vocal3, numero_cuenta))
+        SET tutor = ?,
+            presidente = ?,
+            secretario = ?,
+            vocal1 = ?,
+            vocal2 = ?,
+            vocal3 = ?
+        WHERE numeroCuenta = ?
+          AND planEstudios = ?
+    """, (
+        tutor,
+        presidente,
+        secretario,
+        vocal1,
+        vocal2,
+        vocal3,
+        numero_cuenta,
+        int(plan_estudios)
+    ))
+
     conn.commit()
     conn.close()
 
@@ -1384,17 +1427,54 @@ def index():
         seleccion_id = request.form.get("seleccion_id")
         if seleccion_id:
             fila = _obtener_registro_por_id(int(seleccion_id))
+
             if not fila:
                 return jsonify(success=False, error="Selección inválida.")
-            # Normaliza campos para generar inmediatamente si viene tipo_documento
+
             _id, cuenta, nombre, plan, espec, sexo, titulo, modalidad = fila
-            prog = _infer_programa(int(plan)).lower()  # 'especialidad' | 'maestría' | 'doctorado'
-            if prog == "Desconocido".lower():
+
+            plan = int(plan)
+            prog = _infer_programa(plan).lower()
+
+            if prog == "desconocido":
                 return jsonify(success=False, error="Plan de estudios no reconocido.")
 
+            # Si solo está seleccionando el plan, revisar si ya tiene datos de examen
             if not tipo_documento:
-                # Si solo validaban, indica que ya puede mostrar botones
-                return jsonify(success=True, tipo_modal="omit_modal")
+                row = obtener_examen_por_cuenta(str(cuenta), plan)
+
+                if row:
+                    fch, hr, pres, v1, v2, v3, sec, ing, ter, prom, fol, *rest = row
+                    completos = all([fch, hr, ing, ter, prom, fol])
+
+                    if completos:
+                        return jsonify(
+                            success=True,
+                            tipo_modal="omit_modal",
+                            nombreCompleto=nombre
+                        )
+
+                return jsonify(
+                    success=True,
+                    tipo_modal="solo_fecha_hora",
+                    nombreCompleto=nombre
+                )
+
+            # Si viene de Confirmar modal, guardar datos de examen del plan seleccionado
+            if tipo_documento == "confirmar_modal":
+                guardar_examen_por_cuenta(
+                    str(cuenta),
+                    plan,
+                    fecha_examen,
+                    hora_examen,
+                    ingreso,
+                    termino,
+                    promedio,
+                    folio,
+                    modalidad_sede
+                )
+
+                return jsonify(success=True)
 
             # Generar documentos con la fila elegida
             return creacionDocumento(
@@ -1430,7 +1510,9 @@ def index():
 
         # =============== VALIDACIÓN (sin elegir documento) ===============
         if not tipo_documento:
-            row = obtener_examen_por_cuenta(num_de_cuenta)
+            
+            row = obtener_examen_por_cuenta(num_de_cuenta, resultadoPlan[2])
+
             if row:
                 # Soporta 11 o 12 columnas
                 fch, hr, pres, v1, v2, v3, sec, ing, ter, prom, fol, *rest = row
@@ -1443,7 +1525,8 @@ def index():
                     return jsonify({
                         "success": True,
                         "tipo_modal": "omit_modal",
-                        "nombreCompleto": nombre
+                        "nombreCompleto": nombre,
+                        "planEstudios": resultadoPlan[2]
                     })
                 else:
                     # Faltan datos guardados → abrir modal (según solo_fecha_hora o normal)
@@ -1453,7 +1536,8 @@ def index():
                     return jsonify({
                         "success": True,
                         "tipo_modal": ("solo_fecha_hora" if resultadoIf == "solo_fecha_hora" else "completo"),
-                        "nombreCompleto": nombre
+                        "nombreCompleto": nombre,
+                        "planEstudios": resultadoPlan[2]
                     })
             else:
                 if resultadoIf == "completo":
@@ -1463,7 +1547,12 @@ def index():
                 filas = _listar_registros_por_cuenta(num_de_cuenta)
                 nombre = filas[0][2]  # nombreCompleto
 
-                return jsonify(success=True, tipo_modal="solo_fecha_hora", nombreCompleto=nombre)
+                return jsonify(
+                    success=True,
+                    tipo_modal="solo_fecha_hora",
+                    nombreCompleto=nombre,
+                    planEstudios=resultadoPlan[2]
+                )
 
         # ============= FIN VALIDACIÓN (sin elegir documento) =============
 
@@ -1498,8 +1587,13 @@ def index():
             vocal3_form    = (request.form.get("vocal3") or "").strip()
 
             if any([tutor_form, pres_form, sec_form, vocal1_form, vocal2_form, vocal3_form]):
+                
                 # Obtenemos valores actuales para no borrar nada
-                pos = obtnerDatosPosgrado(num_de_cuenta)
+                pos = obtnerDatosPosgrado(
+                    num_de_cuenta,
+                    resultadoPlan[2]
+                )
+
                 if pos:
                     _, _, _, _, _, _, tutor_act, pres_act, sec_act, v1_act, v2_act, v3_act, _, _, _ = pos
                 else:
@@ -1513,12 +1607,19 @@ def index():
                 nuevo_v3     = modificMombreSinodal(vocal3_form) if vocal3_form else v3_act
 
                 actualizar_jurado_y_tutor(
-                    num_de_cuenta, nuevo_tutor, nuevo_pres, nuevo_sec, nuevo_v1, nuevo_v2, nuevo_v3
+                    num_de_cuenta,
+                    resultadoPlan[2],
+                    nuevo_tutor,
+                    nuevo_pres,
+                    nuevo_sec,
+                    nuevo_v1,
+                    nuevo_v2,
+                    nuevo_v3
                 )
 
             # 2) Guardar SOLO los datos de examen en examenDatos
             guardar_examen_por_cuenta(
-                num_de_cuenta, fecha_examen, hora_examen,
+                num_de_cuenta, resultadoPlan[2], fecha_examen, hora_examen,
                 ingreso, termino, promedio, folio, modalidad_sede
             )
             return jsonify(success=True)
@@ -1545,7 +1646,13 @@ def datos_guardados_examen():
     if not num:
         return jsonify(success=False, error="Falta número de cuenta.")
 
-    row = obtener_examen_por_cuenta(num)
+    plan_estudios = (request.args.get("planEstudios") or "").strip()
+
+    if not plan_estudios:
+        return jsonify(success=False, error="Falta plan de estudios.")
+
+    row = obtener_examen_por_cuenta(num, plan_estudios)
+
     if not row:
         return jsonify(success=False, error="No hay datos guardados para este número. Captúralos primero.")
 
@@ -1554,7 +1661,7 @@ def datos_guardados_examen():
     mod_sede = rest[0] if rest else ""
 
     # posgrado (tutor + sinodales)
-    pos = obtnerDatosPosgrado(num)
+    pos = obtnerDatosPosgrado(num, plan_estudios)
     tutor = presidente = secretario = vocal1 = vocal2 = vocal3 = ""
     if pos:
         _, _, _, _, _, _, tutor, presidente, secretario, vocal1, vocal2, vocal3, _, _, _ = pos

@@ -6,14 +6,11 @@ from datetime import datetime
 from fpdf import FPDF
 import os
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 captura_bp = Blueprint('captura', __name__, template_folder='../templates')
 
-# Variables Globales 
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/Documentos/"
-
+#################################################################################################################################
 @captura_bp.route("/", methods=["GET"])
 @permission_required("captura")
 def index():

@@ -3,13 +3,9 @@ import sqlite3
 from fpdf import FPDF
 from io import BytesIO
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 votos_Oficio_PUEI_bp = Blueprint('votosOficio', __name__, template_folder='../templates')
-
-# Rutas
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/Documentos/"
 
 # --------------------------- UTILIDADES ---------------------------
 def _etiqueta_genero(s):
@@ -271,42 +267,68 @@ def sinodales_autocomplete():
 @votos_Oficio_PUEI_bp.route("/obtener_datos", methods=["POST"])
 def obtener_datos():
     datos = request.get_json()
-    cuenta = datos.get("numeroCuenta")
+    cuenta = (datos.get("numeroCuenta") or "").strip()
+    seleccion_id = datos.get("id")
 
     conn = sqlite3.connect(direccionBase)
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
-               secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY planEstudios DESC
-        LIMIT 1
-    """, (cuenta,))
-    row = cursor.fetchone()
+
+    if seleccion_id:
+        cursor.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
+                   secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+            FROM posgrado
+            WHERE id = ?
+            LIMIT 1
+        """, (seleccion_id,))
+    else:
+        cursor.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
+                   secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY planEstudios
+        """, (cuenta,))
+
+    filas = cursor.fetchall()
     conn.close()
 
-    if row:
-        return jsonify({
-            "success": True,
-            "id": row[0],
-            "numeroCuenta": row[1],
-            "nombreCompleto": row[2],
-            "planEstudios": row[3],
-            "especializacion": row[4],
-            "tituloTesina": row[5],
-            "tutor": row[6],
-            "presidente": row[7],
-            "secretario": row[8],
-            "vocal1": row[9],
-            "vocal2": row[10],
-            "vocal3": row[11],
-            "sexo": row[12],
-            "modalidad": row[13],
-            "sexoTutor": row[14],
-        })
-    else:
-        return jsonify({"success": False})
+    if not filas:
+        return jsonify({"success": False, "error": "No se encontraron datos."})
+
+    if not seleccion_id and len(filas) > 1:
+        opciones = []
+        for row in filas:
+            opciones.append({
+                "id": row[0],
+                "numeroCuenta": row[1],
+                "nombreCompleto": row[2],
+                "planEstudios": row[3],
+                "especializacion": row[4],
+                "modalidad": row[13]
+            })
+        return jsonify({"success": True, "multiples": opciones})
+
+    row = filas[0]
+
+    return jsonify({
+        "success": True,
+        "id": row[0],
+        "numeroCuenta": row[1],
+        "nombreCompleto": row[2],
+        "planEstudios": row[3],
+        "especializacion": row[4],
+        "tituloTesina": row[5],
+        "tutor": row[6],
+        "presidente": row[7],
+        "secretario": row[8],
+        "vocal1": row[9],
+        "vocal2": row[10],
+        "vocal3": row[11],
+        "sexo": row[12],
+        "modalidad": row[13],
+        "sexoTutor": row[14],
+    })
 
 @votos_Oficio_PUEI_bp.route("/modificar_datos", methods=["POST"])
 def modificar_datos():
@@ -342,4 +364,3 @@ def disable_cache(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-

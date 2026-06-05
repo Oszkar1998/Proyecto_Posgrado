@@ -1,117 +1,42 @@
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("login-form");
     const inputCuenta = document.getElementById("numeroDeCuenta");
-    const msgEstado = document.getElementById("estado-validacion");
+    const btnIngresar = document.querySelector("button[type='submit']");
 
-    const contBotones = document.getElementById("botones-expediente");
+    const botonesDocumentos = document.getElementById("botones-expediente");
     const btnDocumento1 = document.getElementById("btn-documento-1");
     const btnDocumento2 = document.getElementById("btn-documento-2");
-
-    const contOpcionesDoc2 = document.getElementById("botones-opciones-doc2");
+    const botonesOpcionesDoc2 = document.getElementById("botones-opciones-doc2");
     const btnDoc2SinX = document.getElementById("btn-doc2-sinX");
     const btnDoc2ConX = document.getElementById("btn-doc2-conX");
 
-    form.addEventListener("submit", (e) => e.preventDefault());
+    let seleccionIdGlobal = "";
 
-    // Estado interno
-    let cuentaValidada = "";
-    let debounceId = null;
+    if (botonesDocumentos) botonesDocumentos.style.display = "none";
+    if (botonesOpcionesDoc2) botonesOpcionesDoc2.style.display = "none";
 
-    // ===== UTIL =====
-    function setEstado(tipo, texto) {
-        msgEstado.className = "estado-validacion " + tipo;
-        msgEstado.textContent = texto;
+    function cerrarModalSeleccion() {
+        const modal = document.getElementById("modalSeleccionPlan");
+        if (modal) modal.style.display = "none";
     }
 
-    function limpiarUI() {
-        contBotones.style.display = "none";
-        contOpcionesDoc2.style.display = "none";
-        cuentaValidada = "";
+    window.cerrarModalSeleccion = cerrarModalSeleccion;
+
+    function mostrarBotonesDocumentos() {
+        if (btnIngresar) btnIngresar.style.display = "none";
+        if (botonesDocumentos) botonesDocumentos.style.display = "block";
+        if (botonesOpcionesDoc2) botonesOpcionesDoc2.style.display = "none";
     }
 
-    function soloNumeros(valor) {
-        return valor.replace(/\D/g, "").slice(0, 9);
-    }
-
-    // ===== VALIDACIÓN =====
-    async function validarCuenta() {
-        const numeroDeCuenta = (inputCuenta.value || "").trim();
-
-        if (!numeroDeCuenta) return;
-
-        setEstado("info", "Validando número de cuenta...");
-
-        try {
-            const response = await fetch("/dgae/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({ numeroDeCuenta })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                cuentaValidada = numeroDeCuenta;
-                setEstado("ok", "✅ Cuenta validada. Puedes generar documentos.");
-                contBotones.style.display = "block";
-            } else {
-                limpiarUI();
-                setEstado("error", data.error || "Cuenta no válida.");
-            }
-
-        } catch (error) {
-            console.error(error);
-            limpiarUI();
-            setEstado("error", "Error de red al validar.");
-        }
-    }
-
-    // ===== INPUT =====
-    inputCuenta.addEventListener("input", () => {
-        let valor = soloNumeros(inputCuenta.value);
-        inputCuenta.value = valor;
-
-        limpiarUI();
-
-        if (debounceId) clearTimeout(debounceId);
-
-        if (valor.length < 9) {
-            setEstado("warn", "Escribe tu número completo (9 dígitos)...");
-            return;
-        }
-
-        setEstado("info", "Validando automáticamente...");
-
-        debounceId = setTimeout(() => {
-            validarCuenta();
-        }, 300);
-    });
-
-    inputCuenta.addEventListener("blur", () => {
-        const val = inputCuenta.value.trim();
-        if (val.length === 9 && cuentaValidada !== val) {
-            validarCuenta();
-        }
-    });
-
-    // ===== GENERAR DOCUMENTOS =====
-    function generarDocumento(tipoDocumento) {
+    function validarCuenta() {
         const numeroDeCuenta = inputCuenta.value.trim();
 
-        if (!numeroDeCuenta) {
-            setEstado("warn", "Primero ingresa el número de cuenta.");
-            return;
-        }
+        seleccionIdGlobal = "";
 
-        if (cuentaValidada !== numeroDeCuenta) {
-            setEstado("warn", "Espera a que se valide el número.");
-            return;
-        }
+        if (botonesDocumentos) botonesDocumentos.style.display = "none";
+        if (botonesOpcionesDoc2) botonesOpcionesDoc2.style.display = "none";
 
-        setEstado("info", "Generando documento...");
+        if (!/^\d{9}$/.test(numeroDeCuenta)) return;
 
         fetch("/dgae/", {
             method: "POST",
@@ -119,36 +44,153 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: new URLSearchParams({
-                numeroDeCuenta,
-                tipoDocumento
+                numeroDeCuenta: numeroDeCuenta
             })
         })
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                setEstado("ok", "Documento generado correctamente.");
-
-                (data.documentos || []).forEach(doc => {
-                    const url = `/static/Documentos/${doc}`;
-                    window.open(url, "_blank");
-                });
-
-            } else {
-                setEstado("error", data.error || "Error al generar documento.");
+            if (!data.success) {
+                alert(data.error || "No se encontró la cuenta.");
+                return;
             }
+
+            if (data.multiples && data.multiples.length > 1) {
+                mostrarModalSeleccion(data.multiples, data.resumen || "");
+                return;
+            }
+
+            mostrarBotonesDocumentos();
         })
-        .catch(() => {
-            setEstado("error", "Error de red al generar documento.");
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error de red al validar la cuenta.");
         });
     }
 
-    // ===== EVENTOS BOTONES =====
-    btnDocumento1.addEventListener("click", () => generarDocumento("documento1"));
+    function mostrarModalSeleccion(opciones, resumenTexto) {
+        let modal = document.getElementById("modalSeleccionPlan");
 
-    btnDocumento2.addEventListener("click", () => {
-        contOpcionesDoc2.style.display = "block";
-    });
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "modalSeleccionPlan";
+            modal.className = "modal";
 
-    btnDoc2SinX.addEventListener("click", () => generarDocumento("documento2_sinX"));
-    btnDoc2ConX.addEventListener("click", () => generarDocumento("documento2_conX"));
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Selecciona el plan para generar DGAE</h2>
+                    <p id="resumenProgramas"></p>
+                    <div id="opcionesPlanes" class="opciones-planes"></div>
+                    <button type="button" id="cerrarModalSeleccion">Cerrar</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const btnCerrar = document.getElementById("cerrarModalSeleccion");
+            if (btnCerrar) {
+                btnCerrar.addEventListener("click", cerrarModalSeleccion);
+            }
+        }
+
+        const contenedor = document.getElementById("opcionesPlanes");
+        const resumen = document.getElementById("resumenProgramas");
+
+        if (!contenedor || !resumen) return;
+
+        contenedor.innerHTML = "";
+        resumen.textContent = resumenTexto || "";
+
+        opciones.forEach(op => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = `${op.programa} · plan ${op.planEstudios} · ${op.especializacion || ""}`;
+
+            btn.addEventListener("click", function () {
+                seleccionIdGlobal = String(op.id);
+                cerrarModalSeleccion();
+                mostrarBotonesDocumentos();
+            });
+
+            contenedor.appendChild(btn);
+        });
+
+        modal.style.display = "flex";
+    }
+
+    function obtenerDocumento(tipoDocumento) {
+        const numeroDeCuenta = inputCuenta.value.trim();
+
+        const body = new URLSearchParams({
+            numeroDeCuenta: numeroDeCuenta,
+            tipoDocumento: tipoDocumento
+        });
+
+        if (seleccionIdGlobal) {
+            body.append("seleccion_id", seleccionIdGlobal);
+        }
+
+        fetch("/dgae/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: body
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.error || "No se pudo generar el documento.");
+                return;
+            }
+
+            data.documentos.forEach(doc => {
+                window.open(`/static/Documentos/${doc}`, "_blank");
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error de red al generar el documento.");
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            validarCuenta();
+        });
+    }
+
+    if (inputCuenta) {
+        inputCuenta.addEventListener("input", function () {
+            const cuenta = inputCuenta.value.trim();
+
+            if (cuenta.length < 9) {
+                seleccionIdGlobal = "";
+                if (botonesDocumentos) botonesDocumentos.style.display = "none";
+                if (botonesOpcionesDoc2) botonesOpcionesDoc2.style.display = "none";
+                if (btnIngresar) btnIngresar.style.display = "block";
+                return;
+            }
+
+            if (cuenta.length === 9) validarCuenta();
+        });
+    }
+
+    if (btnDocumento1) {
+        btnDocumento1.addEventListener("click", () => obtenerDocumento("documento1"));
+    }
+
+    if (btnDocumento2) {
+        btnDocumento2.addEventListener("click", () => {
+            if (botonesOpcionesDoc2) botonesOpcionesDoc2.style.display = "block";
+        });
+    }
+
+    if (btnDoc2SinX) {
+        btnDoc2SinX.addEventListener("click", () => obtenerDocumento("documento2_sinX"));
+    }
+
+    if (btnDoc2ConX) {
+        btnDoc2ConX.addEventListener("click", () => obtenerDocumento("documento2_conX"));
+    }
 });

@@ -3,11 +3,9 @@ from flask import Blueprint, render_template, request, url_for, send_file, abort
 import io
 from datetime import datetime
 from auth import permission_required
+from config import direccionBase, direccionImagen,direccionPDF
 
 actas_grado_bp = Blueprint('actas_grado', __name__, template_folder='../templates')
-
-direccionBase = "static/BaseDeDatos/basePosgrado.db"  
-
 
 #################################################################################################################################
 @actas_grado_bp.route("/", methods=["GET", "POST"])
