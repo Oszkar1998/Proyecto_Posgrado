@@ -18,32 +18,44 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function consultarYMostrar(numeroCuenta) {
-    // Rellena la tarjetita (nombre/especialización)
-    busquedaPorCuenta();
+      busquedaPorCuenta();
 
-    const res = await fetch("/votosOficio", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
-    });
-    const data = await res.json();
+      spinner.show("Generando documento...");
+      try {
+          const res = await fetch("/votosOficio", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
+          });
+          const data = await res.json();
 
-    if (data.success) {
-      setHint("");
-      botonesDocumentos.style.display = "block";
+          if (data.success) {
+              setHint("");
+              botonesDocumentos.style.display = "block";
 
-      if (data.multiples && data.multiples.length > 1) {
-        mostrarModalSeleccionVotos(data.multiples);
-        return;
+              if (data.multiples && data.multiples.length > 1) {
+                  spinner.hide();
+                  mostrarModalSeleccionVotos(data.multiples);
+                  return;
+              }
+
+              if (data.votos_url) {
+                  spinner.hide();
+                  btnDocumento2.onclick = () => window.open(data.votos_url, "_blank");
+                  return;
+              }
+
+              spinner.hide();
+              toast.error("No se pudo generar el documento.");
+          } else {
+              spinner.hide();
+              resetUI();
+          }
+      } catch (error) {
+          spinner.hide();
+          console.error(error);
+          toast.error("Error de conexión con el servidor.");
       }
-      if (data.votos_url) {
-        btnDocumento2.onclick = () => window.open(data.votos_url, "_blank");
-        return;
-      }
-      alert("No se pudo generar el documento.");
-    } else {
-      resetUI();
-    }
   }
 
   // Sin botón: no usamos submit; validamos al teclear
@@ -101,7 +113,7 @@ function actualizarCapturar() {
     };
 
     if (!data.nombreCompleto || !data.numeroDeCuenta || !data.planEstudios || !data.modalidad || !data.presidente || !data.secretario || !data.vocal1 || !data.sexo || !data.especializacion) {
-        alert("⚠ Por favor completa todos los campos obligatorios.");
+        toast.warn("Por favor completa todos los campos obligatorios.");
         return;
     }
 
@@ -115,7 +127,7 @@ function actualizarCapturar() {
     .then(response => response.json())
     .then(res => {
         if (res.success) {
-            alert("✅ Datos guardados correctamente.");
+            toast.ok("Datos guardados correctamente.");
             cerrarModalCapturar();
 
             // ✅ Limpiar campos del modal
@@ -126,12 +138,12 @@ function actualizarCapturar() {
             // ✅ Recargar la página
             location.reload();
         } else {
-            alert("❌ Error al guardar: " + res.error);
+            toast.error("Error al guardar: " + res.error);
         }
     })
     .catch(error => {
         console.error("❌ Error en la solicitud:", error);
-        alert("❌ Error en la conexión con el servidor.");
+        toast.error("Error en la conexión con el servidor.");
     });
 }
 
@@ -157,7 +169,7 @@ function busquedaPorNombre() {
     const nombre = document.getElementById("nombreCompletoBusqueda").value.trim();
 
     if (!nombre) {
-        alert("⚠ Por favor ingresa un nombre.");
+        toast.warn("Por favor ingresa un nombre.");
         return;
     }
 
@@ -212,7 +224,7 @@ function busquedaPorCuenta() {
     const cuenta = document.getElementById("numeroDeCuenta").value.trim();
 
     if (!cuenta) {
-        alert("⚠ Por favor ingresa el número de cuenta.");
+        toast.warn("Por favor ingresa el número de cuenta.");
         return;
     }
 
@@ -281,7 +293,7 @@ function buscarDatosModificar() {
   .then(response => response.json())
   .then(data => {
     if (!data.success) {
-      alert(data.error || "No se encontraron datos.");
+      toast.error(data.error || "No se encontraron datos.");
       return;
     }
 
@@ -292,7 +304,7 @@ function buscarDatosModificar() {
 
     pintarFormularioModificar(data);
   })
-  .catch(err => alert("No se encontraron datos con ese número de cuenta."));
+  .catch(err => toast.error("No se encontraron datos con ese número de cuenta."));
 }
 
 function guardarCambiosModificar() {
@@ -323,13 +335,13 @@ function guardarCambiosModificar() {
     })
     .then(response => response.json())
     .then(data => {
-      alert("✅ Datos actualizados correctamente.");
+      toast.ok("Datos actualizados correctamente.");
       cerrarModalModificarDatos();
       // 🔄 Recargar la página automáticamente después de guardar
       location.reload();
     });
   } catch (error) {
-    alert("❌ Error al guardar los cambios.");
+    toast.error("Error al guardar los cambios.");
   }
 }
 
@@ -438,7 +450,7 @@ function soloDigitos(str) {
 function mostrarModalError(msg) {
   const modal = document.getElementById('modalError');
   const msgP = document.getElementById('modalErrorMsg');
-  if (!modal) { alert(msg || 'No existe esa cuenta en la base.'); return; }
+  if (!modal) { toast.error(msg || 'No existe esa cuenta en la base.'); return; }
   if (msgP) msgP.textContent = msg || 'No existe esa cuenta en la base.';
   modal.style.display = 'block';
   void modal.offsetHeight; // reflow
@@ -546,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Si el backend regresa múltiples coincidencias
       if (data.multiples) {
         // aquí puedes abrir tu modal de selección si ya lo manejas
-        alert('Se encontraron múltiples registros. Selecciona el correcto en la lista.');
+        toast.warn('Se encontraron múltiples registros. Selecciona el correcto en la lista.');
         return;
       }
 
@@ -654,13 +666,13 @@ function cargarRegistroModificarPorId(id) {
   .then(response => response.json())
   .then(data => {
     if (!data.success) {
-      alert(data.error || "No se pudo cargar el registro.");
+      toast.error(data.error || "No se pudo cargar el registro.");
       return;
     }
 
     pintarFormularioModificar(data);
   })
-  .catch(err => alert("No se pudo cargar el registro seleccionado."));
+  .catch(err => toast.error("No se pudo cargar el registro seleccionado."));
 }
 
 function pintarFormularioModificar(data) {

@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                alert(data.error || "No se encontró la cuenta.");
+                toast.error(data.error || "No se encontró la cuenta.");
                 return;
             }
 
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("Error de red al validar la cuenta.");
+            toast.error("Error de red al validar la cuenta.");
         });
     }
 
@@ -129,6 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body.append("seleccion_id", seleccionIdGlobal);
         }
 
+        spinner.show("Generando documento...");
         fetch("/dgae/", {
             method: "POST",
             headers: {
@@ -138,18 +139,19 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
+            spinner.hide();
             if (!data.success) {
-                alert(data.error || "No se pudo generar el documento.");
+                toast.error(data.error || "No se pudo generar el documento.");
                 return;
             }
-
             data.documentos.forEach(doc => {
                 window.open(`/static/Documentos/${doc}`, "_blank");
             });
         })
         .catch(error => {
+            spinner.hide();
             console.error("Error:", error);
-            alert("Error de red al generar el documento.");
+            toast.error("Error de red al generar el documento.");
         });
     }
 

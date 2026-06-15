@@ -22,7 +22,7 @@ function abrirModalFechaExtra(campo) {
   const opcionesPago = document.getElementById("opcionesPagoSinodales");
 
   if (!modal || !inputCampo || !titulo || !descripcion) {
-    alert("No existe el modal de fecha extra en el HTML.");
+    toast.warn("No existe el modal de fecha extra en el HTML.");
     return;
   }
 
@@ -158,7 +158,7 @@ async function buscarActaParaModificar() {
   const folioEl = document.getElementById("mod_folio_buscar");
 
   if (!numCuentaEl || !folioEl) {
-    alert("No existe el formulario de búsqueda para modificar en el HTML.");
+    toast.error("No existe el formulario de búsqueda para modificar en el HTML.");
     return;
   }
 
@@ -166,7 +166,7 @@ async function buscarActaParaModificar() {
   const folio = (folioEl.value || "").trim();
 
   if (!numCuenta || !folio) {
-    alert("Ingresa número de cuenta y folio.");
+    toast.warn("Ingresa número de cuenta y folio.");
     return;
   }
 
@@ -178,7 +178,7 @@ async function buscarActaParaModificar() {
       body: JSON.stringify({ numCuenta, folio }),
     });
   } catch (e) {
-    alert("No se pudo conectar con el servidor.");
+    toast.error("No se pudo conectar con el servidor.");
     return;
   }
 
@@ -190,7 +190,7 @@ async function buscarActaParaModificar() {
   }
 
   if (!resp.ok) {
-    alert(data.error || "No se encontró el acta.");
+    toast.error(data.error || "No se encontró el acta.");
     return;
   }
 

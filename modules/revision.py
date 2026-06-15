@@ -731,12 +731,6 @@ def verificarCoordinador(sexo):
 @revision_bp.route("/", methods=["GET", "POST"])
 @permission_required("revision")
 def index():
-    # --- Sesión ---
-    if "user_id" not in session:
-        if request.method == "POST":
-            return jsonify({"success": False, "error": "Sesión expirada. Vuelve a iniciar sesión."}), 401
-        return redirect(url_for("index"))  # ajusta si usas otra ruta de login
-
     # --- GET: página ---
     if request.method == "GET":
         return render_template("revision.html")

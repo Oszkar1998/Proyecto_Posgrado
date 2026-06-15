@@ -277,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         setEstado("info", "Generando documento...");
+        spinner.show("Generando documento...");
 
         const body = new URLSearchParams({
             numeroDeCuenta,
@@ -296,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then(response => response.json())
             .then(data => {
+                spinner.hide();
                 if (data.success && data.documento) {
                     setEstado("ok", "Documento generado correctamente.");
                     window.open(data.documento, "_blank");
@@ -304,6 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .catch(error => {
+                spinner.hide();
                 console.error(error);
                 setEstado("error", "Error de red al generar el documento.");
             });

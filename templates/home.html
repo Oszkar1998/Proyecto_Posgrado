@@ -5,9 +5,18 @@
     <meta http-equiv="Cache-Control" content="no-store" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Principal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/home.css') }}">
     <link rel="icon" href="https://www.unam.mx/sites/default/files/favicon.ico" type="image/x-icon">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 </head>
 
 <body>
@@ -16,69 +25,99 @@
     <header class="navbar">
         <div class="navbar-left">
             <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM" class="logo-unam">
-            <span class="titulo-navbar">Facultad de Ingeniería - POSGRADO</span>
+            <span class="titulo-navbar">Facultad de Ingeniería — POSGRADO</span>
         </div>
-        
-        <!-- Boton para menú principal -->
         <button class="logout-button" onclick="window.location.href='/logout'">
-            🚪 Cerrar Sesión
+            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
         </button>
     </header>
 
     <!-- Contenido principal -->
     <div class="main-wrapper">
         <h1 class="titulo">Bienvenido</h1>
-        <p class="subtitulo">Selecciona una opción para comenzar</p>
-
+        <p class="subtitulo">Selecciona un módulo para comenzar</p>
 
         <div class="container">
+
             {% if 'superadmin' in roles or 'admin' in roles or 'revision' in permissions %}
-                <a href="{{ url_for('revision.index') }}" class="card">📑 REVISIÓN</a>
+            <a href="{{ url_for('revision.index') }}" class="card">
+                <i class="fa-solid fa-file-lines card-icon"></i>
+                <span>REVISIÓN</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'examen' in permissions %}
-                <a href="{{ url_for('examen.index') }}" class="card">📝 EXAMEN</a>
+            <a href="{{ url_for('examen.index') }}" class="card">
+                <i class="fa-solid fa-pen-to-square card-icon"></i>
+                <span>EXAMEN</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'dgae' in permissions %}
-                <a href="{{ url_for('dgae.dgae') }}" class="card">🏛️ DGAE</a>
+            <a href="{{ url_for('dgae.dgae') }}" class="card">
+                <i class="fa-solid fa-landmark card-icon"></i>
+                <span>DGAE</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'dgae_grado' in permissions %}
-                <a href="{{ url_for('dgaeGrado.index') }}" class="card">🏛️ DGAE GRADO</a>
+            <a href="{{ url_for('dgaeGrado.index') }}" class="card">
+                <i class="fa-solid fa-building-columns card-icon"></i>
+                <span>DGAE GRADO</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'votos_puei' in permissions %}
-                <a href="{{ url_for('votosOficio.index') }}" class="card">🗳️ VOTOS (PUEI)</a>
+            <a href="{{ url_for('votosOficio.index') }}" class="card">
+                <i class="fa-solid fa-ballot-check card-icon"></i>
+                <span>VOTOS (PUEI)</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'actas_grado' in permissions %}
-                <a href="{{ url_for('actas_grado.index') }}" class="card">📜 ACTAS GRADO</a>
+            <a href="{{ url_for('actas_grado.index') }}" class="card">
+                <i class="fa-solid fa-scroll card-icon"></i>
+                <span>ACTAS GRADO</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles or 'admin' in roles or 'candidatura' in permissions %}
-                <a href="{{ url_for('candidatura.index') }}" class="card">👤 CANDIDATURA</a>
+            <a href="{{ url_for('candidatura.index') }}" class="card">
+                <i class="fa-solid fa-user-graduate card-icon"></i>
+                <span>CANDIDATURA</span>
+            </a>
             {% endif %}
-            
+
             {% if 'superadmin' in roles or 'admin' in roles or 'pago_examen' in permissions %}
-                <a href="{{ url_for('pagoExamen.index') }}" class="card">🧾 PAGO EXAMEN</a>
+            <a href="{{ url_for('pagoExamen.index') }}" class="card">
+                <i class="fa-solid fa-receipt card-icon"></i>
+                <span>PAGO EXAMEN</span>
+            </a>
             {% endif %}
-            
+
             {% if 'superadmin' in roles or 'admin' in roles or 'captura' in permissions %}
-                <a href="{{ url_for('captura.index') }}" class="card">🖥️ CAPTURA</a>
+            <a href="{{ url_for('captura.index') }}" class="card">
+                <i class="fa-solid fa-database card-icon"></i>
+                <span>CAPTURA</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles %}
-                <a href="{{ url_for('register') }}" class="card admin-card">👤 CREAR USUARIO</a>
+            <a href="{{ url_for('register') }}" class="card admin-card">
+                <i class="fa-solid fa-user-plus card-icon"></i>
+                <span>CREAR USUARIO</span>
+            </a>
             {% endif %}
 
             {% if 'superadmin' in roles %}
-                <a href="{{ url_for('manage_users') }}" class="card admin-card">⚙️ ADMINISTRAR USUARIOS</a>
+            <a href="{{ url_for('manage_users') }}" class="card admin-card">
+                <i class="fa-solid fa-users-gear card-icon"></i>
+                <span>ADMINISTRAR USUARIOS</span>
+            </a>
             {% endif %}
+
         </div>
-
     </div>
-
 
 </body>
 </html>

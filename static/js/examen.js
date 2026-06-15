@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No fue posible validar.");
+                toast.error(data.error || "No fue posible validar.");
                 resetAfterError();
                 return;
             }
@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error(error);
             setStatus("Error de red.");
-            alert("Ocurrió un error al validar la cuenta.");
+            toast.error("Ocurrió un error al validar la cuenta.");
         }
     }
 
@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No se encontró el alumno.");
+                toast.error(data.error || "No se encontró el alumno.");
                 return;
             }
 
@@ -382,16 +382,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            alert("Para modificar este registro falta seleccionar el plan de estudios.");
+            toast.warn("Para modificar este registro falta seleccionar el plan de estudios.");
         } catch (error) {
             console.error(error);
-            alert("No se pudo cargar la información para modificar.");
+            toast.error("No se pudo cargar la información para modificar.");
         }
     }
 
     window.guardarFechaHora = async function () {
         if (!window.numeroDeCuentaGlobal) {
-            alert("Falta número de cuenta.");
+            toast.warn("Falta número de cuenta.");
             return;
         }
 
@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const secretario = document.getElementById("secretario")?.value || "";
 
         if (!fecha || !hora || !ingreso || !termino || !promedio || !folio || !modalidadSede) {
-            alert("Por favor, completa fecha, hora, ingreso, término, promedio, folio y sede del examen.");
+            toast.warn("Por favor, completa fecha, hora, ingreso, término, promedio, folio y sede del examen.");
             return;
         }
 
@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No se pudo guardar.");
+                toast.error(data.error || "No se pudo guardar.");
                 return;
             }
 
@@ -459,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setStatus("✅ Datos guardados. Ya puedes generar documentos.");
         } catch (error) {
             console.error(error);
-            alert("Error de red al guardar.");
+            toast.error("Error de red al guardar.");
         }
     };
 
@@ -469,10 +469,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function generarDocumento(tipoDocumento) {
         if (!window.numeroDeCuentaGlobal) {
-            alert("Primero ingresa el número de cuenta.");
+            toast.warn("Primero ingresa el número de cuenta.");
             return;
         }
 
+        spinner.show("Generando documento...");
         try {
             const body = new URLSearchParams({
                 numeroDeCuenta: window.numeroDeCuentaGlobal,
@@ -494,11 +495,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (data.success && data.pdf_url) {
+                spinner.hide();
                 window.open(data.pdf_url, "_blank");
                 return;
             }
 
             if (data.success && data.documentos) {
+                spinner.hide();
                 (data.documentos || []).forEach((doc) => {
                     const url = `/static/Documentos/${doc}`;
                     window.open(url, "_blank");
@@ -506,10 +509,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            alert("❌ Error al generar documento: " + (data.error || "desconocido"));
+            spinner.hide();
+            toast.error("Error al generar documento: " + (data.error || "desconocido"));
         } catch (error) {
+            spinner.hide();
             console.error(error);
-            alert("Error de red al generar documento.");
+            toast.error("Error de red al generar documento.");
         }
     }
 
@@ -562,7 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function seleccionarPlan(seleccionId, planEstudios){
         
         if (!window.numeroDeCuentaGlobal) {
-            alert("No se encontró el número de cuenta.");
+            toast.warn("No se encontró el número de cuenta.");
             return;
         }
 
@@ -592,7 +597,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No se pudo seleccionar el plan.");
+                toast.error(data.error || "No se pudo seleccionar el plan.");
                 return;
             }
 
@@ -624,7 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setStatus("Completa el formulario para continuar.");
         } catch (error) {
             console.error(error);
-            alert("Ocurrió un error al seleccionar el plan.");
+            toast.error("Ocurrió un error al seleccionar el plan.");
         }
     }
 
@@ -637,7 +642,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.success) {
-                alert(data.error || "No hay datos guardados para este plan.");
+                toast.warn(data.error || "No hay datos guardados para este plan.");
                 window.modoModificarGlobal = false;
                 return;
             }
@@ -671,7 +676,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setStatus("Editando datos guardados del plan seleccionado.");
         } catch (error) {
             console.error(error);
-            alert("No se pudo cargar la información para modificar.");
+            toast.error("No se pudo cargar la información para modificar.");
         }
     }
 });

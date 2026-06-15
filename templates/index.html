@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>    
-    <!-- 👉 Este evita que el navegador use páginas del caché -->                               
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión</title>
-
-    
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
-    
-    <!-- 👉 Este script fuerza recarga si se vuelve con la flecha -->
     <script>
         window.onpageshow = function(event) {
             if (event.persisted) {
@@ -23,6 +20,11 @@
         };
     </script>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 </head>
 
 <body>
@@ -33,30 +35,50 @@
 
     <div class="auth-box">
         <div class="form-container login-container" id="login">
-            <h2>🔐 Iniciar Sesión</h2>
+
+            <div class="login-icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <h2>Iniciar Sesión</h2>
             <p class="login-subtitle">Acceso para personal autorizado</p>
 
             {% if error %}
-            <div class="mensaje-error">{{ error }}</div>
+            <div class="mensaje-error">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+            </div>
             {% endif %}
 
             <form method="POST" action="{{ url_for('index') }}">
-                <input type="email" name="email" placeholder="Correo electrónico" required>
 
-                <div class="password-wrapper">
-                    <input type="password" name="password" id="password" placeholder="Contraseña" required>
-                    <button type="button" class="toggle-password" onclick="togglePassword()">Ver</button>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                    <input type="email" name="email" placeholder="Correo electrónico" required>
                 </div>
 
-                <button type="submit">Ingresar</button>
+                <div class="input-wrapper password-wrapper">
+                    <i class="fa-solid fa-key input-icon"></i>
+                    <input type="password" name="password" id="password" placeholder="Contraseña" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fa-solid fa-eye" id="eye-icon"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-right-to-bracket"></i> Ingresar
+                </button>
+
             </form>
         </div>
     </div>
-    
+
     {% if message %}
     <script>
-        alert("{{ message }}");
+        document.addEventListener("DOMContentLoaded", () => {
+            toast.ok("{{ message }}");
+        });
     </script>
     {% endif %}
+
 </body>
 </html>

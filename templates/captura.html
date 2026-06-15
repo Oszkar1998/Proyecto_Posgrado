@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Captura</title>
 
-  <link rel="stylesheet" href="/static/Estilos/captura.css" />
-  <script src="/static/js/captura.js" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/captura.css') }}" />
+  <script src="{{ url_for('static', filename='js/captura.js') }}" defer></script>
 
+  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+  <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 </head>
 
 <body>

@@ -511,9 +511,6 @@ def limpiar_texto(texto):
 #################################################################################################################################
 @candidatura_bp.route("/", methods=["GET"])
 def index():
-    if "user_id" not in session:
-        return redirect(url_for("index"))
-
     roles = session.get("roles", [])
     permissions = session.get("permissions", [])
     open_mode = request.args.get("open")

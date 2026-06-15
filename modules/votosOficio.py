@@ -75,9 +75,6 @@ def _pdf_response(pdf, filename):
 @votos_Oficio_PUEI_bp.route("/", methods=["GET", "POST"])
 @permission_required("votos_puei")
 def index():
-    if "user_id" not in session:
-        return redirect(url_for("index"))
-
     if request.method == "POST":
         numDeCuenta = request.form["numeroDeCuenta"].strip()
 

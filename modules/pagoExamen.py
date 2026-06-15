@@ -12,6 +12,4 @@ pagoExamen_bp = Blueprint('pagoExamen', __name__, template_folder='../templates'
 @pagoExamen_bp.route("/", methods=["GET"])
 @permission_required("pago_examen")
 def index():
-    if "user_id" not in session:
-        return redirect(url_for("index"))
     return render_template("pagoExamen.html")

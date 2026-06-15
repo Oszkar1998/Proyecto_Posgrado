@@ -14,8 +14,6 @@ captura_bp = Blueprint('captura', __name__, template_folder='../templates')
 @captura_bp.route("/", methods=["GET"])
 @permission_required("captura")
 def index():
-    if "user_id" not in session:
-        return redirect(url_for("index"))
     return render_template("captura.html")
 
 @captura_bp.route("/votos", methods=["GET"])

@@ -10,6 +10,14 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/examen.css') }}" />
     <script src="{{ url_for('static', filename='js/examen.js') }}" defer></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -17,12 +25,12 @@
     <!-- Barra superior -->
     <header class="topbar">
         <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-            <span>🏠 Menú Principal </span>
+            <span><i class="fa-solid fa-house"></i> Menú Principal</span>
         </div>
 
         <div class="top-actions">
             <button id="btn-modificar-datos" type="button" title="Editar datos ya guardados">
-                ✏️ Modificar Datos
+                <i class="fa-solid fa-pen-to-square"></i> Modificar Datos
             </button>
         </div>
     </header>
@@ -30,7 +38,7 @@
     <!-- Contenido principal -->
     <main class="container">
         <section class="card">
-            <h1>📘 Consulta de Documentos de Posgrado</h1>
+            <h1><i class="fa-solid fa-file-lines"></i> Consulta de Documentos de Posgrado</h1>
             <p class="descripcion">Ingrese el número de cuenta para consultar y generar documentos.</p>
 
             <form id="login-form" autocomplete="off">
@@ -50,12 +58,24 @@
             </form>
 
             <div id="botones-expediente" class="botones-expediente">
-                <button id="btn-documento-5" type="button" data-tipo="5">📄 Citatorio</button>
-                <button id="btn-documento-6" type="button" data-tipo="6">🖋️ Protesta</button>
-                <button id="btn-documento-2" type="button" data-tipo="2">🏅 Medalla</button>
-                <button id="btn-documento-3" type="button" data-tipo="3">📑 Mención Honorífica</button>
-                <button id="btn-documento-7" type="button" data-tipo="7">📝 Acta</button>
-                <button id="btn-documento-4" type="button" data-tipo="4">📚 Todas</button>
+                <button id="btn-documento-5" type="button" data-tipo="5">
+                    <i class="fa-solid fa-file"></i> Citatorio
+                </button>
+                <button id="btn-documento-6" type="button" data-tipo="6">
+                    <i class="fa-solid fa-signature"></i> Protesta
+                </button>
+                <button id="btn-documento-2" type="button" data-tipo="2">
+                    <i class="fa-solid fa-medal"></i> Medalla
+                </button>
+                <button id="btn-documento-3" type="button" data-tipo="3">
+                    <i class="fa-solid fa-award"></i> Mención Honorífica
+                </button>
+                <button id="btn-documento-7" type="button" data-tipo="7">
+                    <i class="fa-solid fa-file-pen"></i> Acta
+                </button>
+                <button id="btn-documento-4" type="button" data-tipo="4">
+                    <i class="fa-solid fa-book"></i> Todas
+                </button>
             </div>
         </section>
     </main>
@@ -105,8 +125,12 @@
             <input type="text" id="secretario" name="secretario" placeholder="Secretario">
 
             <div class="modal-actions">
-                <button type="button" onclick="guardarFechaHora()">✅ Confirmar</button>
-                <button type="button" onclick="cerrarModalFechaHora()">❌ Cancelar</button>
+                <button type="button" onclick="guardarFechaHora()">
+                    <i class="fa-solid fa-check"></i> Confirmar
+                </button>
+                <button type="button" onclick="cerrarModalFechaHora()">
+                    <i class="fa-solid fa-xmark"></i> Cancelar
+                </button>
             </div>
         </div>
     </div>
@@ -118,7 +142,9 @@
             <p id="resumenProgramas" class="modal-resumen"></p>
             <div id="opcionesPlanes" class="opciones-planes"></div>
             <div class="modal-actions">
-                <button type="button" class="btn cancel" onclick="cerrarModalSeleccion()">Cerrar</button>
+                <button type="button" class="btn cancel" onclick="cerrarModalSeleccion()">
+                    <i class="fa-solid fa-xmark"></i> Cerrar
+                </button>
             </div>
         </div>
     </div>

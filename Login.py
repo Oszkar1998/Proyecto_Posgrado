@@ -23,6 +23,28 @@ from modules.pagoExamen import pagoExamen_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-cambiar-en-produccion")
+
+# ── Manejadores de error ──────────────────────────────
+@app.errorhandler(400)
+def error_400(e):
+    return render_template("error.html", codigo=400, mensaje="Solicitud inválida."), 400
+
+@app.errorhandler(401)
+def error_401(e):
+    return render_template("error.html", codigo=401, mensaje="Sesión expirada. Inicia sesión de nuevo."), 401
+
+@app.errorhandler(403)
+def error_403(e):
+    return render_template("error.html", codigo=403, mensaje="No tienes permiso para realizar esta acción."), 403
+
+@app.errorhandler(404)
+def error_404(e):
+    return render_template("error.html", codigo=404, mensaje="La página que buscas no existe."), 404
+
+@app.errorhandler(500)
+def error_500(e):
+    return render_template("error.html", codigo=500, mensaje="Error interno del servidor. Intenta de nuevo."), 500
+# ─────────────────────────────────────────────────────
  
 # Registrar Blueprints
 app.register_blueprint(actas_grado_bp, url_prefix='/actasGrado')

@@ -169,3 +169,63 @@ a:hover {
 .toggle-password:hover {
     background-color: #444;
 }
+
+
+/* Ícono grande de candado arriba del formulario */
+.login-icon {
+    text-align: center;
+    margin-bottom: 12px;
+    color: #f2c94c;
+    font-size: 40px;
+}
+ 
+/* Inputs con ícono a la izquierda */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 10px 0;
+}
+ 
+.input-wrapper input {
+    width: 100%;
+    padding-left: 42px;
+    margin: 0;
+    box-sizing: border-box;
+}
+ 
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 15px;
+    pointer-events: none;
+}
+ 
+/* Botón de ojo para contraseña */
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: auto;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    background-color: #2c2c2c;
+    color: #fff;
+    cursor: pointer;
+}
+ 
+/* Botón de submit con ícono */
+.btn-submit i {
+    margin-right: 6px;
+}
+ 
+/* Quitar keyframes duplicado */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+ 

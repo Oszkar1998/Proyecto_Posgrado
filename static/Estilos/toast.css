@@ -1,0 +1,94 @@
+/* toast.css — Estilos para el sistema de notificaciones */
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+    width: calc(100% - 40px);
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border-left: 5px solid rgba(255,255,255,0.3);
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Tipos */
+.toast-ok {
+    background-color: #1a7f4b;
+    border-left-color: #22c55e;
+}
+
+.toast-warn {
+    background-color: #92600a;
+    border-left-color: #f2c94c;
+}
+
+.toast-error {
+    background-color: #9b1c1c;
+    border-left-color: #ef4444;
+}
+
+/* Ícono */
+.toast-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Mensaje */
+.toast-msg {
+    flex: 1;
+    line-height: 1.4;
+}
+
+/* Botón cerrar */
+.toast-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+    width: auto;
+}
+
+.toast-close:hover {
+    color: #fff;
+    background: none;
+    box-shadow: none;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    #toast-container {
+        top: auto;
+        bottom: 20px;
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+        width: calc(100% - 20px);
+    }
+}

@@ -1404,9 +1404,6 @@ def actualizar_jurado_y_tutor(numero_cuenta, plan_estudios, tutor, presidente, s
 @examen_bp.route("/", methods=["GET", "POST"])
 @permission_required("examen")
 def index():
-    if "user_id" not in session:
-        return redirect(url_for("index"))  # Redirige a login si no hay sesión
-
     if request.method == "POST":
         num_de_cuenta = request.form.get("numeroDeCuenta")
         tipo_documento = request.form.get("tipoDocumento")

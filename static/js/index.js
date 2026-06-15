@@ -1,13 +1,13 @@
 
 function togglePassword() {
     const passwordInput = document.getElementById("password");
-    const toggleButton = document.querySelector(".toggle-password");
+    const eyeIcon = document.getElementById("eye-icon");
 
     if (passwordInput.type === "password") {
         passwordInput.type = "text";
-        toggleButton.textContent = "Ocultar";
+        eyeIcon.className = "fa-solid fa-eye-slash";
     } else {
         passwordInput.type = "password";
-        toggleButton.textContent = "Ver";
+        eyeIcon.className = "fa-solid fa-eye";
     }
 }

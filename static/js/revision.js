@@ -62,6 +62,7 @@ function bindBusquedaAutomatica() {
 }
 
 async function consultarRevision(numCuenta) {
+    spinner.show("Generando documento...");
     try {
         const res = await fetch("/revision/", {
             method: "POST",
@@ -77,36 +78,43 @@ async function consultarRevision(numCuenta) {
             setHint("");
 
             if (data.multiples && data.multiples.length > 1) {
+                spinner.hide();
                 mostrarModalSeleccion(data.multiples, numCuenta, data.resumen);
                 return;
             }
 
             if (data.pdf_url) {
+                spinner.hide();
                 window.open(data.pdf_url, "_blank");
                 await actualizarContadorAutomaticamente();
                 setTimeout(() => window.location.reload(), 500);
                 return;
             }
 
-            alert("No se pudo generar el documento.");
+            spinner.hide();
+            toast.error("No se pudo generar el documento.");
             return;
         }
 
         if (data.no_encontrado) {
+            spinner.hide();
             mostrarModalConfirmacion(numCuenta);
             return;
         }
 
+        spinner.hide();
         resetUI();
         if (data.error) {
-            alert(data.error);
+            toast.error(data.error);
         }
     } catch (error) {
-        console.error("❌ Error al consultar revisión:", error);
+        spinner.hide();
+        console.error("Error al consultar revisión:", error);
         resetUI();
-        alert("Ocurrió un error al consultar la información.");
+        toast.error("Ocurrió un error al consultar la información.");
     }
 }
+
 
 /* =========================
    CONTADOR
@@ -145,7 +153,7 @@ function actualizarContador() {
     const nuevoValor = parseInt(input ? input.value : "", 10);
 
     if (isNaN(nuevoValor) || nuevoValor < 1) {
-        alert("Ingrese un valor válido.");
+        toast.warn("Ingrese un valor válido.");
         return;
     }
 
@@ -163,12 +171,12 @@ function actualizarContador() {
                 if (span) span.textContent = data.contador;
                 cerrarModalContador();
             } else {
-                alert("⚠ Error al actualizar el contador: " + (data.error || "Desconocido"));
+                toast.error("Error al actualizar el contador: " + (data.error || "Desconocido"));
             }
         })
         .catch(error => {
             console.error("❌ Error en la solicitud:", error);
-            alert("Ocurrió un error al actualizar el contador.");
+            toast.error("Ocurrió un error al actualizar el contador.");
         });
 }
 
@@ -220,7 +228,7 @@ function actualizarCoordinador() {
     const sexo = document.getElementById("sexoCoordinador")?.value || "";
 
     if (!nombre || !sexo) {
-        alert("⚠ Por favor llena ambos campos.");
+        toast.warn("Por favor llena ambos campos.");
         return;
     }
 
@@ -237,15 +245,15 @@ function actualizarCoordinador() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("✅ Coordinador actualizado exitosamente.");
+                toast.ok("Coordinador actualizado exitosamente.");
                 cerrarModalCoordinador();
             } else {
-                alert("⚠ Error al actualizar: " + (data.error || "Desconocido"));
+                toast.error("Error al actualizar: " + (data.error || "Desconocido"));
             }
         })
         .catch(error => {
             console.error("❌ Error en la solicitud:", error);
-            alert("Ocurrió un error al actualizar el coordinador.");
+            toast.error("Ocurrió un error al actualizar el coordinador.");
         });
 }
 
@@ -300,7 +308,7 @@ function bindNuevoUsuarioForm() {
         };
 
         if (!payload.nombre || !payload.cuenta || !payload.plan || !payload.clave || !payload.programa || !payload.genero) {
-            alert("⚠ Todos los campos son obligatorios.");
+            toast.warn("Todos los campos son obligatorios.");
             return;
         }
 
@@ -316,15 +324,15 @@ function bindNuevoUsuarioForm() {
             const data = await res.json();
 
             if (data.success) {
-                alert("✅ Usuario registrado correctamente.");
+                toast.ok("Usuario registrado correctamente.");
                 cerrarModalNuevoUsuario();
                 window.location.reload();
             } else {
-                alert("⚠ Error al registrar usuario: " + (data.error || "Desconocido"));
+                toast.error("Error al registrar usuario: " + (data.error || "Desconocido"));
             }
         } catch (error) {
             console.error("❌ Error al registrar usuario:", error);
-            alert("Ocurrió un error al registrar el usuario.");
+            toast.error("Ocurrió un error al registrar el usuario.");
         }
     });
 }
@@ -372,6 +380,7 @@ function cerrarModalSeleccion() {
 }
 
 function seleccionarPlan(numCuenta, seleccionId) {
+    spinner.show("Generando documento...");
     fetch("/revision/", {
         method: "POST",
         headers: {
@@ -383,19 +392,21 @@ function seleccionarPlan(numCuenta, seleccionId) {
         .then(async data => {
             if (data.success) {
                 if (data.pdf_url) {
+                    spinner.hide();
                     window.open(data.pdf_url, "_blank");
                 }
-
                 cerrarModalSeleccion();
                 await actualizarContadorAutomaticamente();
                 setTimeout(() => window.location.reload(), 500);
             } else {
-                alert(data.error || "Ocurrió un error.");
+                spinner.hide();
+                toast.error(data.error || "Ocurrió un error.");
             }
         })
         .catch(error => {
-            console.error("❌ Error al seleccionar plan:", error);
-            alert("Ocurrió un error al seleccionar el plan.");
+            spinner.hide();
+            console.error("Error al seleccionar plan:", error);
+            toast.error("Ocurrió un error al seleccionar el plan.");
         });
 }
 

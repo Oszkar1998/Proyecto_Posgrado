@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 
     <meta charset="UTF-8">
@@ -9,22 +9,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Votos Oficio</title>
 
-    <link rel="stylesheet" href="/static/Estilos/votosOficio.css">
-    <script src="/static/js/votosOficio.js" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/votosOficio.css') }}">
+    <script src="{{ url_for('static', filename='js/votosOficio.js') }}" defer></script>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>  
    
-     <!-- Boton para menú principal -->
+    <!-- Botón para menú principal -->
     <header class="header">
         <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-            <span>🏠 Menú Principal </span>
+            <span><i class="fa-solid fa-house"></i> Menú Principal</span>
         </div>
     </header>
 
-    
-    <!-- Modal para  capturar datos -->
+    <!-- Modal para capturar datos -->
     <div class="modal-capturar" id="modal-capturar" style="display: none;">
         <div class="modal-content">
             <h2>CAPTURA DE DATOS</h2>
@@ -66,15 +72,19 @@
             <input type="text" id="vocal3" name="vocal3" placeholder="TERCER VOCAL">
             <input type="text" id="secretario" name="secretario" placeholder="SECRETARIO">
                     
-            <button onclick="actualizarCapturar()">✅ Guardar</button>
-            <button onclick="cerrarModalCapturar()">❌ Cancelar</button>
+            <button onclick="actualizarCapturar()">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+            <button onclick="cerrarModalCapturar()">
+                <i class="fa-solid fa-xmark"></i> Cancelar
+            </button>
         </div>
     </div>
  
-    <!-- BUSQUEDA POR NOMBRE-->
+    <!-- BUSQUEDA POR NOMBRE -->
     <header class="header">
         <div id="busquedaNombre-container" onclick="mostrarModalBusquedaNombre()">
-            <span> BUSQUEDA POR NOMBRE </span>
+            <span><i class="fa-solid fa-magnifying-glass"></i> BUSQUEDA POR NOMBRE</span>
         </div>
     </header>
 
@@ -85,8 +95,12 @@
             <input type="text" id="nombreCompletoBusqueda" name="nombreCompletoBusqueda" placeholder="INGRESE NOMBRE COMPLETO">
                     
             <div style="margin-top: 15px;">
-                <button onclick="busquedaPorNombre()">🔍 Buscar</button>
-                <button onclick="cerrarModalBusquedaNombre()">❌ Cancelar</button>
+                <button onclick="busquedaPorNombre()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                </button>
+                <button onclick="cerrarModalBusquedaNombre()">
+                    <i class="fa-solid fa-xmark"></i> Cancelar
+                </button>
             </div>
                     
             <!-- Contenedor para mostrar resultados -->
@@ -97,7 +111,7 @@
     <!-- MODIFICAR DATOS -->
     <header class="header">
         <div id="modificarDatos-container" onclick="mostrarModalModificarDatos()">
-            <span> MODIFICAR DATOS </span>
+            <span><i class="fa-solid fa-pen-to-square"></i> MODIFICAR DATOS</span>
         </div>
     </header>
             
@@ -106,18 +120,23 @@
         <div class="modal-content3">
             <h2>MODIFICAR DATOS</h2>
             <input type="text" id="numeroCuentaModificar" placeholder="Ingrese número de cuenta">
-            <button onclick="buscarDatosModificar()">🔍 Buscar</button>
+            <button onclick="buscarDatosModificar()">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
 
             <div id="datosModificarForm" style="max-height: 400px; overflow-y: auto;"></div>
 
-            <button onclick="guardarCambiosModificar()">💾 Guardar Cambios</button>
-            <button onclick="cerrarModalModificarDatos()">❌ Cancelar</button>
+            <button onclick="guardarCambiosModificar()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+            </button>
+            <button onclick="cerrarModalModificarDatos()">
+                <i class="fa-solid fa-xmark"></i> Cancelar
+            </button>
         </div>
     </div>
 
-
     <div class="container">
-        <h1>📘 Consulta de Documentos de Posgrado</h1>
+        <h1><i class="fa-solid fa-file-lines"></i> Consulta de Documentos de Posgrado</h1>
         
         <form id="login-form" method="POST" action="/votosOficio">
           <label for="numeroDeCuenta">Número de Cuenta:</label>
@@ -129,30 +148,35 @@
 
         <!-- Solo botón de votos -->
         <div id="botones-expediente" style="display: none; margin-top: 20px;">
-            <button id="btn-documento-2">VOTOS -> 5 FORMATOS</button>
+            <button id="btn-documento-2">
+                <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
+            </button>
         </div>
     </div>
 
     <!-- Modal Selección de Plan para Votos -->
     <div id="modalSeleccionPlanVotos" class="modal" style="display:none;">
-    <div class="modal-content">
-        <h2>Selecciona el plan para generar VOTOS</h2>
-        <div id="opcionesPlanesVotos"></div>
-        <button class="btn cancel" onclick="cerrarModalSeleccionVotos()">Cerrar</button>
-    </div>
+        <div class="modal-content">
+            <h2>Selecciona el plan para generar VOTOS</h2>
+            <div id="opcionesPlanesVotos"></div>
+            <button class="btn cancel" onclick="cerrarModalSeleccionVotos()">
+                <i class="fa-solid fa-xmark"></i> Cerrar
+            </button>
+        </div>
     </div>
 
     <!-- Modal de error: número de cuenta NO existe -->
     <div id="modalError" class="modal" style="display:none;">
-    <div class="modal-content">
-        <h2>Cuenta no encontrada</h2>
-        <p id="modalErrorMsg">El número de cuenta no se encuentra en la base de datos. Ingresa uno correcto.</p>
-        <div style="margin-top: 12px;">
-        <button onclick="cerrarModalError()">Cerrar</button>
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-circle-exclamation"></i> Cuenta no encontrada</h2>
+            <p id="modalErrorMsg">El número de cuenta no se encuentra en la base de datos. Ingresa uno correcto.</p>
+            <div style="margin-top: 12px;">
+                <button onclick="cerrarModalError()">
+                    <i class="fa-solid fa-xmark"></i> Cerrar
+                </button>
+            </div>
         </div>
-    </div>
     </div>  
 
 </body>
 </html>
-

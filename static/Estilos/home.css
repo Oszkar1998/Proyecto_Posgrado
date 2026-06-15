@@ -160,3 +160,20 @@ body {
         max-width: 320px;
     }
 }
+
+
+/* Cards con ícono arriba y texto abajo */
+.card {
+    flex-direction: column;
+    gap: 10px;
+}
+ 
+.card-icon {
+    font-size: 32px;
+    display: block;
+}
+ 
+/* Ícono en botón cerrar sesión */
+.logout-button i {
+    margin-right: 6px;
+}

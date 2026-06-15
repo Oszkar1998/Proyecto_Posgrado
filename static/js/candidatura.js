@@ -70,14 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- API: generar PDF (acta / citatorio) ---
   async function generarPDF(tipo) {
     if (!cuentaActual || cuentaActual.length !== 9) {
-      alert("Primero ingresa un número de cuenta válido (9 dígitos).");
+      toast.warn("Primero ingresa un número de cuenta válido (9 dígitos).");
       return;
     }
 
     if (tipo === "acta") {
-      obtenerFolioActa(); // ya incrementó en backend
+      obtenerFolioActa();
     }
-
 
     setEstado(`Generando ${tipo.toUpperCase()}…`, "info");
 
@@ -85,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("numeroDeCuenta", cuentaActual);
     formData.append("tipo", tipo);
 
+    spinner.show("Generando documento...");
     try {
       const resp = await fetch("/candidatura/generar_pdf", {
         method: "POST",
@@ -95,17 +95,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await resp.json();
 
       if (!resp.ok || !data.success) {
+        spinner.hide();
         setEstado(data.error || "No se pudo generar el PDF.", "error");
         return;
       }
 
       if (data.pdf_url) {
+        spinner.hide();
         window.open(data.pdf_url, "_blank");
         setEstado("PDF generado correctamente.", "ok");
       } else {
+        spinner.hide();
         setEstado("El servidor no devolvió la URL del PDF.", "error");
       }
     } catch (e) {
+      spinner.hide();
       console.error(e);
       setEstado("Error de conexión al generar PDF.", "error");
     }
@@ -249,7 +253,7 @@ async function cargarCandidaturaPorCuenta() {
   if (fields) fields.style.display = "none"; // ✅ ocultar siempre antes
 
   if (!num || num.length !== 9) {
-    alert("Número de cuenta inválido.");
+    toast.warn("Número de cuenta inválido.");
     return;
   }
 
@@ -258,7 +262,7 @@ async function cargarCandidaturaPorCuenta() {
     const data = await resp.json();
 
     if (!data || !data.numero_cuenta) {
-      alert("No se encontró ese registro.");
+      toast.error("No se encontró ese registro.");
       return;
     }
 
@@ -284,7 +288,7 @@ async function cargarCandidaturaPorCuenta() {
 
   } catch (e) {
     console.error(e);
-    alert("Error al cargar datos.");
+    toast.error("Error al cargar datos.");
   }
 }
 
@@ -318,15 +322,15 @@ async function guardarCambiosCandidatura() {
     const data = await resp.json();
 
     if (!resp.ok || !data.ok) {
-      alert(data.error || "Error al guardar.");
+      toast.error(data.error || "Error al guardar.");
       return;
     }
 
-    alert("Datos actualizados correctamente.");
+    toast.ok("Datos actualizados correctamente.");
     cerrarModalModificarDatos();
   } catch (e) {
     console.error(e);
-    alert("Error de conexión.");
+    toast.error("Error de conexión.");
   }
 }
 
@@ -351,22 +355,22 @@ async function guardarCapturaCandidatura() {
   };
 
   // Validación mínima rápida
-  if (!payload.nombre_completo) return alert("Falta: Nombre completo");
-  if (!/^\d{9}$/.test(payload.numero_cuenta)) return alert("Número de cuenta inválido (9 dígitos).");
-  if (!payload.especialidad) return alert("Falta: Especialidad");
-  if (!payload.titulo_proyecto) return alert("Falta: Título del proyecto");
-  if (!payload.semestre_ingreso) return alert("Falta: Semestre ingreso");
-  if (!payload.semestre_presentado) return alert("Falta: Semestre presentado");
-  if (!payload.evaluacion) return alert("Falta: Evaluación");
-  if (!payload.presidente) return alert("Falta: Presidente");
-  if (!payload.secretario) return alert("Falta: Secretario");
-  if (!payload.vocal1) return alert("Falta: Vocal 1");
-  if (!payload.vocal2) return alert("Falta: Vocal 2");
-  if (!payload.vocal3) return alert("Falta: Vocal 3");
-  if (!payload.sexo) return alert("Falta: Sexo");
-  if (!payload.modalidad_sede) return alert("Falta: Modalidad / Sede");
-  if (!payload.fecha_examen) return alert("Falta: Fecha examen");
-  if (!payload.hora_examen) return alert("Falta: Hora examen");
+  if (!payload.nombre_completo) return toast.warn("Falta: Nombre completo");
+  if (!/^\d{9}$/.test(payload.numero_cuenta)) return toast.warn("Número de cuenta inválido (9 dígitos).");
+  if (!payload.especialidad) return toast.warn("Falta: Especialidad");
+  if (!payload.titulo_proyecto) return toast.warn("Falta: Título del proyecto");
+  if (!payload.semestre_ingreso) return toast.warn("Falta: Semestre ingreso");
+  if (!payload.semestre_presentado) return toast.warn("Falta: Semestre presentado");
+  if (!payload.evaluacion) return toast.warn("Falta: Evaluación");
+  if (!payload.presidente) return toast.warn("Falta: Presidente");
+  if (!payload.secretario) return toast.warn("Falta: Secretario");
+  if (!payload.vocal1) return toast.warn("Falta: Vocal 1");
+  if (!payload.vocal2) return toast.warn("Falta: Vocal 2");
+  if (!payload.vocal3) return toast.warn("Falta: Vocal 3");
+  if (!payload.sexo) return toast.warn("Falta: Sexo");
+  if (!payload.modalidad_sede) return toast.warn("Falta: Modalidad / Sede");
+  if (!payload.fecha_examen) return toast.warn("Falta: Fecha examen");
+  if (!payload.hora_examen) return toast.warn("Falta: Hora examen");
 
   try {
     const resp = await fetch("/candidatura/api/crear", {
@@ -378,15 +382,15 @@ async function guardarCapturaCandidatura() {
     const data = await resp.json();
 
     if (!resp.ok || !data.ok) {
-      alert(data.error || "Error al guardar.");
+      toast.error(data.error || "Error al guardar.");
       return;
     }
 
-    alert("Registro guardado correctamente ✅");
+    toast.ok("Registro guardado correctamente");
     cerrarModalCapturar();
   } catch (e) {
     console.error(e);
-    alert("Error de conexión.");
+    toast.error("Error de conexión.");
   }
 }
 
@@ -413,7 +417,7 @@ function actualizarFolioActa() {
   const input = document.getElementById("nuevoFolioActa");
   const nuevo = parseInt(input?.value || "", 10);
 
-  if (isNaN(nuevo) || nuevo < 1) return alert("Ingresa un valor válido.");
+  if (isNaN(nuevo) || nuevo < 1) return toast.warn("Ingresa un valor válido.");
 
   fetch("/candidatura/actualizar_folio_acta", {
     method: "POST",
@@ -422,7 +426,7 @@ function actualizarFolioActa() {
   })
   .then(r => r.json())
   .then(data => {
-    if (!data.success) return alert(data.error || "No se pudo actualizar.");
+    if (!data.success) return toast.error(data.error || "No se pudo actualizar.");
     const span = document.getElementById("folio-valor");
     if (span) span.textContent = data.folio;
     cerrarModalFolioActa();
