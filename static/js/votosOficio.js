@@ -11,51 +11,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function resetUI() {
     botonesDocumentos.style.display = "none";
-    document.getElementById("botones-expediente").innerHTML = "";
+    botonesDocumentos.innerHTML = `<button id="btn-documento-2"><i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS</button>`;
     const m = document.getElementById("modalSeleccionPlanVotos");
     if (m) m.style.display = "none";
     setHint("Escribe tu número completo (9 dígitos)...");
   }
 
   async function consultarYMostrar(numeroCuenta) {
-      busquedaPorCuenta();
+    spinner.show("Buscando...");
+    try {
+        const res = await fetch("/votosOficio", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
+        });
+        const data = await res.json();
 
-      spinner.show("Generando documento...");
-      try {
-          const res = await fetch("/votosOficio", {
-              method: "POST",
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
-          });
-          const data = await res.json();
+        if (data.success) {
+            setHint("");
 
-          if (data.success) {
-              setHint("");
-              botonesDocumentos.style.display = "block";
+            if (data.multiples && data.multiples.length > 1) {
+                spinner.hide();
+                mostrarModalSeleccionVotos(data.multiples);
+                return;
+            }
 
-              if (data.multiples && data.multiples.length > 1) {
-                  spinner.hide();
-                  mostrarModalSeleccionVotos(data.multiples);
-                  return;
-              }
+            if (data.votos_url) {
+                spinner.hide();
+                botonesDocumentos.style.display = "block";
+                botonesDocumentos.innerHTML = `
+                    <div style="
+                        background: rgba(246,195,67,0.08);
+                        border: 1px solid rgba(246,195,67,0.3);
+                        border-radius: 12px;
+                        padding: 16px;
+                        margin-bottom: 14px;
+                        text-align: center;
+                        color: #f6c343;
+                    ">
+                        <p style="font-size:16px; font-weight:700; margin:0 0 6px 0;">
+                            ${data.nombre || ""}
+                        </p>
+                        <p style="font-size:13px; color:#ccc; margin:0 0 4px 0;">
+                            Cuenta: <strong style="color:#fff">${numeroCuenta}</strong>
+                        </p>
+                        <p style="font-size:13px; color:#ccc; margin:0;">
+                            ${data.especializacion || ""} ${data.modalidad ? "· " + data.modalidad : ""}
+                        </p>
+                    </div>
+                    <button id="btn-documento-2" style="
+                        background:#28a745; color:#fff; border:none;
+                        border-radius:10px; padding:12px 20px;
+                        font-weight:700; font-size:15px; cursor:pointer; width:100%;
+                    ">
+                        <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
+                    </button>
+                `;
+                const btn = document.getElementById("btn-documento-2");
+                if (btn) btn.onclick = () => window.open(data.votos_url, "_blank");
+                return;
+            }
 
-              if (data.votos_url) {
-                  spinner.hide();
-                  btnDocumento2.onclick = () => window.open(data.votos_url, "_blank");
-                  return;
-              }
-
-              spinner.hide();
-              toast.error("No se pudo generar el documento.");
-          } else {
-              spinner.hide();
-              resetUI();
-          }
-      } catch (error) {
-          spinner.hide();
-          console.error(error);
-          toast.error("Error de conexión con el servidor.");
-      }
+            spinner.hide();
+            toast.error("No se pudo generar el documento.");
+        } else {
+            spinner.hide();
+            resetUI();
+        }
+    } catch (error) {
+        spinner.hide();
+        console.error(error);
+        toast.error("Error de conexión con el servidor.");
+    }
   }
 
   // Sin botón: no usamos submit; validamos al teclear

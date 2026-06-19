@@ -118,7 +118,13 @@ def index():
 
         votos_filename = "Votos.pdf"
         pdf_votos.output(direccionPDF + votos_filename, "F")
-        return jsonify({"success": True, "votos_url": f"/votosOficio/ver_pdf/{votos_filename}"})
+        return jsonify({
+            "success": True,
+            "votos_url": f"/votosOficio/ver_pdf/{votos_filename}",
+            "nombre": nombre,
+            "especializacion": espec or "",
+            "modalidad": modalidad or ""
+        })
     
     return render_template("votosOficio.html")
 

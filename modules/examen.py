@@ -313,10 +313,10 @@ def generar_citatorio(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pr
         pdf.multi_cell(110, 5, "                                                                                     ", align="C")
         pdf.set_font("Arial", size=12, style="B")
         pdf.set_xy(10, 247)
-        pdf.multi_cell(100, 5, coordinadorNombre, align="C")
+        pdf.multi_cell(100, 5, coordinadorNombre.upper(), align="C")
         pdf.set_font("Arial", size=12, style="B")
         pdf.set_xy(7.5, 254)
-        pdf.multi_cell(80, 5, coordinadorGenero, align="C")
+        pdf.multi_cell(78, 5, coordinadorGenero, align="C")
 
 def documento_medalla(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad):
     
