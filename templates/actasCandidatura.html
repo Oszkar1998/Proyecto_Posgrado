@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actas Candidatura</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/actasCandidatura.css') }}">
+    <script src="{{ url_for('static', filename='js/actasCandidatura.js') }}" defer></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Botón Menú principal -->
+    <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
+        <span><i class="fa-solid fa-house"></i> Menú Principal</span>
+    </div>
+
+    <!-- Flash mensajes del backend -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-overlay" style="display:flex;">
+                <div class="flash-box">
+                    <div class="flash-msg {{ category }}">{{ message }}</div>
+                    <button class="flash-btn" onclick="this.closest('.flash-overlay').style.display='none'">Cerrar</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ====== PÁGINA PRINCIPAL: BÚSQUEDA ====== -->
+    <div class="container">
+        <div class="card">
+            <h1><i class="fa-solid fa-file-contract"></i> Búsqueda de Actas Candidatura</h1>
+            <p class="descripcion">
+                Puede buscar actas ingresando el número de cuenta, el nombre del alumno, un sinodal o un rango de fechas.
+                <br>● Si ingresa <strong>número de cuenta</strong>, se listarán todos sus registros.
+                <br>● Si ingresa <strong>nombre del alumno</strong>, se buscarán coincidencias.
+                <br>● Si ingresa <strong>Sinodal</strong>, se listarán todas las actas donde aparezca en el jurado.
+                <br>● Si ingresa <strong>rango de fechas</strong>, se mostrarán las actas dentro de ese periodo.
+                <br>● Puede combinar sinodal o nombre con un rango de fechas para acotar resultados.
+            </p>
+
+            <form id="searchForm" method="POST">
+                <div class="input-group">
+                    <label for="numeroCuenta">Número de Cuenta:</label>
+                    <input type="text" id="numeroCuenta" name="numeroCuenta"
+                           placeholder="Ejemplo: 123456789" maxlength="9" inputmode="numeric">
+
+                    <label for="nombreAlumno">Nombre del Alumno:</label>
+                    <input type="text" id="nombreAlumno" name="nombreAlumno"
+                           placeholder="Ejemplo: JUAN PÉREZ LÓPEZ">
+
+                    <label for="sinodal">Sinodal:</label>
+                    <input type="text" id="sinodal" name="sinodal"
+                           placeholder="Ejemplo: DR. MARÍA PÉREZ LÓPEZ">
+
+                    <label for="fechaInicio">Fecha Inicio:</label>
+                    <input type="date" id="fechaInicio" name="fechaInicio">
+
+                    <label for="fechaFin">Fecha Fin:</label>
+                    <input type="date" id="fechaFin" name="fechaFin">
+                </div>
+
+                <button type="submit" class="btn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Obtener Documentos
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultados de búsqueda -->
+    {% if resultados %}
+    <div class="resultados">
+        <h2>{{ resultados|length }} resultado(s) encontrado(s)</h2>
+        <ul>
+            {% for r in resultados %}
+            <li>
+                <strong>{{ r[2] }}</strong>
+                Cuenta: {{ r[1] }} · Fecha: {{ r[3] }} · Evaluación: {{ r[4] }} · Resultado: {{ r[5] }}
+                <div style="margin-top:10px;">
+                    <button class="btn abrir-acta" data-url="{{ url_for('actas_candidatura.ver_pdf', registro_id=r[0]) }}">
+                        <i class="fa-solid fa-file-pdf"></i> Ver Acta PDF
+                    </button>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mensaje %}
+    <div class="resultados">
+        <p style="color:#f7c948; text-align:center;">{{ mensaje }}</p>
+    </div>
+    {% endif %}
+
+    <!-- ====== MODAL CAPTURAR DATOS ====== -->
+    <div id="modal-capturar-actaCandidatura" class="modal-menu-votos">
+        <div class="modal-menu-votos-content">
+            <h2>CAPTURAR DATOS - ACTAS CANDIDATURA</h2>
+
+            <form method="POST" action="{{ url_for('actas_candidatura.guardar_acta') }}" enctype="multipart/form-data">
+
+                <label>Número de cuenta *</label>
+                <input type="text" name="numeroCuenta" maxlength="9" placeholder="9 dígitos" required>
+
+                <label>Nombre completo *</label>
+                <input type="text" name="nombre" placeholder="Nombre completo" required>
+
+                <label>Semestre ingreso *</label>
+                <input type="text" name="semestreIngreso" placeholder="Ej: 2023-1" required>
+
+                <label>Semestre presentado *</label>
+                <select name="semestrePresentado" required>
+                    <option value="">Selecciona...</option>
+                    <option value="TERCER">TERCER</option>
+                    <option value="CUARTO">CUARTO</option>
+                    <option value="QUINTO">QUINTO</option>
+                    <option value="SEXTO">SEXTO</option>
+                    <option value="SEPTIMO">SEPTIMO</option>
+                </select>
+
+                <label>Evaluación *</label>
+                <select name="evaluacion" required>
+                    <option value="">Selecciona...</option>
+                    <option value="PRIMERA">PRIMERA</option>
+                    <option value="SEGUNDA">SEGUNDA</option>
+                </select>
+
+                <label>Fecha *</label>
+                <input type="date" name="fecha" required>
+
+                <label>Hora *</label>
+                <input type="time" name="hora" required>
+
+                <label>Resultado del examen *</label>
+                <select name="resultadoExamen" required>
+                    <option value="">Selecciona...</option>
+                    <option value="Aprobado">Aprobado</option>
+                    <option value="No aprobado">No aprobado</option>
+                </select>
+
+                <hr style="margin:16px 0; opacity:.25;">
+                <p style="color:#ccc; font-size:13px; margin-bottom:10px;">
+                    Sinodales — opcionales (pueden no presentarse):
+                </p>
+
+                <label>Presidente</label>
+                <input type="text" name="presidente" placeholder="Opcional">
+
+                <label>Secretario</label>
+                <input type="text" name="secretario" placeholder="Opcional">
+
+                <label>Vocal 1</label>
+                <input type="text" name="vocal1" placeholder="Opcional">
+
+                <label>Vocal 2</label>
+                <input type="text" name="vocal2" placeholder="Opcional">
+
+                <label>Vocal 3</label>
+                <input type="text" name="vocal3" placeholder="Opcional">
+
+                <hr style="margin:16px 0; opacity:.25;">
+                <label>Acta escaneada (PDF) *</label>
+                <input type="file" name="actaPDF" accept="application/pdf" required>
+
+                <div style="margin-top:14px;">
+                    <button type="submit" class="btn">
+                        <i class="fa-solid fa-check"></i> Guardar
+                    </button>
+                    <button type="button" class="btn btn-cancelar"
+                            onclick="cerrarModal('modal-capturar-actaCandidatura')">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== MODAL MODIFICAR DATOS ====== -->
+    <div id="modal-modificar-actaCandidatura" class="modal-menu-votos">
+        <div class="modal-menu-votos-content">
+            <h2>MODIFICAR DATOS - ACTAS CANDIDATURA</h2>
+
+            <label>Número de cuenta a buscar</label>
+            <input type="text" id="mod_numeroCuenta_buscar" maxlength="9" placeholder="9 dígitos">
+            <button type="button" class="btn" onclick="buscarParaModificar()">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+
+            <div id="mod_lista_registros" style="margin-top:14px;"></div>
+
+            <div id="mod_form_fields" style="display:none;">
+                <hr style="margin:16px 0; opacity:.25;">
+
+                <form method="POST" action="{{ url_for('actas_candidatura.actualizar_acta') }}"
+                      enctype="multipart/form-data">
+
+                    <input type="hidden" name="id" id="mod_id">
+
+                    <label>Número de cuenta *</label>
+                    <input type="text" name="numeroCuenta" id="mod_numeroCuenta" maxlength="9" required>
+
+                    <label>Nombre completo *</label>
+                    <input type="text" name="nombre" id="mod_nombre" required>
+
+                    <label>Semestre ingreso *</label>
+                    <input type="text" name="semestreIngreso" id="mod_semestreIngreso" required>
+
+                    <label>Semestre presentado *</label>
+                    <select name="semestrePresentado" id="mod_semestrePresentado" required>
+                        <option value="">Selecciona...</option>
+                        <option value="TERCER">TERCER</option>
+                        <option value="CUARTO">CUARTO</option>
+                        <option value="QUINTO">QUINTO</option>
+                        <option value="SEXTO">SEXTO</option>
+                        <option value="SEPTIMO">SEPTIMO</option>
+                    </select>
+
+                    <label>Evaluación *</label>
+                    <select name="evaluacion" id="mod_evaluacion" required>
+                        <option value="">Selecciona...</option>
+                        <option value="PRIMERA">PRIMERA</option>
+                        <option value="SEGUNDA">SEGUNDA</option>
+                    </select>
+
+                    <label>Fecha *</label>
+                    <input type="date" name="fecha" id="mod_fecha" required>
+
+                    <label>Hora *</label>
+                    <input type="time" name="hora" id="mod_hora" required>
+
+                    <label>Resultado del examen *</label>
+                    <select name="resultadoExamen" id="mod_resultadoExamen" required>
+                        <option value="">Selecciona...</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="No aprobado">No aprobado</option>
+                    </select>
+
+                    <hr style="margin:16px 0; opacity:.25;">
+
+                    <label>Presidente</label>
+                    <input type="text" name="presidente" id="mod_presidente">
+
+                    <label>Secretario</label>
+                    <input type="text" name="secretario" id="mod_secretario">
+
+                    <label>Vocal 1</label>
+                    <input type="text" name="vocal1" id="mod_vocal1">
+
+                    <label>Vocal 2</label>
+                    <input type="text" name="vocal2" id="mod_vocal2">
+
+                    <label>Vocal 3</label>
+                    <input type="text" name="vocal3" id="mod_vocal3">
+
+                    <hr style="margin:16px 0; opacity:.25;">
+                    <label>Reemplazar PDF (opcional)</label>
+                    <input type="file" name="actaPDF" accept="application/pdf">
+
+                    <div style="margin-top:14px;">
+                        <button type="submit" class="btn">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                        </button>
+                        <button type="button" class="btn btn-cancelar"
+                                onclick="cerrarModal('modal-modificar-actaCandidatura')">
+                            <i class="fa-solid fa-xmark"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

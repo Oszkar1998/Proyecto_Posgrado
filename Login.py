@@ -20,6 +20,7 @@ from modules.votosOficio import votos_Oficio_PUEI_bp
 from modules.candidatura import candidatura_bp
 from modules.captura import captura_bp
 from modules.pagoExamen import pagoExamen_bp
+from modules.actasCandidatura import actas_candidatura_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-cambiar-en-produccion")
@@ -56,6 +57,8 @@ app.register_blueprint(votos_Oficio_PUEI_bp, url_prefix='/votosOficio')
 app.register_blueprint(candidatura_bp, url_prefix="/candidatura")
 app.register_blueprint(captura_bp, url_prefix="/captura")
 app.register_blueprint(pagoExamen_bp, url_prefix="/pagoExamen")
+app.register_blueprint(actas_candidatura_bp, url_prefix='/actasCandidatura')
+
 
 DATABASE = "static/BaseDeDatos/basePosgrado.db"
 
@@ -146,10 +149,11 @@ def index():
 def register():
     db = get_db()
 
+    def get_permissions():
+        return db.execute("SELECT name, description FROM permissions ORDER BY name").fetchall()
+
     if request.method == "GET":
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template("register.html", permissions=permissions)
+        return render_template("register.html", permissions=get_permissions())
 
     email = request.form.get("email", "").strip()
     password = request.form.get("password", "").strip()
@@ -157,33 +161,22 @@ def register():
     selected_permissions = request.form.getlist("permissions")
 
     if not email or not password:
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template("register.html", permissions=permissions, error="Correo y contraseña son obligatorios.")
+        return render_template("register.html", permissions=get_permissions(),
+                               error="Correo y contraseña son obligatorios.")
 
     if len(password) < 6:
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template("register.html", permissions=permissions, error="La contraseña debe tener al menos 6 caracteres.")
+        return render_template("register.html", permissions=get_permissions(),
+                               error="La contraseña debe tener al menos 6 caracteres.")
 
     if is_admin != "1" and not selected_permissions:
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template(
-            "register.html",
-            permissions=permissions,
-            error="Debes seleccionar al menos un permiso o marcar como administrador."
-        )
+        return render_template("register.html", permissions=get_permissions(),
+                               error="Debes seleccionar al menos un permiso o marcar como administrador.")
 
     try:
         hashed_password = generate_password_hash(password)
-
-        cursor = db.execute(
-            "INSERT INTO users (email, password) VALUES (?, ?)",
-            (email, hashed_password)
-        )
+        cursor = db.execute("INSERT INTO users (email, password) VALUES (?, ?)",
+                            (email, hashed_password))
         db.commit()
-
         user_id = cursor.lastrowid
 
         if is_admin == "1":
@@ -199,15 +192,12 @@ def register():
                 """, (user_id, permission_name))
 
         db.commit()
-
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template("register.html", permissions=permissions, message="Usuario creado y permisos asignados correctamente.")
+        return render_template("register.html", permissions=get_permissions(),
+                               message="Usuario creado y permisos asignados correctamente.")
 
     except sqlite3.IntegrityError:
-        cursor = db.execute("SELECT name, description FROM permissions ORDER BY name")
-        permissions = cursor.fetchall()
-        return render_template("register.html", permissions=permissions, error="El correo ya está registrado.")
+        return render_template("register.html", permissions=get_permissions(),
+                               error="El correo ya está registrado.")
 
 @app.route("/manage_users")
 @superadmin_required
@@ -235,7 +225,6 @@ def edit_user(user_id):
     if not user:
         return abort(404)
 
-    # Evita que el superadmin se edite a sí mismo
     if user_id == session["user_id"]:
         return abort(403)
 
@@ -307,6 +296,29 @@ def edit_user(user_id):
 
     db.commit()
     return redirect(url_for("manage_users"))
+
+
+@app.route("/delete_user/<int:user_id>", methods=["POST"])
+@superadmin_required
+def delete_user(user_id):
+    # No puede eliminarse a sí mismo
+    if user_id == session["user_id"]:
+        return abort(403)
+
+    db = get_db()
+
+    user = db.execute("SELECT id, email FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not user:
+        return abort(404)
+
+    # Eliminar permisos, roles y usuario
+    db.execute("DELETE FROM user_permissions WHERE user_id = ?", (user_id,))
+    db.execute("DELETE FROM user_roles WHERE user_id = ?", (user_id,))
+    db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    db.commit()
+
+    return redirect(url_for("manage_users"))
+
 
 @app.route("/home")
 def home():

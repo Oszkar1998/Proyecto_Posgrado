@@ -179,42 +179,6 @@ button:hover {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: #1e1e1e;
-    padding: 28px;
-    border-radius: 16px;
-    border: 1px solid rgba(250, 204, 21, 0.5);
-    box-shadow: 0 0 25px rgba(250, 204, 21, 0.25);
-    width: 90%;
-    max-width: 520px;
-    text-align: center;
-    color: white;
-}
-
-.opciones-planes {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 18px;
-}
-
-.opciones-planes button {
-    width: 100%;
-    background: #facc15;
-    color: black;
-    font-weight: bold;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
     background: rgba(0, 0, 0, 0.72);
     justify-content: center;
     align-items: center;

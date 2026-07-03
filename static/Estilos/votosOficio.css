@@ -36,16 +36,6 @@ body {
   cursor: pointer;
 }
 
-/* Contenedor de los 3 botones centrados */
-.derecha{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  margin: 0 auto;
-  width: fit-content;
-}
-
 /* ====== BOTONES SUPERIORES (SIN ABSOLUTE) ====== */
 #capturar-container,
 #busquedaNombre-container,

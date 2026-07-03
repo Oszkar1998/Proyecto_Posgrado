@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
   <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -20,7 +22,7 @@
   <!-- Botón Menú principal -->
   <header class="header">
     <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-      <span>🏠 Menú Principal</span>
+      <span><i class="fa-solid fa-house"></i> Menú Principal</span>
     </div>
   </header>
 
@@ -32,7 +34,7 @@
     <div class="grid-opciones">
       <!-- Opción 1 -->
       <div class="card-opcion" onclick="mostrarMenuVotos()">
-        <div class="icono">🗳️</div>
+        <div class="icono"><i class="fa-solid fa-square-poll-vertical"></i></div>
         <div class="texto">
           <h2>VOTOS</h2>
           <p>Captura y gestión de votos</p>
@@ -41,7 +43,7 @@
 
       <!-- Opción 2 -->
       <div class="card-opcion" onclick="mostrarMenuCandidatura()">
-        <div class="icono">👤</div>
+        <div class="icono"><i class="fa-solid fa-user-graduate"></i></div>
         <div class="texto">
           <h2>CANDIDATURA</h2>
           <p>Captura y gestión de candidatura</p>
@@ -50,9 +52,18 @@
 
       <!-- Opción 3 -->
       <div class="card-opcion" onclick="mostrarMenuActasGrado()">
-        <div class="icono">📄</div>
+        <div class="icono"><i class="fa-solid fa-scroll"></i></div>
         <div class="texto">
           <h2>ACTAS GRADO</h2>
+          <p>Captura y gestión de actas</p>
+        </div>
+      </div>
+
+      <!-- Opción 4 -->
+      <div class="card-opcion" onclick="mostrarMenuActasCandidatura()">
+        <div class="icono"><i class="fa-solid fa-file-contract"></i></div>
+        <div class="texto">
+          <h2>ACTAS CANDIDATURA</h2>
           <p>Captura y gestión de actas</p>
         </div>
       </div>
@@ -93,7 +104,7 @@
   </div>
 
   <!-- Modal menú ACTAS GRADO -->
-  <div id="modal-menu-actas" class="modal-menu-votos" style="display:none;">
+  <div id="modal-menu-actas-grado" class="modal-menu-votos" style="display:none;">
     <div class="modal-menu-votos-content">
       <h2>ACTAS GRADO</h2>
       <p>Selecciona una opción</p>
@@ -109,6 +120,21 @@
     </div>
   </div>
 
+  <!-- Modal menú ACTAS CANDIDATURA -->
+  <div id="modal-menu-actas-candidatura" class="modal-menu-votos" style="display:none;">
+    <div class="modal-menu-votos-content">
+      <h2>ACTAS CANDIDATURA</h2>
+      <p>Selecciona una opción</p>
+
+      <div class="menu-votos-grid">
+        <button type="button" onclick="abrirActasCandidatura('capturar')">CAPTURAR DATOS</button>
+        <button type="button" onclick="abrirActasCandidatura('modificar')">MODIFICAR DATOS</button>
+        <button type="button" onclick="abrirActasCandidatura('verActa')">VER ACTA</button>
+      </div>
+
+      <button type="button" class="btn-cerrar" onclick="cerrarMenuActasCandidatura()">Cerrar</button>
+    </div>
+  </div>
 
 </body>
 </html>

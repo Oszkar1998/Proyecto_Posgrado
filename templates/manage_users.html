@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Administrar usuarios</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .tabla-usuarios {
             width: 100%;
@@ -35,10 +36,115 @@
             color: #f2d200;
             text-decoration: none;
             font-weight: bold;
+            margin-right: 12px;
         }
 
         .editar-link:hover {
             text-decoration: underline;
+        }
+
+        .btn-eliminar {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            width: auto;
+        }
+
+        .btn-eliminar:hover {
+            color: #ff6b7a;
+            background: none;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Modal de confirmación */
+        #modal-confirmar-eliminar {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-confirmar-box {
+            background: #0f1116;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            border-radius: 18px;
+            padding: 32px 28px;
+            width: 90%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 0 35px rgba(220, 53, 69, 0.2);
+            animation: fadeInModal 0.25s ease;
+        }
+
+        .modal-confirmar-box h2 {
+            color: #dc3545;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .modal-confirmar-box p {
+            color: #ccc;
+            font-size: 15px;
+            margin: 12px 0 24px;
+            line-height: 1.5;
+        }
+
+        .modal-confirmar-box strong {
+            color: #fff;
+        }
+
+        .modal-confirmar-acciones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-confirmar-si {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+            width: auto;
+        }
+
+        .btn-confirmar-si:hover {
+            background: #c82333;
+        }
+
+        .btn-confirmar-no {
+            background: #f6c343;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+            width: auto;
+        }
+
+        .btn-confirmar-no:hover {
+            background: #e0b132;
+        }
+
+        @keyframes fadeInModal {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 
@@ -55,14 +161,14 @@
 
     <div class="auth-box" style="width: 750px; max-width: 95%;">
         <div class="form-container">
-            <h2>👥 Administrar usuarios</h2>
+            <h2><i class="fa-solid fa-users-gear"></i> Administrar usuarios</h2>
 
             <table class="tabla-usuarios">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Correo</th>
-                        <th>Acción</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,8 +181,15 @@
                                 <span class="no-editable">No editable</span>
                             {% else %}
                                 <a class="editar-link" href="{{ url_for('edit_user', user_id=user['id']) }}">
-                                    Editar privilegios
+                                    <i class="fa-solid fa-pen-to-square"></i> Editar
                                 </a>
+                                <button
+                                    class="btn-eliminar"
+                                    data-id="{{ user['id'] }}"
+                                    data-email="{{ user['email'] }}"
+                                    onclick="confirmarEliminar(this)">
+                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                </button>
                             {% endif %}
                         </td>
                     </tr>
@@ -89,5 +202,51 @@
             </p>
         </div>
     </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div id="modal-confirmar-eliminar">
+        <div class="modal-confirmar-box">
+            <h2><i class="fa-solid fa-triangle-exclamation"></i> Confirmar eliminación</h2>
+            <p>
+                ¿Estás seguro de que deseas eliminar al usuario<br>
+                <strong id="email-a-eliminar"></strong>?<br><br>
+                Esta acción no se puede deshacer.
+            </p>
+            <div class="modal-confirmar-acciones">
+                <form id="form-eliminar" method="POST" action="">
+                    <button type="submit" class="btn-confirmar-si">
+                        <i class="fa-solid fa-trash"></i> Sí, eliminar
+                    </button>
+                </form>
+                <button class="btn-confirmar-no" onclick="cerrarModalEliminar()">
+                    <i class="fa-solid fa-xmark"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmarEliminar(btn) {
+            const userId = btn.getAttribute("data-id");
+            const email = btn.getAttribute("data-email");
+            document.getElementById("email-a-eliminar").textContent = email;
+            document.getElementById("form-eliminar").action = `/delete_user/${userId}`;
+            document.getElementById("modal-confirmar-eliminar").style.display = "flex";
+        }
+
+        function cerrarModalEliminar() {
+            document.getElementById("modal-confirmar-eliminar").style.display = "none";
+        }
+
+        // Cerrar con ESC
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") cerrarModalEliminar();
+        });
+
+        // Cerrar al hacer clic fuera
+        document.getElementById("modal-confirmar-eliminar").addEventListener("click", function(e) {
+            if (e.target === this) cerrarModalEliminar();
+        });
+    </script>
 </body>
 </html>
