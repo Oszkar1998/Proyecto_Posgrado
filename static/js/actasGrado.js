@@ -266,4 +266,12 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarModal("modal-fecha-extra-acta");
     cerrarFlash();
   });
+
+  document.addEventListener("click", (e) => {
+      ["modal-capturar-acta", "modal-buscar-acta", "modal-modificar-acta",
+      "modal-fecha-extra-acta"].forEach(id => {
+          const modal = document.getElementById(id);
+          if (modal && e.target === modal) modal.style.display = "none";
+      });
+  });
 });

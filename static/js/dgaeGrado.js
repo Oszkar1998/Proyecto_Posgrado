@@ -311,4 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 setEstado("error", "Error de red al generar el documento.");
             });
     }
+
+    document.addEventListener("click", (e) => {
+        const modal = document.getElementById("modalSeleccionPlanGrado");
+        if (modal && e.target === modal) modal.style.display = "none";
+    });
 });

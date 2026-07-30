@@ -1,12 +1,10 @@
 # Librerías necesarias
 from datetime import datetime
-import sqlite3
-
 from flask import Blueprint, jsonify, redirect, render_template, request, send_from_directory, session, url_for
 from fpdf import FPDF
-
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
+from db import get_connection
 
 revision_bp = Blueprint('revision', __name__, template_folder='../templates')
 
@@ -612,19 +610,17 @@ def _infer_programa(plan_int: int) -> str:
     return "Desconocido"
 
 def _listar_registros_por_cuenta(num_cuenta: str):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
-               sexo, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY planEstudios
-    """, (num_cuenta,))
-    rows = cur.fetchall()
-    conn.close()
-    return rows
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
+                   sexo, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY planEstudios
+        """, (num_cuenta,))
+        return cur.fetchall()
 
 ########## FECHA ##########
 def fecha():
@@ -663,26 +659,23 @@ def _ensure_contador_revision(conn):
         conn.commit()
 
 def obtener_contador():
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    _ensure_contador_revision(conn)
-    cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_REVISION_ID,))
-    val = cur.fetchone()[0]
-    conn.close()
+    with get_connection() as conn:
+        _ensure_contador_revision(conn)
+        cur = conn.cursor()
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_REVISION_ID,))
+        val = cur.fetchone()[0]
     return int(val)
 
 def incrementar_contador():
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    _ensure_contador_revision(conn)
-
-    cur.execute("BEGIN IMMEDIATE")
-    cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_REVISION_ID,))
-    actual = int(cur.fetchone()[0])
-    nuevo = actual + 1
-    cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo, CONTADOR_REVISION_ID))
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        _ensure_contador_revision(conn)
+        cur = conn.cursor()
+        cur.execute("BEGIN IMMEDIATE")
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_REVISION_ID,))
+        actual = int(cur.fetchone()[0])
+        nuevo = actual + 1
+        cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo, CONTADOR_REVISION_ID))
+        conn.commit()
     return nuevo
 
 def verificarContador(contador):
@@ -698,23 +691,23 @@ def verificarContador(contador):
 
 ########## COORDINADOR ########
 def obtener_coordinador():
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("SELECT nombre, genero FROM coordinador ORDER BY id DESC LIMIT 1")
-    resultado = cursor.fetchone()
-    conn.close()
-    
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT nombre, genero FROM coordinador ORDER BY id DESC LIMIT 1")
+        resultado = cursor.fetchone()
     if resultado:
-        return resultado  # Devuelve (nombre, genero)
-    return ("", "")  # Si no hay registros, regresa vacío
+        return resultado
+    return ("", "")
 
 # 🔵 Actualizar coordinador
 def actualizar_coordinador(nombre, genero):
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("UPDATE coordinador SET nombre = ?, genero = ? WHERE id = (SELECT id FROM coordinador ORDER BY id DESC LIMIT 1)", (nombre, genero))
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE coordinador SET nombre = ?, genero = ?
+            WHERE id = (SELECT id FROM coordinador ORDER BY id DESC LIMIT 1)
+        """, (nombre, genero))
+        conn.commit()
 
 def verificarCoordinador(sexo):
     if sexo == "M":
@@ -744,25 +737,22 @@ def index():
 
     # Si el front ya envió una selección de plan, cargamos ese registro directo
     if sel_id:
-        conn = sqlite3.connect(direccionBase)
-        cur = conn.cursor()
-        
-        try:
-            sel_id_int = int(sel_id)
-        except (TypeError, ValueError):
-            return jsonify({"success": False, "error": "Selección inválida."}), 400
+        with get_connection() as conn:
+            cur = conn.cursor()
+            try:
+                sel_id_int = int(sel_id)
+            except (TypeError, ValueError):
+                return jsonify({"success": False, "error": "Selección inválida."}), 400
 
-        cur.execute("""
-            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-                tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
-                sexo, modalidad
-            FROM posgrado
-            WHERE id = ? AND numeroCuenta = ?
-            LIMIT 1
-        """, (sel_id_int, numDeCuenta))
-       
-        datos_alumno = cur.fetchone()
-        conn.close()
+            cur.execute("""
+                SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                    tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
+                    sexo, modalidad
+                FROM posgrado
+                WHERE id = ? AND numeroCuenta = ?
+                LIMIT 1
+            """, (sel_id_int, numDeCuenta))
+            datos_alumno = cur.fetchone()
 
         if not datos_alumno:
             return jsonify({"success": False, "error": "Selección inválida."}), 400
@@ -858,15 +848,14 @@ def obtener_contador_api():
 def actualizar_contador_api():
     try:
         nuevo_valor = request.json.get("nuevoContador")
-        
         if not isinstance(nuevo_valor, int) or nuevo_valor < 1:
             return jsonify({"success": False, "error": "Valor inválido"}), 400
 
-        conn = sqlite3.connect(direccionBase)
-        cursor = conn.cursor()
-        cursor.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo_valor, CONTADOR_REVISION_ID))
-        conn.commit()
-        conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE contador SET valor = ? WHERE id = ?",
+                          (nuevo_valor, CONTADOR_REVISION_ID))
+            conn.commit()
 
         return jsonify({"success": True, "contador": nuevo_valor})
     except Exception as e:
@@ -923,12 +912,13 @@ def registrar_usuario():
         if not (nombre and cuenta and plan and clave and programa and genero):
             return jsonify({"success": False, "error": "Todos los campos son obligatorios."}), 400
 
-        conn = sqlite3.connect(direccionBase)
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO usuarios (No_cuenta, Plan_estudios, Clave, Nomb_alu, programa, genero) VALUES (?, ?, ?, ?, ?, ?)",
-                       (cuenta, plan, clave, nombre, programa, genero))
-        conn.commit()
-        conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO usuarios (No_cuenta, Plan_estudios, Clave, Nomb_alu, programa, genero)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (cuenta, plan, clave, nombre, programa, genero))
+            conn.commit()
 
         return jsonify({"success": True})
     except Exception as e:

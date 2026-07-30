@@ -466,3 +466,11 @@ window.addEventListener("load", () => {
     mostrarModalModificarDatos();
   }
 });
+
+document.addEventListener("click", function(e) {
+    ["modal-capturar", "modal-busquedaNombre", "modal-modificarDatos"].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && modal.style.display === "flex" && e.target === modal)
+            modal.style.display = "none";
+    });
+});

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Candidatura</title>
 
-  <!-- Puedes reutilizar el mismo estilo de votos si quieres -->
   <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/candidatura.css') }}" />
   <script src="{{ url_for('static', filename='js/candidatura.js') }}" defer></script>
 
@@ -14,6 +13,8 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
   <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -21,12 +22,12 @@
   <!-- Barra superior -->
   <div class="barra-superior">
     <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-      <span>🏠 Menú Principal</span>
+      <span><i class="fa-solid fa-house"></i> Menú Principal</span>
     </div>
 
     <div class="izquierda">
       <div id="folio-container" onclick="mostrarModalFolioActa()">
-        <span>📄 FOLIO ACTA: <span id="folio-valor">0</span></span>
+        <span><i class="fa-solid fa-file"></i> FOLIO ACTA: <span id="folio-valor">0</span></span>
       </div>
     </div>
 
@@ -35,8 +36,12 @@
       <div class="modal-content2">
         <h2>Actualizar Folio (Acta)</h2>
         <input type="number" id="nuevoFolioActa" min="1" required>
-        <button type="button" onclick="actualizarFolioActa()">✅ Guardar</button>
-        <button type="button" onclick="cerrarModalFolioActa()">❌ Cancelar</button>
+        <button type="button" onclick="actualizarFolioActa()">
+          <i class="fa-solid fa-check"></i> Guardar
+        </button>
+        <button type="button" onclick="cerrarModalFolioActa()">
+          <i class="fa-solid fa-xmark"></i> Cancelar
+        </button>
       </div>
     </div>
 
@@ -112,24 +117,13 @@
           <option value="" disabled selected>SELECCIONE LA SEDE</option>
           <option value="En la Aula Virtual Universitaria">Aula Virtual Universitaria</option>
           <option value="En la Facultad de Ingeniería">Facultad de Ingeniería</option>
-          <option value="En el Instituto de Ciencias Aplicadas y Tecnología">
-            Instituto de Ciencias Aplicadas y Tecnología
-          </option>
-          <option value="En el Instituto de Energías Renovables">
-            Instituto de Energías Renovables
-          </option>
-          <option value="En el Instituto de Ingeniería">
-            Instituto de Ingeniería
-          </option>
-          <option value="En el Instituto de Matemáticas Aplicadas y Sistemas">
-            Instituto de Matemáticas Aplicadas y Sistemas
-          </option>
-          <option value="En el Instituto Mexicano de Tecnología del Agua">
-            Instituto Mexicano de Tecnología del Agua
-          </option>
+          <option value="En el Instituto de Ciencias Aplicadas y Tecnología">Instituto de Ciencias Aplicadas y Tecnología</option>
+          <option value="En el Instituto de Energías Renovables">Instituto de Energías Renovables</option>
+          <option value="En el Instituto de Ingeniería">Instituto de Ingeniería</option>
+          <option value="En el Instituto de Matemáticas Aplicadas y Sistemas">Instituto de Matemáticas Aplicadas y Sistemas</option>
+          <option value="En el Instituto Mexicano de Tecnología del Agua">Instituto Mexicano de Tecnología del Agua</option>
         </select>
       </div>
-
 
       <label>Fecha examen</label>
       <input id="cap_fecha_examen" type="date" />
@@ -148,112 +142,108 @@
   <div id="modal-busquedaNombre">
     <div class="modal-content2">
       <h2>BUSQUEDA POR NOMBRE - CANDIDATURA</h2>
-      
-      <label>Nombre completo</label>
-<input id="bus_nombre" type="text" placeholder="Ingresa nombre completo o parte..." />
 
-<div style="margin-top:10px;">
-  <button type="button" onclick="buscarPorNombreCandidatura()">Buscar</button>
-  <button type="button" onclick="cerrarModalBusquedaNombre()">Cerrar</button>
-</div>
+      <label>Nombre completo</label>
+      <input id="bus_nombre" type="text" placeholder="Ingresa nombre completo o parte..." />
+
+      <div style="margin-top:10px;">
+        <button type="button" onclick="buscarPorNombreCandidatura()">Buscar</button>
+        <button type="button" onclick="cerrarModalBusquedaNombre()">Cerrar</button>
+      </div>
 
       <div id="bus_resultados" style="margin-top:14px;"></div>
     </div>
   </div>
 
   <!-- ====== MODAL MODIFICAR DATOS ====== -->
-<div id="modal-modificarDatos">
-  <div class="modal-content3">
-    <h2>MODIFICAR DATOS - CANDIDATURA</h2>
-
-    <label>Número de cuenta</label>
-    <input id="mod_numero_cuenta_buscar" type="text" placeholder="9 dígitos" maxlength="9" />
-
-    <div style="margin-top:10px;">
-      <button type="button" onclick="cargarCandidaturaPorCuenta()">Cargar</button>
-      <button type="button" onclick="cerrarModalModificarDatos()">Cerrar</button>
-    </div>
-
-    <!-- 👇 ESTE CONTENEDOR ES NUEVO: todo oculto hasta que exista la cuenta -->
-    <div id="mod_form_fields" style="display:none;">
-
-      <hr style="margin:16px 0; opacity:.25;" />
-
-      <!-- Campos para editar -->
-      <label>Nombre completo</label>
-      <input id="mod_nombre_completo" type="text" />
+  <div id="modal-modificarDatos">
+    <div class="modal-content3">
+      <h2>MODIFICAR DATOS - CANDIDATURA</h2>
 
       <label>Número de cuenta</label>
-      <input id="mod_numero_cuenta" type="text" maxlength="9" readonly class="input-bloqueado">
+      <input id="mod_numero_cuenta_buscar" type="text" placeholder="9 dígitos" maxlength="9" />
 
-      <label>Especialidad</label>
-      <input id="mod_especialidad" type="text" />
-
-      <label>Título del proyecto</label>
-      <input id="mod_titulo_proyecto" type="text" />
-
-      <label>Semestre ingreso</label>
-      <input id="mod_semestre_ingreso" type="text" />
-
-      <label>Semestre presentado</label>
-      <select id="mod_semestre_presentado">
-        <option value="">Selecciona...</option>
-        <option value="TERCER">TERCER</option>
-        <option value="CUARTO">CUARTO</option>
-        <option value="QUINTO">QUINTO</option>
-        <option value="SEXTO">SEXTO</option>
-        <option value="SEPTIMO">SEPTIMO</option>
-      </select>
-
-      <label>Evaluación</label>
-      <select id="mod_evaluacion">
-        <option value="">Selecciona...</option>
-        <option value="PRIMERA">PRIMERA</option>
-        <option value="SEGUNDA">SEGUNDA</option>
-      </select>
-
-      <label>Presidente</label>
-      <input id="mod_presidente" type="text" />
-
-      <label>Secretario</label>
-      <input id="mod_secretario" type="text" />
-
-      <label>Vocal 1</label>
-      <input id="mod_vocal1" type="text" />
-
-      <label>Vocal 2</label>
-      <input id="mod_vocal2" type="text" />
-
-      <label>Vocal 3</label>
-      <input id="mod_vocal3" type="text" />
-
-      <label>Sexo</label>
-      <select id="mod_sexo">
-        <option value="">Selecciona...</option>
-        <option value="F">F</option>
-        <option value="M">M</option>
-      </select>
-
-      <label>Modalidad / Sede</label>
-      <input id="mod_modalidad_sede" type="text" />
-
-      <label>Fecha examen</label>
-      <input id="mod_fecha_examen" type="date" />
-
-      <label>Hora examen</label>
-      <input id="mod_hora_examen" type="time" />
-
-      <div style="margin-top:14px;">
-        <button type="button" onclick="guardarCambiosCandidatura()">Guardar Cambios</button>
+      <div style="margin-top:10px;">
+        <button type="button" onclick="cargarCandidaturaPorCuenta()">Cargar</button>
+        <button type="button" onclick="cerrarModalModificarDatos()">Cerrar</button>
       </div>
 
+      <div id="mod_form_fields" style="display:none;">
+        <hr style="margin:16px 0; opacity:.25;" />
+
+        <label>Nombre completo</label>
+        <input id="mod_nombre_completo" type="text" />
+
+        <label>Número de cuenta</label>
+        <input id="mod_numero_cuenta" type="text" maxlength="9" readonly class="input-bloqueado">
+
+        <label>Especialidad</label>
+        <input id="mod_especialidad" type="text" />
+
+        <label>Título del proyecto</label>
+        <input id="mod_titulo_proyecto" type="text" />
+
+        <label>Semestre ingreso</label>
+        <input id="mod_semestre_ingreso" type="text" />
+
+        <label>Semestre presentado</label>
+        <select id="mod_semestre_presentado">
+          <option value="">Selecciona...</option>
+          <option value="TERCER">TERCER</option>
+          <option value="CUARTO">CUARTO</option>
+          <option value="QUINTO">QUINTO</option>
+          <option value="SEXTO">SEXTO</option>
+          <option value="SEPTIMO">SEPTIMO</option>
+        </select>
+
+        <label>Evaluación</label>
+        <select id="mod_evaluacion">
+          <option value="">Selecciona...</option>
+          <option value="PRIMERA">PRIMERA</option>
+          <option value="SEGUNDA">SEGUNDA</option>
+        </select>
+
+        <label>Presidente</label>
+        <input id="mod_presidente" type="text" />
+
+        <label>Secretario</label>
+        <input id="mod_secretario" type="text" />
+
+        <label>Vocal 1</label>
+        <input id="mod_vocal1" type="text" />
+
+        <label>Vocal 2</label>
+        <input id="mod_vocal2" type="text" />
+
+        <label>Vocal 3</label>
+        <input id="mod_vocal3" type="text" />
+
+        <label>Sexo</label>
+        <select id="mod_sexo">
+          <option value="">Selecciona...</option>
+          <option value="F">F</option>
+          <option value="M">M</option>
+        </select>
+
+        <label>Modalidad / Sede</label>
+        <input id="mod_modalidad_sede" type="text" />
+
+        <label>Fecha examen</label>
+        <input id="mod_fecha_examen" type="date" />
+
+        <label>Hora examen</label>
+        <input id="mod_hora_examen" type="time" />
+
+        <div style="margin-top:14px;">
+          <button type="button" onclick="guardarCambiosCandidatura()">Guardar Cambios</button>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-  
-  <!-- ====== CONSULTA DE DOCUMENTOS (lo que tu candidatura.js espera) ====== -->
+
+  <!-- ====== CONSULTA DE DOCUMENTOS ====== -->
   <div class="container">
-    <h2>📘 Consulta de Documentos de Posgrado</h2>
+    <h2><i class="fa-solid fa-file-lines"></i> Consulta de Documentos de Posgrado</h2>
 
     <label for="numeroDeCuenta">Número de Cuenta:</label>
     <input id="numeroDeCuenta" type="text" placeholder="Ejemplo: 123456789" maxlength="9" />

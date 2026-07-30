@@ -1,12 +1,12 @@
 
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, send_file
 from io import BytesIO
-import sqlite3
 from datetime import datetime
 from fpdf import FPDF
 import os
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
+from db import get_connection
 
 dgaeGrado_bp = Blueprint('dgaeGrado', __name__, template_folder='../templates')
 
@@ -23,44 +23,38 @@ def fecha_texto():
     return f"Ciudad Universitaria, Cd. Mx., a {hoy.day} de {meses[hoy.month]} de {hoy.year}."
 
 def buscar_alumno(numero_cuenta):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY id DESC
-        LIMIT 1
-    """, (numero_cuenta,))
-    row = cur.fetchone()
-    conn.close()
-    return row
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (numero_cuenta,))
+        return cur.fetchone()
 
 def listar_registros_grado(numero_cuenta):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY planEstudios
-    """, (numero_cuenta,))
-    filas = cur.fetchall()
-    conn.close()
-    return filas
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY planEstudios
+        """, (numero_cuenta,))
+        return cur.fetchall()
 
 def buscar_alumno_por_id(registro_id):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
-        FROM posgrado
-        WHERE id = ?
-        LIMIT 1
-    """, (registro_id,))
-    row = cur.fetchone()
-    conn.close()
-    return row
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+            FROM posgrado
+            WHERE id = ?
+            LIMIT 1
+        """, (registro_id,))
+        return cur.fetchone()
 
 def inferir_programa_grado(plan):
     plan = int(plan)

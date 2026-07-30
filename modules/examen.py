@@ -1,9 +1,9 @@
 # Librerías necesarias
 from flask import Blueprint, render_template, request, jsonify, send_from_directory, session, redirect, url_for
-import sqlite3
 from datetime import datetime
 from fpdf import FPDF, HTMLMixin
 from auth import permission_required
+from db import get_connection
 
 class MyPDF(FPDF, HTMLMixin):
     pass
@@ -581,9 +581,9 @@ def documentos_Menciones(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, 
 
     pdf.set_font("Arial", size=12, style="B")
     pdf.set_xy(12,60)
-    pdf.cell(0, 5, coordinadorNombre, 0, 1)
+    pdf.cell(0, 5, coordinadorNombre.upper(), 0, 1)
     pdf.set_xy(12,64)
-    pdf.cell(0, 5, coordinadorGenero, 0, 1)
+    pdf.cell(0, 5, coordinadorGenero.upper(), 0, 1)
     pdf.set_font("Arial", size=11.7)
     pdf.set_xy(12,69)
     pdf.cell(0, 5, "P R E S E N T E", 0, 1)
@@ -685,7 +685,7 @@ def documentos_Menciones(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, 
     
     pdf.set_font("Arial", size=12)
     pdf.set_xy(12,59)
-    pdf.multi_cell(180, 5, coordinadorNombre, align="L")
+    pdf.multi_cell(180, 5, coordinadorNombre.upper(), align="L")
     pdf.set_xy(12,65)
     pdf.multi_cell(180, 5, coordinadorGenero, align="L")
     pdf.set_xy(12,71)
@@ -1006,40 +1006,74 @@ def generar_acta(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
         return max(y_nombre_fin, y0 + altura_min)
 
     # Filas
-    y = fila_sinodal(presidentePos, "Presidente", y)
-    y = fila_sinodal(vocal1Pos,     "Vocal 1",   y - 1)
-    y = fila_sinodal(vocal2Pos,     "Vocal 2",   y - 1)
-    y = fila_sinodal(vocal3Pos,     "Vocal 3",   y - 1)
-    y = fila_sinodal(secretarioPos, "Secretario",y -1)
+    if numeroCuentaPos == "524021767":
+        y = fila_sinodal(presidentePos, "Presidente", y)
+        y = fila_sinodal(vocal1Pos,     "Vocal 1",   y - 4)
+        y = fila_sinodal(vocal2Pos,     "Vocal 2",   y - 4)
+        y = fila_sinodal(vocal3Pos,     "Vocal 3",   y - 4)
+        y = fila_sinodal(secretarioPos, "Secretario",y - 4)
+    else:
+        y = fila_sinodal(presidentePos, "Presidente", y)
+        y = fila_sinodal(vocal1Pos,     "Vocal 1",   y - 1)
+        y = fila_sinodal(vocal2Pos,     "Vocal 2",   y - 1)
+        y = fila_sinodal(vocal3Pos,     "Vocal 3",   y - 1)
+        y = fila_sinodal(secretarioPos, "Secretario",y - 1)
 
     # Continua debajo del cuadro
     pdf.set_y(y)
     # ========= FIN CUADRO DE SINODALES =========
 
-    pdf.set_font("Arial", size=11, style="B")  
-    pdf.set_xy(74, 248)                 
-    pdf.multi_cell(100, 0, "\"POR MI RAZA HABLARÁ EL ESPIRITU\"", align="C")
+    if numeroCuentaPos == "524021767":
+        pdf.set_font("Arial", size=11, style="B")  
+        pdf.set_xy(74, 247)                 
+        pdf.multi_cell(100, 0, "\"POR MI RAZA HABLARÁ EL ESPIRITU\"", align="C")
 
-    pdf.set_font("Times", size=10.3)
-    pdf.set_x(50)
-    pdf.multi_cell(160, 10, "El suscrito Coordinador del Programa constató que las firmas corresponden al jurado designado", align="C")
-    
-    if coordinadorNombre == "Dra. AIDA HUERTA BARRIENTOS":  
-        pdf.set_font("Arial", style="B", size=10)
-        pdf.set_xy(97, 257)
-        pdf.multi_cell(0, 5, coordinadorNombre, align="L")
-    elif coordinadorNombre == "Dr. GABRIEL EDUARDO SANDOVAL ROMERO":
-        pdf.set_font("Arial", style="B", size=10)
-        pdf.set_xy(85, 257)
-        pdf.multi_cell(0, 5, coordinadorNombre, align="L")
+        pdf.set_font("Times", size=10.3)
+        pdf.set_x(50)
+        pdf.multi_cell(160, 10, "El suscrito Coordinador del Programa constató que las firmas corresponden al jurado designado", align="C")
+        
+        if coordinadorNombre == "Dra. AIDA HUERTA BARRIENTOS":  
+            pdf.set_font("Arial", style="B", size=10)
+            pdf.set_xy(97, 256)
+            pdf.multi_cell(0, 5, coordinadorNombre.upper(), align="L")
+        elif coordinadorNombre == "Dr. GABRIEL EDUARDO SANDOVAL ROMERO":
+            pdf.set_font("Arial", style="B", size=10)
+            pdf.set_xy(85, 264)
+            pdf.multi_cell(0, 5, coordinadorNombre.upper(), align="L")
 
-    # Líneas para firma
-    pdf.set_font("Arial", size=12, style="BU")
-    pdf.set_xy(69, 265)
-    pdf.multi_cell(100, 5, "                                                                         ", align="R")
-    pdf.set_font("Arial", size=10)
-    pdf.set_xy(88, 270)
-    pdf.multi_cell(0, 5, "Nombre y firma del Coordinador del Programa", align="L")
+        # Líneas para firma
+        pdf.set_font("Arial", size=12, style="BU")
+        pdf.set_xy(69, 268)
+        pdf.multi_cell(100, 5, "                                                                         ", align="R")
+        pdf.set_font("Arial", size=10)
+        pdf.set_xy(88, 272)
+        pdf.multi_cell(0, 5, "Nombre y firma del Coordinador del Programa", align="L")
+
+    else:
+        pdf.set_font("Arial", size=11, style="B")  
+        pdf.set_xy(74, 248)                 
+        pdf.multi_cell(100, 0, "\"POR MI RAZA HABLARÁ EL ESPIRITU\"", align="C")
+
+        pdf.set_font("Times", size=10.3)
+        pdf.set_x(50)
+        pdf.multi_cell(160, 10, "El suscrito Coordinador del Programa constató que las firmas corresponden al jurado designado", align="C")
+        
+        if coordinadorNombre == "Dra. AIDA HUERTA BARRIENTOS":  
+            pdf.set_font("Arial", style="B", size=10)
+            pdf.set_xy(97, 257)
+            pdf.multi_cell(0, 5, coordinadorNombre.upper(), align="L")
+        elif coordinadorNombre == "Dr. GABRIEL EDUARDO SANDOVAL ROMERO":
+            pdf.set_font("Arial", style="B", size=10)
+            pdf.set_xy(85, 257)
+            pdf.multi_cell(0, 5, coordinadorNombre.upper(), align="L")
+
+        # Líneas para firma
+        pdf.set_font("Arial", size=12, style="BU")
+        pdf.set_xy(69, 265)
+        pdf.multi_cell(100, 5, "                                                                         ", align="R")
+        pdf.set_font("Arial", size=10)
+        pdf.set_xy(88, 270)
+        pdf.multi_cell(0, 5, "Nombre y firma del Coordinador del Programa", align="L")
 
     pdf.set_font("Arial", size=9)
     pdf.set_xy(15, 265)
@@ -1117,35 +1151,28 @@ def fechaActual():
     return dia,mes,año
 
 def verificarPlanEstudios(numero_cuenta):
-    """
-    Busca en POSGRADO por numeroCuenta.
-    - Si NO existe: (None, "completo")  -> para ti significa "no está en la base".
-    - Si existe y su plan está en 3000–5999: (fila, "solo_fecha_hora").
-    - Cualquier caso fuera de rango (no debería por el CHECK): (None, "completo").
-    """
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT
-          numeroCuenta,           -- [0]
-          nombreCompleto,         -- [1]
-          planEstudios,           -- [2] (numérico)
-          especializacion,        -- [3] (texto mostrado en PDFs)
-          presidente,             -- [4]
-          secretario,             -- [5]
-          vocal1,                 -- [6]
-          vocal2,                 -- [7]
-          vocal3,                 -- [8]
-          sexo,                   -- [9]  (M/F/X)
-          tituloTesina,           -- [10]
-          modalidad               -- [11]
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY id DESC
-        LIMIT 1
-    """, (numero_cuenta,))
-    fila = cursor.fetchone()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT
+              numeroCuenta,
+              nombreCompleto,
+              planEstudios,
+              especializacion,
+              presidente,
+              secretario,
+              vocal1,
+              vocal2,
+              vocal3,
+              sexo,
+              tituloTesina,
+              modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (numero_cuenta,))
+        fila = cursor.fetchone()
 
     if not fila:
         return None, "completo"
@@ -1249,69 +1276,41 @@ def formatear_titulo(texto):
     return " ".join(resultado)
 
 def guardar_examen_por_cuenta(numero_cuenta, plan_estudios, fecha, hora, ingreso, termino, promedio, folio, modalidad_sede):
-    """
-    Guarda datos de examen por alumno y plan de estudios.
-    La llave correcta es: numeroCuenta + planEstudios.
-    """
     numero_cuenta = (numero_cuenta or "").strip()
-
     if not numero_cuenta:
         raise ValueError("numeroCuenta vacío")
-
     if not plan_estudios:
         raise ValueError("planEstudios vacío")
-
     plan_estudios = int(plan_estudios)
 
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-
-    cur.execute("""
-      INSERT INTO examenDatos
-        (numeroCuenta, planEstudios, fecha, hora, ingreso, termino, promedio, folio, modalidadSede)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(numeroCuenta, planEstudios) DO UPDATE SET
-        fecha=excluded.fecha,
-        hora=excluded.hora,
-        ingreso=excluded.ingreso,
-        termino=excluded.termino,
-        promedio=excluded.promedio,
-        folio=excluded.folio,
-        modalidadSede=excluded.modalidadSede
-    """, (
-        numero_cuenta,
-        plan_estudios,
-        fecha,
-        hora,
-        ingreso,
-        termino,
-        promedio,
-        folio,
-        modalidad_sede
-    ))
-
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+          INSERT INTO examenDatos
+            (numeroCuenta, planEstudios, fecha, hora, ingreso, termino, promedio, folio, modalidadSede)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(numeroCuenta, planEstudios) DO UPDATE SET
+            fecha=excluded.fecha,
+            hora=excluded.hora,
+            ingreso=excluded.ingreso,
+            termino=excluded.termino,
+            promedio=excluded.promedio,
+            folio=excluded.folio,
+            modalidadSede=excluded.modalidadSede
+        """, (numero_cuenta, plan_estudios, fecha, hora, ingreso, termino, promedio, folio, modalidad_sede))
+        conn.commit()
 
 def obtener_examen_por_cuenta(numero_cuenta, plan_estudios):
-    """
-    Obtiene datos de examen usando numeroCuenta + planEstudios.
-    """
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-
-    cur.execute("""
-      SELECT fecha, hora, presidente, vocal1, vocal2, vocal3, secretario,
-             ingreso, termino, promedio, folio, modalidadSede
-      FROM examenDatos
-      WHERE numeroCuenta = ?
-        AND planEstudios = ?
-      LIMIT 1
-    """, (numero_cuenta, int(plan_estudios)))
-
-    row = cur.fetchone()
-    conn.close()
-    return row
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+          SELECT fecha, hora, presidente, vocal1, vocal2, vocal3, secretario,
+                 ingreso, termino, promedio, folio, modalidadSede
+          FROM examenDatos
+          WHERE numeroCuenta = ? AND planEstudios = ?
+          LIMIT 1
+        """, (numero_cuenta, int(plan_estudios)))
+        return cur.fetchone()
 
 def _infer_programa(plan: int) -> str:
     if 3000 <= plan <= 3999:
@@ -1323,81 +1322,51 @@ def _infer_programa(plan: int) -> str:
     return "Desconocido"
 
 def _listar_registros_por_cuenta(numero_cuenta: str):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               sexo, tituloTesina, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY id DESC
-    """, (numero_cuenta,))
-    filas = cur.fetchall()
-    conn.close()
-    return filas
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   sexo, tituloTesina, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY id DESC
+        """, (numero_cuenta,))
+        return cur.fetchall()
 
 def _obtener_registro_por_id(reg_id: int):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               sexo, tituloTesina, modalidad
-        FROM posgrado
-        WHERE id = ?
-        LIMIT 1
-    """, (reg_id,))
-    fila = cur.fetchone()
-    conn.close()
-    return fila
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   sexo, tituloTesina, modalidad
+            FROM posgrado
+            WHERE id = ? LIMIT 1
+        """, (reg_id,))
+        return cur.fetchone()
 
 def obtnerDatosPosgrado(numero_cuenta: str, plan_estudios):
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
-               sexo, modalidad, sexoTutor
-        FROM posgrado
-        WHERE numeroCuenta = ?
-          AND planEstudios = ?
-        LIMIT 1
-    """, (numero_cuenta, int(plan_estudios)))
-    fila = cursor.fetchone()
-    conn.close()
-
-    return fila
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3,
+                   sexo, modalidad, sexoTutor
+            FROM posgrado
+            WHERE numeroCuenta = ? AND planEstudios = ?
+            LIMIT 1
+        """, (numero_cuenta, int(plan_estudios)))
+        return cursor.fetchone()
 
 def actualizar_jurado_y_tutor(numero_cuenta, plan_estudios, tutor, presidente, secretario, vocal1, vocal2, vocal3):
-    """
-    Actualiza en POSGRADO el tutor y los sinodales
-    del registro exacto: numeroCuenta + planEstudios.
-    """
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE posgrado
-        SET tutor = ?,
-            presidente = ?,
-            secretario = ?,
-            vocal1 = ?,
-            vocal2 = ?,
-            vocal3 = ?
-        WHERE numeroCuenta = ?
-          AND planEstudios = ?
-    """, (
-        tutor,
-        presidente,
-        secretario,
-        vocal1,
-        vocal2,
-        vocal3,
-        numero_cuenta,
-        int(plan_estudios)
-    ))
-
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE posgrado
+            SET tutor=?, presidente=?, secretario=?, vocal1=?, vocal2=?, vocal3=?
+            WHERE numeroCuenta=? AND planEstudios=?
+        """, (tutor, presidente, secretario, vocal1, vocal2, vocal3,
+              numero_cuenta, int(plan_estudios)))
+        conn.commit()
 
 
 #################################################################################################################################

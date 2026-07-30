@@ -1,10 +1,10 @@
 # Libreria Necesaria para conectar PYTHON con HTMLX, y con la Base de Datos
 from flask import Blueprint , render_template, request, jsonify, session, redirect, url_for, send_from_directory
-import sqlite3
 from datetime import datetime
 from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
+from db import get_connection
 
 dgae_bp = Blueprint('dgae', __name__, template_folder='../templates')
 
@@ -1489,23 +1489,16 @@ def _determinar_programa_y_grado(plan_int: int):
     return (None, None)
 
 def _buscar_alumno(numero_cuenta: str):
-    """
-    Devuelve la última fila del alumno en POSGRADO o None.
-    Columnas usadas por DGAE: numeroCuenta, nombreCompleto, planEstudios (clave numérica),
-    especializacion (texto plan), modalidad.
-    """
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY id DESC
-        LIMIT 1
-    """, (numero_cuenta,))
-    row = cur.fetchone()
-    conn.close()
-    return row
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT numeroCuenta, nombreCompleto, planEstudios, especializacion, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (numero_cuenta,))
+        return cur.fetchone()
 
 def _infer_programa(plan):
     plan = int(plan)
@@ -1518,36 +1511,28 @@ def _infer_programa(plan):
     return "desconocido"
 
 def _listar_registros_dgae(numero_cuenta):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               tituloTesina, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY planEstudios
-    """, (numero_cuenta,))
-
-    filas = cur.fetchall()
-    conn.close()
-    return filas
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   tituloTesina, modalidad
+            FROM posgrado
+            WHERE numeroCuenta = ?
+            ORDER BY planEstudios
+        """, (numero_cuenta,))
+        return cur.fetchall()
 
 def _obtener_registro_dgae_por_id(reg_id):
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-               tituloTesina, modalidad
-        FROM posgrado
-        WHERE id = ?
-        LIMIT 1
-    """, (reg_id,))
-
-    fila = cur.fetchone()
-    conn.close()
-    return fila
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   tituloTesina, modalidad
+            FROM posgrado
+            WHERE id = ?
+            LIMIT 1
+        """, (reg_id,))
+        return cur.fetchone()
 
 #################################################################################################################################
 @dgae_bp.route("/", methods=["GET", "POST"])
@@ -1689,4 +1674,3 @@ def disable_cache(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-

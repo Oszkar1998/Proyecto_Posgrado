@@ -1,9 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_from_directory, session, send_file
-import sqlite3
+import uuid
+import os
+import glob
+import time
 from fpdf import FPDF
 from io import BytesIO
 from auth import permission_required
-from config import direccionBase, direccionImagen,direccionPDF
+from config import direccionBase, direccionImagen, direccionPDF
+from db import get_connection
 
 votos_Oficio_PUEI_bp = Blueprint('votosOficio', __name__, template_folder='../templates')
 
@@ -14,8 +18,19 @@ def _etiqueta_genero(s):
 def _validar_rango_plan(plan_int: int) -> bool:
     return 3000 <= plan_int <= 5999
 
+def _limpiar_votos_antiguos():
+    """Elimina PDFs de votos con más de 10 minutos de antigüedad."""
+    patron = direccionPDF + "Votos_*.pdf"
+    ahora = time.time()
+    for archivo in glob.glob(patron):
+        if ahora - os.path.getmtime(archivo) > 600:
+            try:
+                os.remove(archivo)
+            except Exception:
+                pass
+
 # --------------------------- PDF ---------------------------
-def programaEspecializacion(pdf, nombreCompleto, planEstudios,  especializacion, trabajo, persona, genero):
+def programaEspecializacion(pdf, nombreCompleto, planEstudios, especializacion, trabajo, persona, genero):
     pdf.set_left_margin(25)
     pdf.set_right_margin(25)
     pdf.add_page()
@@ -78,23 +93,21 @@ def index():
     if request.method == "POST":
         numDeCuenta = request.form["numeroDeCuenta"].strip()
 
-        conn = sqlite3.connect(direccionBase)
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
-                tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
-            FROM posgrado
-            WHERE numeroCuenta = ?
-            ORDER BY planEstudios
-        """, (numDeCuenta,))
-        filas = cursor.fetchall()
-        conn.close()
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                    tituloTesina, tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+                FROM posgrado
+                WHERE numeroCuenta = ?
+                ORDER BY planEstudios
+            """, (numDeCuenta,))
+            filas = cursor.fetchall()
 
         if not filas:
             return jsonify({"success": False, "error": "No existe esa cuenta en la base."})
 
         if len(filas) > 1:
-            # Devuelve lista de opciones para que el front muestre un modal de selección
             opciones = []
             for (id_, _, nombre, plan, espec, *_resto) in filas:
                 opciones.append({
@@ -105,7 +118,7 @@ def index():
                 })
             return jsonify({"success": True, "multiples": opciones})
 
-        # Un solo registro → generar directo por id
+        # Un solo registro → generar con nombre único para evitar sobreescritura
         (id_, numeroCuenta, nombre, plan, espec, trabajo, tutor, presidente, secretario,
         v1, v2, v3, sexo, modalidad, sexoTutor) = filas[0]
 
@@ -116,8 +129,13 @@ def index():
         for persona in [presidente, secretario, v1, v2, v3]:
             programaEspecializacion(pdf_votos, nombre, plan, espec, trabajo, persona, genero)
 
-        votos_filename = "Votos.pdf"
+        # Nombre único por sesión para evitar sobreescritura entre usuarios simultáneos
+        votos_filename = f"Votos_{uuid.uuid4().hex[:8]}.pdf"
         pdf_votos.output(direccionPDF + votos_filename, "F")
+
+        # Limpiar PDFs antiguos (más de 10 minutos)
+        _limpiar_votos_antiguos()
+
         return jsonify({
             "success": True,
             "votos_url": f"/votosOficio/ver_pdf/{votos_filename}",
@@ -125,7 +143,7 @@ def index():
             "especializacion": espec or "",
             "modalidad": modalidad or ""
         })
-    
+
     return render_template("votosOficio.html")
 
 @votos_Oficio_PUEI_bp.route("/guardar_datos", methods=["POST"])
@@ -138,7 +156,7 @@ def guardar_datos():
     especializacion = (data.get("especializacion") or "").strip()
     titulo = (data.get("tituloOtesina") or "").strip()
     tutor = (data.get("tutor") or "").strip()
-    sexoTutor = (data.get("sexoTutor") or "").strip() 
+    sexoTutor = (data.get("sexoTutor") or "").strip()
     presidente = (data.get("presidente") or "").strip()
     secretario = (data.get("secretario") or "").strip()
     vocal1 = (data.get("vocal1") or "").strip()
@@ -150,28 +168,24 @@ def guardar_datos():
     if not _validar_rango_plan(plan):
         return jsonify({"success": False, "error": "El plan de estudios debe estar entre 3000 y 5999."})
 
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT 1 FROM posgrado
+            WHERE numeroCuenta=? AND planEstudios=? LIMIT 1
+        """, (numero_cuenta, plan))
+        if cur.fetchone():
+            return jsonify({"success": False, "error": "Ya existe ese número de cuenta en ese plan de estudios."})
 
-    # Regla de negocio: mismo alumno NO puede repetirse en el MISMO plan
-    cur.execute("""
-        SELECT 1 FROM posgrado
-        WHERE numeroCuenta=? AND planEstudios=? LIMIT 1
-    """, (numero_cuenta, plan))
-    if cur.fetchone():
-        conn.close()
-        return jsonify({"success": False, "error": "Ya existe ese número de cuenta en ese plan de estudios."})
-
-    cur.execute("""
-        INSERT INTO posgrado (
-            numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina,
-            tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (numero_cuenta, nombre, plan, especializacion, titulo,
-          tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor))
-
-    conn.commit()
-    conn.close()
+        cur.execute("""
+            INSERT INTO posgrado (
+                numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina,
+                tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (numero_cuenta, nombre, plan, especializacion, titulo,
+            tutor, presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor))
+        conn.commit()
+    
     return jsonify({"success": True})
 
 # --------- BÚSQUEDAS ---------
@@ -180,16 +194,13 @@ def buscar_por_cuenta():
     data = request.get_json()
     cuenta = data.get("numeroCuenta")
 
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad
-        FROM posgrado
-        WHERE numeroCuenta = ?
-        ORDER BY planEstudios
-    """, (cuenta,))
-    resultados = cursor.fetchall()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad
+            FROM posgrado WHERE numeroCuenta = ? ORDER BY planEstudios
+        """, (cuenta,))
+        resultados = cursor.fetchall()
 
     respuesta = [{"id": r[0], "numeroCuenta": r[1], "nombreCompleto": r[2],
                   "especializacion": r[3], "modalidad": r[4]} for r in resultados]
@@ -200,16 +211,13 @@ def buscar_nombre():
     data = request.get_json()
     nombre = data.get('nombre', '').strip()
 
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad
-        FROM posgrado
-        WHERE nombreCompleto LIKE ?
-        ORDER BY planEstudios
-    """, ('%' + nombre + '%',))
-    resultados = cursor.fetchall()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad
+            FROM posgrado WHERE nombreCompleto LIKE ? ORDER BY planEstudios
+        """, ('%' + nombre + '%',))
+        resultados = cursor.fetchall()
 
     respuesta = [{"id": r[0], "numeroCuenta": r[1], "nombreCompleto": r[2],
                   "especializacion": r[3], "modalidad": r[4]} for r in resultados]
@@ -218,15 +226,14 @@ def buscar_nombre():
 # --------- GENERAR VOTOS POR ID ---------
 @votos_Oficio_PUEI_bp.route("/votos_id/<int:id>")
 def generar_votos_por_id(id):
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT nombreCompleto, planEstudios, especializacion, tituloTesina,
-               presidente, secretario, vocal1, vocal2, vocal3, sexo
-        FROM posgrado WHERE id = ?
-    """, (id,))
-    datos = cursor.fetchone()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT nombreCompleto, planEstudios, especializacion, tituloTesina,
+                presidente, secretario, vocal1, vocal2, vocal3, sexo
+            FROM posgrado WHERE id = ?
+        """, (id,))
+        datos = cursor.fetchone()
 
     if not datos:
         return "Alumno no encontrado", 404
@@ -251,19 +258,18 @@ def sinodales_autocomplete():
     pat_contains = f"%{q}%"
     pat_prefix   = f"{q}%"
 
-    conn = sqlite3.connect(direccionBase)
-    cur  = conn.cursor()
-    cur.execute("""
-        SELECT nombre_completo
-        FROM sinodales
-        WHERE nombre_completo LIKE ? COLLATE NOCASE
-        ORDER BY
-          CASE WHEN nombre_completo LIKE ? COLLATE NOCASE THEN 0 ELSE 1 END,
-          nombre_completo
-        LIMIT 20
-    """, (pat_contains, pat_prefix))
-    rows = [r[0] for r in cur.fetchall()]
-    conn.close()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT nombre_completo FROM sinodales
+            WHERE nombre_completo LIKE ? COLLATE NOCASE
+            ORDER BY
+            CASE WHEN nombre_completo LIKE ? COLLATE NOCASE THEN 0 ELSE 1 END,
+            nombre_completo
+            LIMIT 20
+        """, (pat_contains, pat_prefix))
+        rows = [r[0] for r in cur.fetchall()]
+
     return jsonify(rows)
 
 # --------- MODIFICAR ---------
@@ -273,28 +279,21 @@ def obtener_datos():
     cuenta = (datos.get("numeroCuenta") or "").strip()
     seleccion_id = datos.get("id")
 
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-
-    if seleccion_id:
-        cursor.execute("""
-            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
-                   secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
-            FROM posgrado
-            WHERE id = ?
-            LIMIT 1
-        """, (seleccion_id,))
-    else:
-        cursor.execute("""
-            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
-                   secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
-            FROM posgrado
-            WHERE numeroCuenta = ?
-            ORDER BY planEstudios
-        """, (cuenta,))
-
-    filas = cursor.fetchall()
-    conn.close()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        if seleccion_id:
+            cursor.execute("""
+                SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
+                    secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+                FROM posgrado WHERE id = ? LIMIT 1
+            """, (seleccion_id,))
+        else:
+            cursor.execute("""
+                SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, tituloTesina, tutor, presidente,
+                    secretario, vocal1, vocal2, vocal3, sexo, modalidad, sexoTutor
+                FROM posgrado WHERE numeroCuenta = ? ORDER BY planEstudios
+            """, (cuenta,))
+        filas = cursor.fetchall()
 
     if not filas:
         return jsonify({"success": False, "error": "No se encontraron datos."})
@@ -337,26 +336,28 @@ def obtener_datos():
 def modificar_datos():
     datos = request.get_json()
     plan = int(datos["planEstudios"])
+    
     if not _validar_rango_plan(plan):
         return jsonify({"success": False, "error": "Plan fuera de rango (3000–5999)."})
-    conn = sqlite3.connect(direccionBase)
-    cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE posgrado
-        SET nombreCompleto = ?, planEstudios = ?, especializacion = ?, tituloTesina = ?,
-            tutor = ?, presidente = ?, secretario = ?, vocal1 = ?, vocal2 = ?, vocal3 = ?,
-            sexo = ?, modalidad = ?, sexoTutor = ?
-        WHERE id = ?
-    """, (
-        datos["nombre"], plan, datos["especializacion"], datos["tituloTesina"],
-        datos["tutor"], datos["presidente"], datos["secretario"], datos["vocal1"],
-        datos["vocal2"], datos["vocal3"], datos["sexo"], datos["modalidad"], datos["sexoTutor"], datos["id"]
-    ))
-    conn.commit()
-    conn.close()
+    
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE posgrado
+            SET nombreCompleto=?, planEstudios=?, especializacion=?, tituloTesina=?,
+                tutor=?, presidente=?, secretario=?, vocal1=?, vocal2=?, vocal3=?,
+                sexo=?, modalidad=?, sexoTutor=?
+            WHERE id=?
+        """, (
+            datos["nombre"], plan, datos["especializacion"], datos["tituloTesina"],
+            datos["tutor"], datos["presidente"], datos["secretario"], datos["vocal1"],
+            datos["vocal2"], datos["vocal3"], datos["sexo"], datos["modalidad"], datos["sexoTutor"], datos["id"]
+        ))
+        conn.commit()
+
     return jsonify({"success": True})
 
-# --------- PDFs estáticos ---------
+# --------- PDFs ---------
 @votos_Oficio_PUEI_bp.route("/ver_pdf/<filename>")
 def ver_pdf(filename):
     return send_from_directory("static/Documentos", filename, mimetype="application/pdf", as_attachment=False)

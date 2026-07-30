@@ -680,3 +680,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+window.addEventListener("click", (e) => {
+    ["modal-fecha-hora", "modalSeleccionPlan"].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && e.target === modal)
+            modal.classList.remove("active");
+    });
+});

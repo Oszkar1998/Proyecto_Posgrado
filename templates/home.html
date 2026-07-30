@@ -27,9 +27,43 @@
             <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM" class="logo-unam">
             <span class="titulo-navbar">Facultad de Ingeniería — POSGRADO</span>
         </div>
-        <button class="logout-button" onclick="window.location.href='/logout'">
+        
+        <button class="logout-button" onclick="confirmarCerrarSesion()">
             <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
         </button>
+
+        <!-- Modal confirmación cerrar sesión -->
+        <div id="modal-cerrar-sesion" style="
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);
+            justify-content:center; align-items:center; z-index:9999;">
+            <div style="
+                background:#0f1116; border:1px solid rgba(220,53,69,0.5);
+                border-radius:18px; padding:32px 28px; width:90%; max-width:420px;
+                text-align:center; box-shadow:0 0 35px rgba(220,53,69,0.2);">
+                <h2 style="color:#dc3545; margin-top:0;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </h2>
+                <p style="color:#ccc; font-size:15px; margin:12px 0 24px; line-height:1.5;">
+                    ¿Estás seguro de que deseas cerrar la sesión?
+                </p>
+                <div style="display:flex; gap:12px; justify-content:center;">
+                    <button onclick="window.location.href='/logout'" style="
+                        background:#dc3545; color:white; border:none;
+                        border-radius:10px; padding:10px 22px;
+                        font-weight:700; cursor:pointer; width:auto;">
+                        <i class="fa-solid fa-check"></i> Sí, salir
+                    </button>
+                    <button onclick="document.getElementById('modal-cerrar-sesion').style.display='none'" style="
+                        background:#f6c343; color:#000; border:none;
+                        border-radius:10px; padding:10px 22px;
+                        font-weight:700; cursor:pointer; width:auto;">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </header>
 
     <!-- Contenido principal -->
@@ -119,5 +153,19 @@
         </div>
     </div>
 
+
+    <script>
+        function confirmarCerrarSesion() {
+            document.getElementById("modal-cerrar-sesion").style.display = "flex";
+        }
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape")
+                document.getElementById("modal-cerrar-sesion").style.display = "none";
+        });
+        document.getElementById("modal-cerrar-sesion").addEventListener("click", function(e) {
+            if (e.target === this) this.style.display = "none";
+        });
+    </script>
+    
 </body>
 </html>

@@ -1,10 +1,10 @@
 # Libreria Necesaria para conectar PYTHON con HTMLX, y con la Base de Datos
 from flask import Blueprint , render_template, request, jsonify, session, redirect, url_for, send_from_directory
-import sqlite3
 from datetime import datetime
 from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
+from db import get_connection
 
 candidatura_bp = Blueprint('candidatura', __name__, template_folder='../templates')
 
@@ -350,20 +350,14 @@ def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
 
 #################################################################################################################################
 def obtenerDatosCandidatura(numero_cuenta: str):
-    conn = sqlite3.connect(direccionBase)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT *
-        FROM candidatura
-        WHERE numero_cuenta = ?
-        LIMIT 1
-    """, (numero_cuenta,))
-
-    fila = cur.fetchone()
-    conn.close()
-    return fila
+    with get_connection() as conn:
+        conn.row_factory = __import__('sqlite3').Row
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT * FROM candidatura
+            WHERE numero_cuenta = ? LIMIT 1
+        """, (numero_cuenta,))
+        return cur.fetchone()
 
 def fechaActual():
 
@@ -455,37 +449,33 @@ def _ensure_contador_acta(conn):
         conn.commit()
 
 def obtener_folio_acta() -> int:
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    _ensure_contador_acta(conn)
-    cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_ACTA_ID,))
-    val = cur.fetchone()[0]
-    conn.close()
+    with get_connection() as conn:
+        _ensure_contador_acta(conn)
+        cur = conn.cursor()
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_ACTA_ID,))
+        val = cur.fetchone()[0]
     return int(val)
 
 def actualizar_folio_acta(nuevo_valor: int) -> int:
     if not isinstance(nuevo_valor, int) or nuevo_valor < 1:
         raise ValueError("Valor inválido")
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    _ensure_contador_acta(conn)
-    cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo_valor, CONTADOR_ACTA_ID))
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        _ensure_contador_acta(conn)
+        cur = conn.cursor()
+        cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo_valor, CONTADOR_ACTA_ID))
+        conn.commit()
     return nuevo_valor
 
 def incrementar_folio_acta() -> int:
-    # Incremento atómico (evita carreras si 2 usuarios generan a la vez)
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    _ensure_contador_acta(conn)
-    cur.execute("BEGIN IMMEDIATE")
-    cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_ACTA_ID,))
-    actual = int(cur.fetchone()[0])
-    nuevo = actual + 1
-    cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo, CONTADOR_ACTA_ID))
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        _ensure_contador_acta(conn)
+        cur = conn.cursor()
+        cur.execute("BEGIN IMMEDIATE")
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_ACTA_ID,))
+        actual = int(cur.fetchone()[0])
+        nuevo = actual + 1
+        cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo, CONTADOR_ACTA_ID))
+        conn.commit()
     return nuevo
 
 def folio_3_digitos(n: int) -> str:
@@ -595,82 +585,66 @@ def ver_pdf(filename):
 @candidatura_bp.route("/api/obtener")
 def obtener_por_cuenta():
     num = request.args.get("numero_cuenta","").strip()
-    conn = sqlite3.connect(direccionBase)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM candidatura WHERE numero_cuenta = ?", (num,))
-    row = cur.fetchone()
-    conn.close()
+    with get_connection() as conn:
+        conn.row_factory = __import__('sqlite3').Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM candidatura WHERE numero_cuenta = ?", (num,))
+        row = cur.fetchone()
     return jsonify(dict(row) if row else {})
 
 @candidatura_bp.route("/api/actualizar", methods=["POST"])
 def actualizar_por_cuenta():
     data = request.get_json(force=True)
-    conn = sqlite3.connect(direccionBase)
-    cur = conn.cursor()
-    cur.execute("""
-      UPDATE candidatura SET
-        nombre_completo=?, especialidad=?, titulo_proyecto=?, semestre_ingreso=?,
-        semestre_presentado=?, evaluacion=?, presidente=?, secretario=?,
-        vocal1=?, vocal2=?, vocal3=?, sexo=?, modalidad_sede=?,
-        fecha_examen=?, hora_examen=?
-      WHERE numero_cuenta=?
-    """, (
-      data["nombre_completo"], data["especialidad"], data["titulo_proyecto"],
-      data["semestre_ingreso"], data["semestre_presentado"], data["evaluacion"],
-      data["presidente"], data["secretario"], data["vocal1"], data["vocal2"],
-      data["vocal3"], data["sexo"], data["modalidad_sede"],
-      data["fecha_examen"], data["hora_examen"],
-      data["numero_cuenta"]
-    ))
-    conn.commit()
-    conn.close()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+          UPDATE candidatura SET
+            nombre_completo=?, especialidad=?, titulo_proyecto=?, semestre_ingreso=?,
+            semestre_presentado=?, evaluacion=?, presidente=?, secretario=?,
+            vocal1=?, vocal2=?, vocal3=?, sexo=?, modalidad_sede=?,
+            fecha_examen=?, hora_examen=?
+          WHERE numero_cuenta=?
+        """, (
+          data["nombre_completo"], data["especialidad"], data["titulo_proyecto"],
+          data["semestre_ingreso"], data["semestre_presentado"], data["evaluacion"],
+          data["presidente"], data["secretario"], data["vocal1"], data["vocal2"],
+          data["vocal3"], data["sexo"], data["modalidad_sede"],
+          data["fecha_examen"], data["hora_examen"],
+          data["numero_cuenta"]
+        ))
+        conn.commit()
     return jsonify({"ok": True})
 
 @candidatura_bp.route("/api/crear", methods=["POST"])
 def crear_registro():
     data = request.get_json(force=True)
-
-    # validación mínima
     numero_cuenta = (data.get("numero_cuenta") or "").strip()
     if not numero_cuenta.isdigit() or len(numero_cuenta) != 9:
         return jsonify({"ok": False, "error": "Número de cuenta inválido (9 dígitos)."}), 400
 
     try:
-        conn = sqlite3.connect(direccionBase)
-        cur = conn.cursor()
-
-        cur.execute("""
-            INSERT INTO candidatura (
-                nombre_completo, numero_cuenta, especialidad, titulo_proyecto,
-                semestre_ingreso, semestre_presentado, evaluacion,
-                presidente, secretario, vocal1, vocal2, vocal3,
-                sexo, modalidad_sede, fecha_examen, hora_examen
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """, (
-            data.get("nombre_completo","").strip(),
-            numero_cuenta,
-            data.get("especialidad","").strip(),
-            data.get("titulo_proyecto","").strip(),
-            data.get("semestre_ingreso","").strip(),
-            data.get("semestre_presentado","").strip(),
-            data.get("evaluacion","").strip(),
-            data.get("presidente","").strip(),
-            data.get("secretario","").strip(),
-            data.get("vocal1","").strip(),
-            data.get("vocal2","").strip(),
-            data.get("vocal3","").strip(),
-            data.get("sexo","").strip(),
-            data.get("modalidad_sede","").strip(),
-            data.get("fecha_examen","").strip(),
-            data.get("hora_examen","").strip()
-        ))
-
-        conn.commit()
-        conn.close()
+        with get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO candidatura (
+                    nombre_completo, numero_cuenta, especialidad, titulo_proyecto,
+                    semestre_ingreso, semestre_presentado, evaluacion,
+                    presidente, secretario, vocal1, vocal2, vocal3,
+                    sexo, modalidad_sede, fecha_examen, hora_examen
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """, (
+                data.get("nombre_completo","").strip(), numero_cuenta,
+                data.get("especialidad","").strip(), data.get("titulo_proyecto","").strip(),
+                data.get("semestre_ingreso","").strip(), data.get("semestre_presentado","").strip(),
+                data.get("evaluacion","").strip(), data.get("presidente","").strip(),
+                data.get("secretario","").strip(), data.get("vocal1","").strip(),
+                data.get("vocal2","").strip(), data.get("vocal3","").strip(),
+                data.get("sexo","").strip(), data.get("modalidad_sede","").strip(),
+                data.get("fecha_examen","").strip(), data.get("hora_examen","").strip()
+            ))
+            conn.commit()
         return jsonify({"ok": True})
-
-    except sqlite3.IntegrityError:
+    except __import__('sqlite3').IntegrityError:
         return jsonify({"ok": False, "error": "Ese número de cuenta ya existe."}), 409
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
@@ -678,26 +652,19 @@ def crear_registro():
 @candidatura_bp.route("/api/buscar")
 def buscar_por_nombre():
     nombre = (request.args.get("nombre") or "").strip()
-
     if not nombre:
         return jsonify([])
 
-    conn = sqlite3.connect(direccionBase)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    # Buscar por nombre (LIKE) - trae varios
-    cur.execute("""
-        SELECT id, nombre_completo, numero_cuenta
-        FROM candidatura
-        WHERE nombre_completo LIKE ?
-        ORDER BY nombre_completo ASC
-        LIMIT 20
-    """, (f"%{nombre}%",))
-
-    rows = cur.fetchall()
-    conn.close()
-
+    with get_connection() as conn:
+        conn.row_factory = __import__('sqlite3').Row
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, nombre_completo, numero_cuenta
+            FROM candidatura
+            WHERE nombre_completo LIKE ?
+            ORDER BY nombre_completo ASC LIMIT 20
+        """, (f"%{nombre}%",))
+        rows = cur.fetchall()
     return jsonify([dict(r) for r in rows])
 
 @candidatura_bp.route("/obtener_folio_acta", methods=["GET"])
