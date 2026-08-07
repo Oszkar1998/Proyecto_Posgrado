@@ -155,15 +155,15 @@ def generar_citatorio(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pr
 
         # Nombres del jurado
         pdf.set_xy(62, 123)
-        pdf.multi_cell(0, 5, presidente, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(presidentePos), align="L")
         pdf.set_xy(62, 133)
-        pdf.multi_cell(0, 5, secretario, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(secretarioPos), align="L")
         pdf.set_xy(62, 143)
-        pdf.multi_cell(0, 5, vocal1, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal1Pos), align="L")
         pdf.set_xy(62, 153)
-        pdf.multi_cell(0, 5, vocal2, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal2Pos), align="L")
         pdf.set_xy(62, 163)
-        pdf.multi_cell(0, 5, vocal3, align="L")
+        pdf.multi_cell(0, 5, modificMombreSinodal(vocal3Pos), align="L")
 
         # Firma
         pdf.set_xy(156.5, 113)

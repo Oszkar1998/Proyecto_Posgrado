@@ -17,16 +17,15 @@ import sqlite3
 from contextlib import contextmanager
 from config import direccionBase
 
+"""
+    Abre una conexión SQLite y la cierra siempre al salir del bloque,
+    incluso si ocurre una excepción durante la consulta.
+"""
 
 @contextmanager
 def get_connection():
-    """
-    Abre una conexión SQLite y la cierra siempre al salir del bloque,
-    incluso si ocurre una excepción durante la consulta.
-    """
-    conn = sqlite3.connect(direccionBase)
+    conn = sqlite3.connect(direccionBase, timeout=10)
     try:
         yield conn
     finally:
         conn.close()
-        
