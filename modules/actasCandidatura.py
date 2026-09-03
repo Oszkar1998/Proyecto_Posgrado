@@ -8,7 +8,7 @@ actas_candidatura_bp = Blueprint('actas_candidatura', __name__, template_folder=
 
 EVALUACIONES_VALIDAS = ["PRIMERA", "SEGUNDA", "TERCERA", "CUARTA", "QUINTA",
                         "SEXTA", "SÉPTIMA", "OCTAVA", "NOVENA", "DÉCIMA"]
-RESULTADOS_VALIDOS = ["Aprobado", "No aprobado"]
+RESULTADOS_VALIDOS = ["Aprobado", "No aprobado", "Suspendido"]
 
 
 @actas_candidatura_bp.route("/", methods=["GET", "POST"])

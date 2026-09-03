@@ -533,7 +533,7 @@ def oficioJurado(pdf, nombreCompleto, planEstudios, especializacion, trabajo, pr
         "UNAM\n"
         "Presente", align="J")
 
-    if str(modalidad) == "Tesina" or str(modalidad) == "Tesis" or str(modalidad) == "Reporte de Estancia Industrial o Empresarial" or str(modalidad) == "Informe de Trabajo de Investigación":
+    if str(modalidad) == "Tesina" or str(modalidad) == "Tesis" or str(modalidad) == "Reporte de Estancia Industrial o Empresarial" or str(modalidad) == "Informe de Trabajo de Investigación" or str(modalidad) == "Artículo de Investigación" or str(modalidad) == "Solicitud de Patente o Modelo de Utilidad":
         
         if int(especializacion) <= 3999:
             pdf.ln(10)

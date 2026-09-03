@@ -28,6 +28,7 @@
         </div>
     </header>
 
+    <!-- Modal selección de plan -->
     <div id="modalSeleccionPlan" class="modal">
         <div class="modal-content">
             <h2>Selecciona el plan para generar DGAE</h2>
@@ -40,9 +41,15 @@
     <!-- Contenido principal -->
     <main class="container">
         <section class="card">
-            <h1>Consulta de Documentos DGAE</h1>
-            <p class="descripcion">Ingrese el número de cuenta para validar y generar los documentos correspondientes.</p>
+            <h1><i class="fa-solid fa-file-lines"></i> Consulta de Documentos DGAE</h1>
+            <p class="descripcion">
+                Ingrese el número de cuenta para generar el documento, o busque por nombre y rango de fechas.
+                <br>● Si ingresa <strong>número de cuenta</strong>, se generará el documento directamente.
+                <br>● Si ingresa <strong>nombre</strong>, se listarán todas las coincidencias.
+                <br>● Si ingresa <strong>rango de fechas</strong>, se mostrarán alumnos cuyo documento fue generado en ese periodo.
+            </p>
 
+            <!-- ====== NÚMERO DE CUENTA (ARRIBA) ====== -->
             <form id="login-form" autocomplete="off">
                 <div class="input-group">
                     <label for="numeroDeCuenta">Número de Cuenta</label>
@@ -72,6 +79,62 @@
                     <button id="btn-doc2-conX" type="button">Documentos con X</button>
                 </div>
             </div>
+
+            <!-- Separador -->
+            <hr style="margin: 24px 0; border-color: rgba(255,255,255,0.1);">
+
+            <!-- ====== BÚSQUEDA POR NOMBRE / FECHAS (ABAJO) ====== -->
+            <form id="form-busqueda" method="GET" action="/dgae/" autocomplete="off">
+                <div class="input-group">
+                    <label for="nombreAlumno">Nombre del Alumno:</label>
+                    <input
+                        type="text"
+                        id="nombreAlumno"
+                        name="nombreAlumno"
+                        placeholder="Ejemplo: JUAN PÉREZ"
+                    />
+
+                    <label for="fechaInicio">Fecha Inicio:</label>
+                    <input
+                        type="date"
+                        id="fechaInicio"
+                        name="fechaInicio"
+                    />
+
+                    <label for="fechaFin">Fecha Fin:</label>
+                    <input
+                        type="date"
+                        id="fechaFin"
+                        name="fechaFin"
+                    />
+                </div>
+
+                <button type="submit" class="btn-buscar">
+                    <i class="fa-solid fa-magnifying-glass"></i> Consultar Datos
+                </button>
+            </form>
+
+            <!-- Resultados de búsqueda -->
+            {% if resultados %}
+            <div class="resultados">
+                <h2>{{ resultados|length }} resultado(s) encontrado(s)</h2>
+                <ul>
+                    {% for r in resultados %}
+                    <li>
+                        <strong>{{ r[2] }}</strong><br>
+                        Cuenta: {{ r[1] }} &nbsp;·&nbsp; Plan: {{ r[3] }} &nbsp;·&nbsp; Especialización: {{ r[4] or '—' }}<br>
+                        <span class="fecha-dgae">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            Último DGAE generado: {{ r[5] or 'Sin registro' }}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% elif mensaje %}
+            <div class="sin-resultados">{{ mensaje }}</div>
+            {% endif %}
+
         </section>
     </main>
 </body>

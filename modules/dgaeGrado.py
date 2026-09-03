@@ -13,6 +13,52 @@ dgaeGrado_bp = Blueprint('dgaeGrado', __name__, template_folder='../templates')
 os.makedirs(direccionPDF, exist_ok=True)
 
 #################################################################################################################################
+def _guardar_fecha_dgaeGrado(registro_id: int):
+    hoy = datetime.now().strftime("%Y-%m-%d")
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("UPDATE posgrado SET fechaDgaeGrado = ? WHERE id = ?", (hoy, registro_id))
+        conn.commit()
+
+def _buscar_por_nombre_y_fechas_grado(nombre: str, fecha_inicio: str, fecha_fin: str):
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, fechaDgaeGrado
+            FROM posgrado
+        """)
+        filas = cur.fetchall()
+
+    resultados = []
+    nombre_upper = nombre.strip().upper() if nombre else ""
+    f_ini = f_fin = None
+
+    if fecha_inicio and fecha_fin:
+        try:
+            f_ini = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+            f_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+        except ValueError:
+            return [], "Formato de fecha no válido."
+
+    for fila in filas:
+        _id, cuenta, nombre_alu, plan, espec, fecha = fila
+        if nombre_upper and nombre_alu and nombre_upper not in nombre_alu.upper():
+            continue
+        if f_ini and f_fin:
+            if not fecha:
+                continue
+            try:
+                f_alu = datetime.strptime(fecha, "%Y-%m-%d")
+                if not (f_ini <= f_alu <= f_fin):
+                    continue
+            except Exception:
+                continue
+        resultados.append((_id, cuenta, nombre_alu, plan, espec, fecha))
+
+    if not resultados:
+        return [], "No se encontraron resultados para los criterios ingresados."
+    return resultados, None
+
 def fecha_texto():
     meses = {
         1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
@@ -452,7 +498,21 @@ def index():
         return redirect(url_for("index"))
 
     if request.method == "GET":
-        return render_template("dgaeGrado.html")
+        nombre = request.args.get("nombreAlumno", "").strip()
+        fecha_inicio = request.args.get("fechaInicio", "").strip()
+        fecha_fin = request.args.get("fechaFin", "").strip()
+
+        if nombre and not (fecha_inicio and fecha_fin):
+            fecha_inicio = ""
+            fecha_fin = ""
+        if (fecha_inicio and fecha_fin) and not nombre:
+            nombre = ""
+
+        if nombre or (fecha_inicio and fecha_fin):
+            resultados, error = _buscar_por_nombre_y_fechas_grado(nombre, fecha_inicio, fecha_fin)
+            return render_template("dgaeGrado.html", resultados=resultados, mensaje=error)
+
+        return render_template("dgaeGrado.html", resultados=[], mensaje=None)
 
     numero = (request.form.get("numeroDeCuenta") or "").strip()
     tipo_doc = (request.form.get("tipoDocumento") or "").strip()
@@ -576,6 +636,9 @@ def ver_documento():
     )
 
     pdf_buffer.seek(0)
+
+    # Guardar fecha de generación
+    _guardar_fecha_dgaeGrado(_id)
 
     return send_file(
         pdf_buffer,

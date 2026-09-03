@@ -82,6 +82,7 @@ body {
     font-size: 14px;
     color: #d1d5db;
     margin-bottom: 25px;
+    text-align: left;
 }
 
 /* ===== INPUT ===== */
@@ -238,4 +239,52 @@ button:hover {
     color: black;
     font-weight: 600;
     cursor: pointer;
+}
+
+/* ====== BÚSQUEDA DGAE ====== */
+html, body { overflow: auto !important; }
+
+.btn-buscar {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: #f6c343;
+    color: #000;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-buscar:hover { background: #e0b132; }
+
+.resultados { margin-top: 20px; }
+.resultados h2 { color: #f6c343; font-size: 16px; margin-bottom: 12px; }
+.resultados ul { list-style: none; padding: 0; }
+.resultados li {
+    background: #1f2a37;
+    color: #fff;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(246,195,67,0.2);
+    line-height: 1.6;
+}
+.resultados li strong { color: #f6c343; font-size: 15px; }
+.fecha-dgae { color: #a0c4ff; font-size: 13px; }
+.sin-resultados { color: #f6c343; text-align: center; margin-top: 15px; font-size: 14px; }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+html, body {
+    overflow: auto !important;
 }

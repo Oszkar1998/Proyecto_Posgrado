@@ -1534,49 +1534,96 @@ def _obtener_registro_dgae_por_id(reg_id):
         """, (reg_id,))
         return cur.fetchone()
 
+def _guardar_fecha_dgae(registro_id: int):
+    """Guarda la fecha actual en posgrado.fecha cuando se genera el documento."""
+    hoy = datetime.now().strftime("%Y-%m-%d")
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("UPDATE posgrado SET fecha = ? WHERE id = ?", (hoy, registro_id))
+        conn.commit()
+
+def _buscar_por_nombre_y_fechas(nombre: str, fecha_inicio: str, fecha_fin: str):
+    """Busca alumnos en posgrado por nombre y/o rango de fechas de generación DGAE."""
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, numeroCuenta, nombreCompleto, planEstudios, especializacion, fecha
+            FROM posgrado
+        """)
+        filas = cur.fetchall()
+
+    resultados = []
+    nombre_upper = nombre.strip().upper() if nombre else ""
+
+    f_ini = f_fin = None
+    if fecha_inicio and fecha_fin:
+        try:
+            f_ini = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+            f_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+        except ValueError:
+            return [], "Formato de fecha no válido."
+
+    for fila in filas:
+        _id, cuenta, nombre_alu, plan, espec, fecha = fila
+
+        # Filtrar por nombre
+        if nombre_upper and nombre_alu and nombre_upper not in nombre_alu.upper():
+            continue
+
+        # Filtrar por rango de fechas
+        if f_ini and f_fin:
+            if not fecha:
+                continue
+            try:
+                f_alu = datetime.strptime(fecha, "%Y-%m-%d")
+                if not (f_ini <= f_alu <= f_fin):
+                    continue
+            except Exception:
+                continue
+
+        resultados.append((_id, cuenta, nombre_alu, plan, espec, fecha))
+
+    if not resultados:
+        return [], "No se encontraron resultados para los criterios ingresados."
+
+    return resultados, None
+
+
 #################################################################################################################################
 @dgae_bp.route("/", methods=["GET", "POST"])
 @permission_required("dgae")
 def dgae():
     if request.method == "GET":
-        return render_template("dgae.html")
+        nombre = request.args.get("nombreAlumno", "").strip()
+        fecha_inicio = request.args.get("fechaInicio", "").strip()
+        fecha_fin = request.args.get("fechaFin", "").strip()
+
+        # Si viene búsqueda por nombre o fechas
+        if nombre or (fecha_inicio and fecha_fin):
+            resultados, error = _buscar_por_nombre_y_fechas(nombre, fecha_inicio, fecha_fin)
+            return render_template("dgae.html", resultados=resultados, mensaje=error)
+
+        return render_template("dgae.html", resultados=[], mensaje=None)
 
     numero = (request.form.get("numeroDeCuenta") or "").strip()
     tipo_doc = (request.form.get("tipoDocumento") or "").strip()
     seleccion_id = request.form.get("seleccion_id")
 
-    # Validaciones básicas
     if not numero or not numero.isdigit() or len(numero) != 9:
         return jsonify(success=False, error="Número de cuenta inválido (9 dígitos)."), 400
 
-    # Si el usuario ya eligió un plan específico
     if seleccion_id:
         fila = _obtener_registro_dgae_por_id(int(seleccion_id))
-
         if not fila:
             return jsonify(success=False, error="Selección inválida.")
-
         _id, No_cuenta_str, Nomb_alu, clave_int, Plan_estudios, _titulo, modalidad = fila
-
-        try:
-            clave_int = int(clave_int)
-        except Exception:
-            return jsonify(success=False, error="El plan de estudios no es numérico.")
-
-        Plan_estudios = Plan_estudios or ""
-        modalidad = modalidad or ""
-
     else:
-        # Buscar todos los registros de esa cuenta
         filas = _listar_registros_dgae(numero)
-
         if not filas:
             return jsonify(success=False, error="No se encontró la cuenta en POSGRADO.")
 
-        # Si hay más de un registro y todavía no selecciona plan, mandar opciones al JS
         if len(filas) > 1:
             opciones = []
-
             for rid, cuenta, nombre, plan, espec, titulo, modalidad in filas:
                 opciones.append({
                     "id": rid,
@@ -1586,30 +1633,26 @@ def dgae():
                     "programa": _infer_programa(plan).capitalize(),
                     "especializacion": espec or ""
                 })
-
             return jsonify({
                 "success": True,
                 "multiples": opciones,
                 "resumen": "Este alumno tiene más de un plan. Selecciona cuál usar para DGAE."
             })
 
-        # Si solo hay un registro, usar ese directamente
         _id, No_cuenta_str, Nomb_alu, clave_int, Plan_estudios, _titulo, modalidad = filas[0]
 
-        try:
-            clave_int = int(clave_int)
-        except Exception:
-            return jsonify(success=False, error="El plan de estudios no es numérico.")
+    try:
+        clave_int = int(clave_int)
+    except Exception:
+        return jsonify(success=False, error="El plan de estudios no es numérico.")
 
-        Plan_estudios = Plan_estudios or ""
-        modalidad = modalidad or ""
-
+    Plan_estudios = Plan_estudios or ""
+    modalidad = modalidad or ""
     programa, grado = _determinar_programa_y_grado(clave_int)
 
     if not programa:
         return jsonify(success=False, error="El plan está fuera de rango (3000–5999).")
 
-    # Si todavía no se pide documento, solo validar y mostrar botones
     if not tipo_doc:
         return jsonify(success=True, msg="Cuenta válida en POSGRADO.")
 
@@ -1618,9 +1661,7 @@ def dgae():
         "documento2_sinX": ("2", "1"),
         "documento2_conX": ("2", "2"),
     }
-
     config = tipos_documento.get(tipo_doc)
-
     if not config:
         return jsonify(success=False, error="Tipo de documento no reconocido."), 400
 
@@ -1629,40 +1670,17 @@ def dgae():
 
     try:
         if grado == "Especialidad":
-            especialidad(
-                No_cuenta_str,
-                Plan_estudios,
-                clave_str,
-                Nomb_alu,
-                programa,
-                opcion,
-                tipo,
-                modalidad
-            )
+            especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         elif grado == "Maestría":
-            maestria(
-                No_cuenta_str,
-                Plan_estudios,
-                clave_str,
-                Nomb_alu,
-                programa,
-                opcion,
-                tipo,
-                modalidad
-            )
+            maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         elif grado == "Doctorado":
-            doctorado(
-                No_cuenta_str,
-                Plan_estudios,
-                clave_str,
-                Nomb_alu,
-                programa,
-                opcion,
-                tipo,
-                modalidad
-            )
+            doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         else:
             return jsonify(success=False, error="Grado no identificado.")
+
+        # Guardar fecha de generación del documento
+        _guardar_fecha_dgae(_id)
+
     except Exception as e:
         return jsonify(success=False, error=f"Error al generar PDF: {e}")
 
