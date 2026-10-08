@@ -62,21 +62,6 @@ function abrirActasCandidatura(accion){
   }
 }
 
-// Cerrar al dar click fuera (para todos los modales)
-document.addEventListener("click", function(e){
-  const mv = document.getElementById("modal-menu-votos");
-  if (mv && mv.style.display === "flex" && e.target === mv) cerrarMenuVotos();
-
-  const mc = document.getElementById("modal-menu-candidatura");
-  if (mc && mc.style.display === "flex" && e.target === mc) cerrarMenuCandidatura();
-
-  const mag = document.getElementById("modal-menu-actas-grado");
-  if (mag && mag.style.display === "flex" && e.target === mag) cerrarMenuActasGrado();
-
-  const mac = document.getElementById("modal-menu-actas-candidatura");
-  if (mac && mac.style.display === "flex" && e.target === mac) cerrarMenuActasCandidatura();
-});
-
 // ESC para cerrar todos
 document.addEventListener("keydown", function(e){
   if (e.key !== "Escape") return;

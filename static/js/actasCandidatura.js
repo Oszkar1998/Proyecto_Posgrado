@@ -140,14 +140,4 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarModal("modal-capturar-actaCandidatura");
     cerrarModal("modal-modificar-actaCandidatura");
   });
-
-  // Cerrar al hacer clic fuera del modal
-  document.addEventListener("click", (e) => {
-    ["modal-capturar-actaCandidatura", "modal-modificar-actaCandidatura"].forEach(id => {
-      const modal = document.getElementById(id);
-      if (modal && e.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-  });
 });

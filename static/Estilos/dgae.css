@@ -5,10 +5,11 @@
     box-sizing: border-box;
 }
 
-/* Evitar scroll innecesario */
+/* Scroll habilitado */
 html, body {
-    height: 100%;
-    overflow: hidden; /* 🔥 quita barras de scroll */
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Fondo general */
@@ -18,17 +19,17 @@ body {
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     background-size: cover;
     background-position: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    background-attachment: fixed;
+    display: block;
+    padding: 80px 20px 40px;
 }
 
 /* ===== TOP BAR ===== */
 .topbar {
-    position: absolute;
+    position: fixed;
     top: 20px;
     left: 30px;
+    z-index: 100;
 }
 
 /* Botón regresar */
@@ -51,10 +52,8 @@ body {
 
 /* ===== CONTENEDOR ===== */
 .container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    max-width: 540px;
+    margin: 0 auto;
 }
 
 /* Tarjeta */
@@ -64,8 +63,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 0 18px rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    width: 90%;
-    max-width: 500px;
+    width: 100%;
     text-align: center;
     backdrop-filter: blur(8px);
 }
@@ -176,6 +174,7 @@ button:hover {
     }
 }
 
+/* ===== MODAL ===== */
 .modal {
     display: none;
     position: fixed;
@@ -242,8 +241,6 @@ button:hover {
 }
 
 /* ====== BÚSQUEDA DGAE ====== */
-html, body { overflow: auto !important; }
-
 .btn-buscar {
     margin-top: 12px;
     padding: 10px 20px;
@@ -255,6 +252,7 @@ html, body { overflow: auto !important; }
     cursor: pointer;
     font-size: 14px;
     transition: background 0.2s;
+    width: 100%;
 }
 
 .btn-buscar:hover { background: #e0b132; }
@@ -283,8 +281,4 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
-}
-
-html, body {
-    overflow: auto !important;
 }

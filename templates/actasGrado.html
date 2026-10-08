@@ -35,7 +35,8 @@
                 ● Si ingresa <strong>solo uno</strong> (número de cuenta o folio), se mostrará una lista con las coincidencias encontradas para que elija la que desea consultar. <br>
                 ● Si ingresa <strong>Sinodal</strong>, se listarán todas las actas donde aparezca ese nombre en el jurado. <br>
                 ● Si ingresa <strong>una fecha de inicio y una fecha final</strong>, se mostrarán todas las actas cuyo registro se encuentre dentro de ese rango. <br>
-                ● Puede combinar <strong>Número de Cuenta, Folio o Sinodal</strong> con un rango de fechas para acotar resultados.
+                ● Si elige un <strong>Nivel</strong> (Especialidad, Maestría o Doctorado), se mostrarán solo las actas de ese nivel según su plan de estudios. <br>
+                ● Puede combinar <strong>Número de Cuenta, Folio, Nombre, Sinodal o Nivel</strong> con un rango de fechas para acotar resultados.
             </p>
 
             <form id="searchForm" method="POST">
@@ -51,6 +52,14 @@
 
                     <label for="sinodal">Sinodal:</label>
                     <input type="text" id="sinodal" name="sinodal" placeholder="Ejemplo: DR. MARÍA PÉREZ LÓPEZ">
+
+                    <label for="nivel">Nivel:</label>
+                    <select id="nivel" name="nivel">
+                        <option value="">Todos</option>
+                        <option value="Especialidad">Especialidad</option>
+                        <option value="Maestría">Maestría</option>
+                        <option value="Doctorado">Doctorado</option>
+                    </select>
 
                     <label for="fechaInicio">Fecha Inicio:</label>
                     <input type="date" id="fechaInicio" name="fechaInicio">
@@ -285,6 +294,11 @@
         <button type="button" class="btn" onclick="mostrarSeccionPagoSinodales('busqueda')">🔍 Búsqueda</button>
         </div>
 
+        <div id="cerrarOpcionesPago" style="display:none; justify-content:center;">
+        <button type="button" class="btn" style="background:#d9534f; width:180px;"
+                onclick="cerrarModal('modal-fecha-extra-acta')">✖ Cerrar</button>
+        </div>
+
         <!-- SECCIÓN PAGO -->
         <div id="seccionPagoFecha">
         <p id="descripcionFechaExtra" style="margin-top:-6px;">
@@ -360,6 +374,16 @@
     {% if resultados %}
         <div class="resultados">
             <h2>{{ resultados|length }} resultado(s) encontrado(s):</h2>
+
+            <!-- Descarga a Excel: reenvía los mismos criterios de la búsqueda -->
+            <form class="form-excel" method="POST" action="{{ url_for('actas_grado.exportar_excel') }}">
+                {% for campo, valor in (criterios or {}).items() %}
+                    <input type="hidden" name="{{ campo }}" value="{{ valor }}">
+                {% endfor %}
+                <button type="submit" class="btn btn-excel">📥 Descargar Excel</button>
+                <small>Listado por nivel: Especialidad, Maestría y Doctorado.</small>
+            </form>
+
             <ul>
                 {% for folio, numCuenta, nombre in resultados %}
                     {% set enlace = url_for("actas_grado.ver_pdf", num_cuenta=numCuenta, folio=folio) %}

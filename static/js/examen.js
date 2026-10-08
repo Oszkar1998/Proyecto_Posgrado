@@ -58,23 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (modalFechaHora) {
-            modalFechaHora.addEventListener("click", (ev) => {
-                if (ev.target === modalFechaHora) {
-                    cerrarModal("modal-fecha-hora");
-                    setStatus("Modal cerrado.");
-                }
-            });
-        }
-
-        if (modalSeleccionPlan) {
-            modalSeleccionPlan.addEventListener("click", (ev) => {
-                if (ev.target === modalSeleccionPlan) {
-                    cerrarModal("modalSeleccionPlan");
-                }
-            });
-        }
-
         const botones = [
             { id: "btn-documento-2", tipo: "2" },
             { id: "btn-documento-3", tipo: "3" },
@@ -296,6 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.multiples && data.multiples.length > 1) {
                 window.numeroDeCuentaGlobal = numeroDeCuenta;
+                cuentaValidada = numeroDeCuenta;
                 mostrarModalSeleccion(data.multiples, data.resumen || "");
                 setStatus("Selecciona el plan o nivel correspondiente.");
                 return;

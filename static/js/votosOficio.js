@@ -492,11 +492,10 @@ function cerrarModalError() {
   }
 }
 
-// Cerrar modal con Escape y clic fuera
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModalError(); });
-window.addEventListener('click', (e) => {
-  const modal = document.getElementById('modalError');
-  if (modal && e.target === modal) cerrarModalError();
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  cerrarModalError();
+  cerrarModalSeleccionVotos();
 });
 
 // Crea (si no existe) y devuelve el panel donde mostramos info

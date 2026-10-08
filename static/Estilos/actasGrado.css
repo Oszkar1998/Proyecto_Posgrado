@@ -46,7 +46,8 @@ label {
     margin-bottom: 5px;
 }
 
-input {
+input,
+.card select {
     width: 100%;
     padding: 10px;
     background-color: #1f2a37;
@@ -54,6 +55,16 @@ input {
     border: 1px solid #3c4b5c;
     border-radius: 8px;
     font-size: 16px;
+}
+
+.card input,
+.card select {
+    box-sizing: border-box;    /* todos los campos miden exactamente lo mismo */
+    height: 42px;
+}
+
+.card select {
+    cursor: pointer;
 }
 
 .btn {
@@ -116,6 +127,31 @@ input {
     color: #f7c948;
     margin-bottom: 15px;
     text-align: center;
+}
+
+/* Botón de descarga a Excel (bloque de resultados) */
+.form-excel {
+    text-align: center;
+    margin: 0 0 20px 0;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-excel {
+    background-color: #1d7a46;
+    color: #ffffff;
+    border: 1px solid #2a9d5c;
+    margin: 0 auto 8px auto;
+}
+
+.btn-excel:hover {
+    background-color: #17633a;
+}
+
+.form-excel small {
+    display: block;
+    color: #bbbbbb;
+    font-size: 12px;
 }
 
 .resultados ul {

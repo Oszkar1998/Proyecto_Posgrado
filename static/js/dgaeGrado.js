@@ -312,8 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    document.addEventListener("click", (e) => {
-        const modal = document.getElementById("modalSeleccionPlanGrado");
-        if (modal && e.target === modal) modal.style.display = "none";
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") cerrarModalSeleccion();
     });
 });

@@ -50,7 +50,7 @@ def opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa,
 def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA UNICO DE ESPECIALIZACIONES DE INGENIERIA"
     grado = "ESPECIALIDAD"
-    coordinadorNombre = "Dra. AIDA HUERTA BARRIENTOS"
+    coordinadorNombre = "DRA. AIDA HUERTA BARRIENTOS"
     coordinadorGenero = "LA COORDINADORA DEL PROGRAMA"
 
     opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
@@ -58,7 +58,7 @@ def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, ge
 def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
     grado = "MAESTRIA"
-    coordinadorNombre = "Dr. GABRIEL EDUARDO SANDOVAL ROMERO"
+    coordinadorNombre = "DR. GABRIEL EDUARDO SANDOVAL ROMERO"
     coordinadorGenero = "COORDINADOR DEL PROGRAMA"
 
     opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
@@ -66,7 +66,7 @@ def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero
 def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
     grado = "DOCTORADO"
-    coordinadorNombre = "Dr. GABRIEL EDUARDO SANDOVAL ROMERO"
+    coordinadorNombre = "DR. GABRIEL EDUARDO SANDOVAL ROMERO"
     coordinadorGenero = "COORDINADOR DEL PROGRAMA"
     
     opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
@@ -298,26 +298,26 @@ def generar_citatorio(pdf, No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pr
 
         # Pie de página
         pdf.set_font("Arial", size=12, style="B")
-        pdf.set_xy(12, 203)
-        pdf.multi_cell(40, 5, "A t e n t a m e n t e", align="C")
+        pdf.set_xy(10, 203)
+        pdf.multi_cell(185, 5, "A t e n t a m e n t e", align="C")
         pdf.set_font("Arial", size=12, style="B")
-        pdf.set_xy(4, 210)
-        pdf.multi_cell(100, 5, "\"POR MI RAZA HABLARÁ EL ESPIRITU\"", align="C")
+        pdf.set_xy(10, 210)
+        pdf.multi_cell(185, 5, "\"POR MI RAZA HABLARÁ EL ESPIRITU\"", align="C")
         pdf.set_font("Arial", size=12)
-        pdf.set_xy(4, 217)
-        pdf.multi_cell(100, 5, "Ciudad Universitaria, a " + dia + " de " + mes + " de " + año, align="C")
-
-        # Firma de la Coordinadora
+        pdf.set_xy(10, 217)
+        pdf.multi_cell(185, 5, "Ciudad Universitaria, a " + dia + " de " + mes + " de " + año, align="C")
+        
+        # Firma del Coordinador
         pdf.set_font("Arial", size=12, style="BU")
-        pdf.set_xy(8, 240)
-        pdf.multi_cell(110, 5, "                                                                                     ", align="C")
+        pdf.set_xy(10, 240)
+        pdf.multi_cell(185, 5, "                                                                  ", align="C")
         pdf.set_font("Arial", size=12, style="B")
         pdf.set_xy(10, 247)
-        pdf.multi_cell(100, 5, coordinadorNombre.upper(), align="C")
+        pdf.multi_cell(185, 5, coordinadorNombre, align="C")
         pdf.set_font("Arial", size=12, style="B")
-        pdf.set_xy(7.5, 254)
-        pdf.multi_cell(78, 5, coordinadorGenero, align="C")
-
+        pdf.set_xy(10, 254)
+        pdf.multi_cell(185, 5, coordinadorGenero, align="C")
+         
 def documento_medalla(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, grado, tituloTesina, modalidad):
     
     if grado == "ESPECIALIDAD":

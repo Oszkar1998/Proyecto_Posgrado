@@ -35,9 +35,11 @@ function abrirModalFechaExtra(campo) {
 
     const pago = document.getElementById("seccionPagoFecha");
     const busqueda = document.getElementById("seccionBusquedaPagoSinodales");
+    const cerrarInicial = document.getElementById("cerrarOpcionesPago");
 
     if (pago) pago.style.display = "none";
     if (busqueda) busqueda.style.display = "none";
+    if (cerrarInicial) cerrarInicial.style.display = "flex";
   }
 
   if (campo === "dgaeEntregaCarpeta") {
@@ -56,6 +58,9 @@ function mostrarSeccionPagoSinodales(seccion) {
   const descripcion = document.getElementById("descripcionFechaExtra");
 
   if (!pago || !busqueda) return;
+
+  const cerrarInicial = document.getElementById("cerrarOpcionesPago");
+  if (cerrarInicial) cerrarInicial.style.display = "none";
 
   if (seccion === "pago") {
     pago.style.display = "block";
@@ -265,13 +270,5 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarModal("modal-modificar-acta");
     cerrarModal("modal-fecha-extra-acta");
     cerrarFlash();
-  });
-
-  document.addEventListener("click", (e) => {
-      ["modal-capturar-acta", "modal-buscar-acta", "modal-modificar-acta",
-      "modal-fecha-extra-acta"].forEach(id => {
-          const modal = document.getElementById(id);
-          if (modal && e.target === modal) modal.style.display = "none";
-      });
   });
 });

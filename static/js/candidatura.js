@@ -157,10 +157,12 @@ document.addEventListener("keydown", (event) => {
   const mCapt = document.getElementById("modal-capturar");
   const mBus  = document.getElementById("modal-busquedaNombre");
   const mMod  = document.getElementById("modal-modificarDatos");
+  const mFolio = document.getElementById("modal-folio");
 
   if (mCapt && mCapt.style.display === "flex") cerrarModalCapturar();
   if (mBus && mBus.style.display === "flex") cerrarModalBusquedaNombre();
   if (mMod && mMod.style.display === "flex") cerrarModalModificarDatos();
+  if (mFolio && mFolio.style.display === "flex") cerrarModalFolioActa();
 });
 
 
@@ -467,10 +469,3 @@ window.addEventListener("load", () => {
   }
 });
 
-document.addEventListener("click", function(e) {
-    ["modal-capturar", "modal-busquedaNombre", "modal-modificarDatos"].forEach(id => {
-        const modal = document.getElementById(id);
-        if (modal && modal.style.display === "flex" && e.target === modal)
-            modal.style.display = "none";
-    });
-});

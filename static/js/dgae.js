@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.cerrarModalSeleccion = cerrarModalSeleccion;
 
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") cerrarModalSeleccion();
+    });
+
     function mostrarBotonesDocumentos() {
         if (btnIngresar) btnIngresar.style.display = "none";
         if (botonesDocumentos) botonesDocumentos.style.display = "block";

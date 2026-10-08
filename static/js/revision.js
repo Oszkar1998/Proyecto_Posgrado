@@ -410,22 +410,14 @@ function seleccionarPlan(numCuenta, seleccionId) {
         });
 }
 
-/* =========================
-   CERRAR MODAL AL DAR CLICK AFUERA
-========================= */
-window.addEventListener("click", (event) => {
-    const modalIds = [
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+
+    [
         "modal-contador",
         "modal-coordinador",
         "modal-confirmar-nuevo",
         "modalNuevoUsuario",
         "modalSeleccionPlan"
-    ];
-
-    modalIds.forEach(id => {
-        const modal = document.getElementById(id);
-        if (modal && event.target === modal) {
-            modal.classList.remove("active");
-        }
-    });
+    ].forEach(id => closeModal(id));
 });
