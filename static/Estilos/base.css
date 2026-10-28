@@ -1,0 +1,257 @@
+/* ============================================================
+   base.css — Estilo común de todos los módulos
+   ------------------------------------------------------------
+   Se carga AL FINAL del <head> de cada módulo, después de su
+   propio CSS, para que estas reglas manden sobre las de cada uno.
+   Aquí solo va lo que debe verse igual en todo el sistema:
+     1. Colores y tipografía
+     2. Barra "Menú principal › Módulo"
+     3. Campos de texto, fecha y listas
+     4. Botón principal de búsqueda
+     5. Ayuda plegable "¿Cómo buscar?"
+   Lo propio de cada módulo se queda en su CSS.
+   ============================================================ */
+
+/* ---------- 1. Colores y tipografía ---------- */
+:root {
+    --oro: #f2c94c;
+    --oro-hover: #ffd966;
+    --oro-tenue: rgba(242, 201, 76, 0.35);
+    --tinta: #141414;
+    --texto: #f5f5f5;
+    --texto-suave: #c4c4c4;
+    --campo-fondo: #17191d;
+    --campo-borde: #4b4f57;
+    --campo-placeholder: #8f939b;
+    --superficie: rgba(255, 255, 255, 0.07);
+    --superficie-borde: rgba(255, 255, 255, 0.18);
+    --fuente: system-ui, "Segoe UI", Ubuntu, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    font-family: var(--fuente);
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+/* ---------- 2. Barra "Menú principal › Módulo" ---------- */
+/* Antes era un botón rojo flotando en la esquina; ahora va en el
+   flujo normal de la página y no tapa el contenido en celular. */
+body #regresar-PagPrincipal {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    cursor: default;
+    transform: none;
+    color: var(--texto);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+body #regresar-PagPrincipal:hover {
+    background: none;
+    transform: none;
+}
+
+/* Si el body centra todo (display:flex + align-items:center), el
+   encabezado ocupa todo el ancho para que la barra quede a la izquierda */
+body > header.header,
+body > header.topbar {
+    align-self: stretch;
+    text-align: left;
+}
+
+body > #regresar-PagPrincipal {
+    align-self: flex-start;
+}
+
+/* Cuando la barra va sola al principio de la página */
+body > #regresar-PagPrincipal,
+body > header > #regresar-PagPrincipal:only-child {
+    margin: 18px 0 0 24px;
+}
+
+.migas-inicio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: var(--superficie);
+    border: 1px solid var(--superficie-borde);
+    color: var(--texto);
+    text-decoration: none;
+    font-weight: 600;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.migas-inicio:hover {
+    border-color: var(--oro);
+    color: var(--oro);
+}
+
+.migas-inicio:focus-visible {
+    outline: 3px solid var(--oro);
+    outline-offset: 2px;
+}
+
+.migas-sep {
+    color: var(--texto-suave);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.migas-actual {
+    color: var(--oro);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* ---------- 3. Campos ---------- */
+body input[type="text"],
+body input[type="number"],
+body input[type="date"],
+body input[type="time"],
+body input[type="search"],
+body input:not([type]),
+body select:not([multiple]),   /* :not() sube la prioridad sobre ".card select" */
+body textarea {
+    background-color: var(--campo-fondo);
+    color: var(--texto);
+    border: 1px solid var(--campo-borde);
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+body input::placeholder,
+body textarea::placeholder {
+    color: var(--campo-placeholder);
+    opacity: 1;
+}
+
+body input[type="text"]:focus,
+body input[type="number"]:focus,
+body input[type="date"]:focus,
+body input[type="time"]:focus,
+body input[type="search"]:focus,
+body input:not([type]):focus,
+body select:not([multiple]):focus,
+body textarea:focus {
+    outline: none;
+    border-color: var(--oro);
+    box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.22);
+}
+
+body input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+/* ---------- 4. Botón principal de búsqueda ---------- */
+body button.btn-principal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--oro);
+    color: var(--tinta);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+body button.btn-principal:hover {
+    background: var(--oro-hover);
+    transform: translateY(-1px);
+}
+
+body button.btn-principal:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/* ---------- 5. Ayuda plegable "¿Cómo buscar?" ---------- */
+.ayuda-busqueda {
+    margin: 0 0 22px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+}
+
+.ayuda-resumen {
+    margin: 0 0 8px;
+}
+
+.ayuda-busqueda details {
+    border: 1px solid var(--superficie-borde);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.ayuda-busqueda summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: var(--oro);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.ayuda-busqueda summary::-webkit-details-marker { display: none; }
+
+.ayuda-busqueda summary::after {
+    content: "\25BE";            /* ▾ */
+    margin-left: auto;
+    transition: transform 0.2s;
+}
+
+.ayuda-busqueda details[open] summary::after { transform: rotate(180deg); }
+
+.ayuda-busqueda summary:focus-visible {
+    outline: 2px solid var(--oro);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+.ayuda-busqueda ul {
+    margin: 0;
+    padding: 0 14px 12px 32px;
+    display: grid;
+    gap: 6px;
+}
+
+.ayuda-busqueda strong { color: var(--texto); }
+
+/* ---------- Celular ---------- */
+@media (max-width: 560px) {
+    body > #regresar-PagPrincipal,
+    body > header > #regresar-PagPrincipal:only-child {
+        margin: 14px 0 0 16px;
+    }
+    .migas-actual { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .migas-inicio, body button.btn-principal, .ayuda-busqueda summary::after { transition: none; }
+    body button.btn-principal:hover { transform: none; }
+}

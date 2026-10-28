@@ -896,38 +896,9 @@ def actualizar_coordinador_api():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-########## Nuevo Usuario ##########
-@revision_bp.route("/registrar_usuario", methods=["POST"])
-@permission_required("revision")
-def registrar_usuario():
-    try:
-        data = request.get_json()
-        nombre = data.get("nombre", "").strip()
-        cuenta = data.get("cuenta", "").strip()
-        plan = data.get("plan", "").strip()
-        clave = data.get("clave", "").strip()
-        programa = data.get("programa", "").strip()
-        genero = data.get("genero", "").strip()
-
-        if not (nombre and cuenta and plan and clave and programa and genero):
-            return jsonify({"success": False, "error": "Todos los campos son obligatorios."}), 400
-
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO usuarios (No_cuenta, Plan_estudios, Clave, Nomb_alu, programa, genero)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (cuenta, plan, clave, nombre, programa, genero))
-            conn.commit()
-
-        return jsonify({"success": True})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
 @revision_bp.after_request
 def disable_cache(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-

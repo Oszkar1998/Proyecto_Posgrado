@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function consultarYMostrar(numeroCuenta) {
     spinner.show("Buscando...");
     try {
-        const res = await fetch("/votosOficio", {
+        const res = await fetch("/votosOficio/", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const pair of formData.entries()) body.append(pair[0], pair[1]);
 
     try {
-      const resp = await fetch(form.action || '/votosOficio', {
+      const resp = await fetch('/votosOficio/', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
         body

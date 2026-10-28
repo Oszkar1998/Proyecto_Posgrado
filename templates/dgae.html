@@ -6,7 +6,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Posgrado | DGAE</title>
+    <title>DGAE — Posgrado FI</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/dgae.css') }}" />
     <script src="{{ url_for('static', filename='js/dgae.js') }}" defer></script>
@@ -18,14 +18,18 @@
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
 </head>
 
 <body>
     <!-- Barra superior -->
     <header class="topbar">
-        <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-            <span><i class="fa-solid fa-house"></i> Menú Principal</span>
-        </div>
+        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
+            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
+            <span class="migas-sep" aria-hidden="true">›</span>
+            <span class="migas-actual">DGAE</span>
+        </nav>
     </header>
 
     <!-- Modal selección de plan -->
@@ -41,13 +45,18 @@
     <!-- Contenido principal -->
     <main class="container">
         <section class="card">
-            <h1><i class="fa-solid fa-file-lines"></i> Consulta de Documentos DGAE</h1>
-            <p class="descripcion">
-                Ingrese el número de cuenta para generar el documento, o busque por nombre y rango de fechas.
-                <br>● Si ingresa <strong>número de cuenta</strong>, se generará el documento directamente.
-                <br>● Si ingresa <strong>nombre</strong>, se listarán todas las coincidencias.
-                <br>● Si ingresa <strong>rango de fechas</strong>, se mostrarán alumnos cuyo documento fue generado en ese periodo.
-            </p>
+            <h1><i class="fa-solid fa-building-columns"></i> DGAE · Documentos</h1>
+            <div class="ayuda-busqueda">
+                <p class="ayuda-resumen">Escribe el número de cuenta para generar el documento, o busca por nombre o por fechas.</p>
+                <details>
+                    <summary><i class="fa-solid fa-circle-question"></i> ¿Cómo buscar?</summary>
+                    <ul>
+                        <li>Con <strong>número de cuenta</strong> se genera el documento directamente.</li>
+                        <li>Con <strong>nombre</strong> se listan todas las coincidencias.</li>
+                        <li>Con <strong>rango de fechas</strong> se muestran los alumnos cuyo documento se generó en ese periodo.</li>
+                    </ul>
+                </details>
+            </div>
 
             <!-- ====== NÚMERO DE CUENTA (ARRIBA) ====== -->
             <form id="login-form" autocomplete="off">
@@ -109,7 +118,7 @@
                     />
                 </div>
 
-                <button type="submit" class="btn-buscar">
+                <button type="submit" class="btn-buscar btn-principal">
                     <i class="fa-solid fa-magnifying-glass"></i> Consultar Datos
                 </button>
             </form>

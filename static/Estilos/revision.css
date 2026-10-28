@@ -202,8 +202,7 @@ input::placeholder {
 /* MODALES */
 .modal,
 .modal-contador,
-.modal-coordinador,
-.modal-nuevo-usuario {
+.modal-coordinador {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -218,8 +217,7 @@ input::placeholder {
 
 .modal.active,
 .modal-contador.active,
-.modal-coordinador.active,
-.modal-nuevo-usuario.active {
+.modal-coordinador.active {
     display: flex !important;
 }
 

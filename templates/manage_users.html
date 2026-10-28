@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Administrar usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar usuarios — Posgrado FI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -146,6 +147,17 @@
             from { transform: scale(0.95); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+    
+        .tabla-scroll { overflow-x: auto; }
+        .tabla-usuarios td:nth-child(2) { overflow-wrap: anywhere; }
+
+        /* Celular: se oculta el ID y los botones van uno debajo del otro */
+        @media (max-width: 560px) {
+            .tabla-usuarios th:first-child,
+            .tabla-usuarios td:first-child { display: none; }
+            .tabla-usuarios td:last-child { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+            .editar-link { margin-right: 0; }
+        }
     </style>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
@@ -163,6 +175,7 @@
         <div class="form-container">
             <h2><i class="fa-solid fa-users-gear"></i> Administrar usuarios</h2>
 
+            <div class="tabla-scroll">
             <table class="tabla-usuarios">
                 <thead>
                     <tr>
@@ -196,6 +209,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
 
             <p style="margin-top: 20px;">
                 <a href="{{ url_for('home') }}">Volver al menú principal</a>

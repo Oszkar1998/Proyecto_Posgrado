@@ -29,6 +29,7 @@ body {
 
 .header-login img {
     height: 155px;
+    max-width: calc(100% - 32px);
     object-fit: contain;
 }
 
@@ -38,8 +39,9 @@ body {
     border-radius: 18px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(242, 201, 76, 0.22);
-    width: 360px;
-    max-width: calc(100% - 40px);
+    width: 420px;              /* 360px de contenido + 60px de relleno */
+    box-sizing: border-box;    /* el relleno ya no hace que se salga en celular */
+    max-width: calc(100% - 32px);
     animation: fadeIn 0.5s ease-in-out;
 }
 

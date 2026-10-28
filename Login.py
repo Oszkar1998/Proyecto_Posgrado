@@ -60,7 +60,7 @@ app.register_blueprint(pagoExamen_bp, url_prefix="/pagoExamen")
 app.register_blueprint(actas_candidatura_bp, url_prefix='/actasCandidatura')
 
 
-DATABASE = "static/BaseDeDatos/basePosgrado.db"
+from config import direccionBase as DATABASE
 
 
 def get_user_roles(user_id):

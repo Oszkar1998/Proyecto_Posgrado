@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Candidatura</title>
+  <title>Candidatura — Posgrado FI</title>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/candidatura.css') }}" />
   <script src="{{ url_for('static', filename='js/candidatura.js') }}" defer></script>
@@ -15,15 +15,19 @@
   <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
 </head>
 
 <body>
 
   <!-- Barra superior -->
   <div class="barra-superior">
-    <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-      <span><i class="fa-solid fa-house"></i> Menú Principal</span>
-    </div>
+    <nav id="regresar-PagPrincipal" aria-label="Ubicación">
+            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
+            <span class="migas-sep" aria-hidden="true">›</span>
+            <span class="migas-actual">Candidatura</span>
+        </nav>
 
     <div class="izquierda">
       <div id="folio-container" onclick="mostrarModalFolioActa()">
@@ -243,7 +247,7 @@
 
   <!-- ====== CONSULTA DE DOCUMENTOS ====== -->
   <div class="container">
-    <h2><i class="fa-solid fa-file-lines"></i> Consulta de Documentos de Posgrado</h2>
+    <h2><i class="fa-solid fa-user-graduate"></i> Examen de Candidatura</h2>
 
     <label for="numeroDeCuenta">Número de Cuenta:</label>
     <input id="numeroDeCuenta" type="text" placeholder="Ejemplo: 123456789" maxlength="9" />

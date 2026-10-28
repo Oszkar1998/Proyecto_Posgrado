@@ -1,8 +1,15 @@
+{%- set NOMBRES_PERMISO = {
+    'revision': 'Revisión', 'examen': 'Examen', 'dgae': 'DGAE', 'dgae_grado': 'DGAE Grado',
+    'votos_puei': 'Votos PUEI', 'candidatura': 'Candidatura', 'captura_candidatura': 'Captura de Candidatura',
+    'actas_grado': 'Actas de Grado', 'actas_candidatura': 'Actas de Candidatura',
+    'captura': 'Captura', 'pago_examen': 'Pago Examen'
+} -%}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Crear usuario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear usuario — Posgrado FI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
 
     <style>
@@ -80,7 +87,11 @@
         form button[type="submit"] {
             margin-top: 22px;
         }
-    </style>
+    
+        @media (max-width: 560px) {
+            .permissions-grid { grid-template-columns: 1fr; column-gap: 0; }
+        }
+        </style>
 
     <script>
         function togglePermissions() {
@@ -131,7 +142,7 @@
                         {% for permission in permissions %}
                             <label>
                                 <input type="checkbox" name="permissions" value="{{ permission['name'] }}">
-                                {{ permission['name'] }}
+                                {{ NOMBRES_PERMISO.get(permission['name']) or permission['description'] or permission['name'] }}
                             </label>
                         {% endfor %}
                     </div>

@@ -6,7 +6,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actas Grado</title>
+    <title>Actas de Grado — Posgrado FI</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/actasGrado.css') }}">
     <script src="{{ url_for('static', filename='js/actasGrado.js') }}"></script>
@@ -16,28 +16,37 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
 </head>
 
 <body>
     <!-- Boton para menú principal -->
     <header class="header">
-        <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-            <span>🏠 Menú Principal </span>
-        </div>
+        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
+            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
+            <span class="migas-sep" aria-hidden="true">›</span>
+            <span class="migas-actual">Actas de Grado</span>
+        </nav>
     </header>
     
     <div class="container">
         <div class="card">
-            <h1 style="margin-top: 3px; font-size: 28px; color: #f7c948;">📜 Búsqueda de Actas</h1>
-            <p class="descripcion">
-                Puede buscar actas ingresando el número de cuenta, el folio, un rango de fechas, el nombre de un <strong>sinodal</strong> o una combinación de ellos. <br>
-                ● Si ingresa <strong>número de cuenta y folio</strong>, se mostrará directamente el acta correspondiente. <br>
-                ● Si ingresa <strong>solo uno</strong> (número de cuenta o folio), se mostrará una lista con las coincidencias encontradas para que elija la que desea consultar. <br>
-                ● Si ingresa <strong>Sinodal</strong>, se listarán todas las actas donde aparezca ese nombre en el jurado. <br>
-                ● Si ingresa <strong>una fecha de inicio y una fecha final</strong>, se mostrarán todas las actas cuyo registro se encuentre dentro de ese rango. <br>
-                ● Si elige un <strong>Nivel</strong> (Especialidad, Maestría o Doctorado), se mostrarán solo las actas de ese nivel según su plan de estudios. <br>
-                ● Puede combinar <strong>Número de Cuenta, Folio, Nombre, Sinodal o Nivel</strong> con un rango de fechas para acotar resultados.
-            </p>
+            <h1 style="margin-top: 3px; font-size: 28px; color: #f7c948;"><i class="fa-solid fa-scroll"></i> Actas de Grado</h1>
+            <div class="ayuda-busqueda">
+                <p class="ayuda-resumen">Llena uno o varios campos y presiona <strong>Buscar actas</strong>. Puedes combinarlos con un rango de fechas.</p>
+                <details>
+                    <summary><i class="fa-solid fa-circle-question"></i> ¿Cómo buscar?</summary>
+                    <ul>
+                        <li>Con <strong>número de cuenta y folio</strong> se abre directamente el acta.</li>
+                        <li>Con <strong>solo uno</strong> de los dos se muestra la lista de coincidencias para que elijas.</li>
+                        <li>Con <strong>sinodal</strong> se listan las actas donde aparece en el jurado.</li>
+                        <li>Con <strong>fecha de inicio y fecha final</strong> se muestran las actas registradas en ese rango.</li>
+                        <li>Con <strong>nivel</strong> (Especialidad, Maestría o Doctorado) se filtran según el plan de estudios.</li>
+                    </ul>
+                </details>
+            </div>
 
             <form id="searchForm" method="POST">
                 <div class="input-group">
@@ -68,7 +77,7 @@
                     <input type="date" id="fechaFin" name="fechaFin">
                 </div>
 
-                <button type="submit" class="btn">🔍 Obtener Documentos</button>
+                <button type="submit" class="btn btn-principal"><i class="fa-solid fa-magnifying-glass"></i> Buscar actas</button>
             </form>
         </div>
     </div>
@@ -158,7 +167,7 @@
         </div>
 
         <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:200px;">💾 Guardar</button>
+            <button type="submit" class="btn" style="width:200px;"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
             <button type="button" class="btn" style="background:#d9534f; width:200px;"
                     onclick="cerrarModal('modal-capturar-acta')">✖ Cancelar</button>
         </div>
@@ -182,7 +191,7 @@
             <label>Folio *</label>
             <input type="text" name="folio" id="mod_folio_buscar" required>
 
-            <button type="button" class="btn" style="width:200px;" onclick="buscarActaParaModificar()">🔎 Buscar</button>
+            <button type="button" class="btn" style="width:200px;" onclick="buscarActaParaModificar()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
         </div>
         </form>
 
@@ -271,7 +280,7 @@
         </div>
 
         <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:220px;">💾 Guardar Cambios</button>
+            <button type="submit" class="btn" style="width:220px;"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
             <button type="button" class="btn" style="background:#d9534f; width:200px;"
                     onclick="cerrarModal('modal-modificar-acta')">✖ Cancelar</button>
         </div>
@@ -325,7 +334,7 @@
             </div>
 
             <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:220px;">💾 Guardar Fecha</button>
+            <button type="submit" class="btn" style="width:220px;"><i class="fa-solid fa-floppy-disk"></i> Guardar fecha</button>
 
             <button type="button" class="btn" style="background:#d9534f; width:180px;"
                     onclick="cerrarModal('modal-fecha-extra-acta')">
@@ -380,7 +389,7 @@
                 {% for campo, valor in (criterios or {}).items() %}
                     <input type="hidden" name="{{ campo }}" value="{{ valor }}">
                 {% endfor %}
-                <button type="submit" class="btn btn-excel">📥 Descargar Excel</button>
+                <button type="submit" class="btn btn-excel"><i class="fa-solid fa-file-excel"></i> Descargar Excel</button>
                 <small>Listado por nivel: Especialidad, Maestría y Doctorado.</small>
             </form>
 

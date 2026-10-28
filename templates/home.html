@@ -6,7 +6,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <title>Inicio — Posgrado FI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/home.css') }}">
     <link rel="icon" href="https://www.unam.mx/sites/default/files/favicon.ico" type="image/x-icon">
     <!-- Font Awesome -->
@@ -20,17 +20,39 @@
 </head>
 
 <body>
+{#- ── Qué puede ver este usuario ─────────────────────────────── #}
+{%- set es_admin       = 'superadmin' in roles or 'admin' in roles -%}
+{%- set es_superadmin  = 'superadmin' in roles -%}
+{%- set ver_revision   = es_admin or 'revision'    in permissions -%}
+{%- set ver_examen     = es_admin or 'examen'      in permissions -%}
+{%- set ver_dgae       = es_admin or 'dgae'        in permissions -%}
+{%- set ver_dgae_grado = es_admin or 'dgae_grado'  in permissions -%}
+{%- set ver_votos      = es_admin or 'votos_puei'  in permissions -%}
+{%- set ver_candidatura= es_admin or 'candidatura' in permissions -%}
+{%- set ver_captura    = es_admin or 'captura'     in permissions -%}
+{%- set ver_actas      = es_admin or 'actas_grado' in permissions -%}
+{%- set ver_pago       = es_admin or 'pago_examen' in permissions -%}
+{%- set hay_documentos = ver_revision or ver_examen or ver_dgae or ver_dgae_grado or ver_votos or ver_candidatura or ver_actas -%}
+{%- set hay_registro   = ver_captura or ver_pago -%}
 
     <!-- Barra superior -->
     <header class="navbar">
         <div class="navbar-left">
-            <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM" class="logo-unam">
+            <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM Posgrado" class="logo-unam">
             <span class="titulo-navbar">Facultad de Ingeniería — POSGRADO</span>
         </div>
-        
-        <button class="logout-button" onclick="confirmarCerrarSesion()">
-            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-        </button>
+
+        <div class="navbar-right">
+            {% if session.get('email') %}
+            <span class="usuario" title="Sesión iniciada como {{ session.get('email') }}">
+                <i class="fa-solid fa-circle-user"></i>
+                <span class="usuario-correo">{{ session.get('email') }}</span>
+            </span>
+            {% endif %}
+            <button class="logout-button" type="button" onclick="confirmarCerrarSesion()">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </button>
+        </div>
 
         <!-- Modal confirmación cerrar sesión -->
         <div id="modal-cerrar-sesion" style="
@@ -42,7 +64,7 @@
                 border-radius:18px; padding:32px 28px; width:90%; max-width:420px;
                 text-align:center; box-shadow:0 0 35px rgba(220,53,69,0.2);">
                 <h2 style="color:#dc3545; margin-top:0;">
-                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
                 </h2>
                 <p style="color:#ccc; font-size:15px; margin:12px 0 24px; line-height:1.5;">
                     ¿Estás seguro de que deseas cerrar la sesión?
@@ -63,96 +85,155 @@
                 </div>
             </div>
         </div>
-
     </header>
 
     <!-- Contenido principal -->
-    <div class="main-wrapper">
-        <h1 class="titulo">Bienvenido</h1>
-        <p class="subtitulo">Selecciona un módulo para comenzar</p>
+    <main class="main-wrapper">
+        <div class="bienvenida">
+            <h1 class="titulo">Bienvenido</h1>
+            <p class="subtitulo">Selecciona un módulo para comenzar</p>
+        </div>
 
-        <div class="container">
+        {% if hay_documentos %}
+        <section class="seccion" aria-labelledby="sec-documentos">
+            <div class="seccion-encabezado">
+                <h2 id="sec-documentos"><i class="fa-solid fa-file-signature"></i> Documentos</h2>
+                <p>Genera oficios, citatorios y documentos oficiales, y consulta actas.</p>
+            </div>
+            <div class="grid">
+                {% if ver_revision %}
+                <a href="{{ url_for('revision.index') }}" class="card">
+                    <i class="fa-solid fa-file-lines card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Revisión</span>
+                        <span class="card-desc">Oficio de revisión de tesis</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_examen %}
+                <a href="{{ url_for('examen.index') }}" class="card">
+                    <i class="fa-solid fa-pen-to-square card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Examen</span>
+                        <span class="card-desc">Citatorio, acta, protesta y menciones</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_votos %}
+                <a href="{{ url_for('votosOficio.index') }}" class="card">
+                    <i class="fa-solid fa-check-to-slot card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Votos PUEI</span>
+                        <span class="card-desc">Votos de sinodales de especialización</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_dgae %}
+                <a href="{{ url_for('dgae.dgae') }}" class="card">
+                    <i class="fa-solid fa-landmark card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">DGAE</span>
+                        <span class="card-desc">Documentos UNAM y NO&#8209;UNAM</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_dgae_grado %}
+                <a href="{{ url_for('dgaeGrado.index') }}" class="card">
+                    <i class="fa-solid fa-building-columns card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">DGAE Grado</span>
+                        <span class="card-desc">Presencial o virtual, mención y medalla</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_candidatura %}
+                <a href="{{ url_for('candidatura.index') }}" class="card">
+                    <i class="fa-solid fa-user-graduate card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Candidatura</span>
+                        <span class="card-desc">Acta y citatorio de candidatura</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_actas %}
+                <a href="{{ url_for('actas_grado.index') }}" class="card">
+                    <i class="fa-solid fa-scroll card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Actas de Grado</span>
+                        <span class="card-desc">Búsqueda por cuenta, folio o sinodal</span>
+                    </span>
+                </a>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
 
-            {% if 'superadmin' in roles or 'admin' in roles or 'revision' in permissions %}
-            <a href="{{ url_for('revision.index') }}" class="card">
-                <i class="fa-solid fa-file-lines card-icon"></i>
-                <span>REVISIÓN</span>
-            </a>
-            {% endif %}
+        {% if hay_registro or es_superadmin %}
+        <div class="fila-secciones">
+        {% if hay_registro %}
+        <section class="seccion" aria-labelledby="sec-registro">
+            <div class="seccion-encabezado">
+                <h2 id="sec-registro"><i class="fa-solid fa-database"></i> Registro</h2>
+                <p>Captura de datos y pagos.</p>
+            </div>
+            <div class="grid grid--2">
+                {% if ver_captura %}
+                <a href="{{ url_for('captura.index') }}" class="card">
+                    <i class="fa-solid fa-keyboard card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Captura</span>
+                        <span class="card-desc">Votos, candidatura y actas</span>
+                    </span>
+                </a>
+                {% endif %}
+                {% if ver_pago %}
+                <a href="{{ url_for('pagoExamen.index') }}" class="card card--pendiente">
+                    <i class="fa-solid fa-receipt card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Pago Examen</span>
+                        <span class="card-desc"><span class="etiqueta">En desarrollo</span></span>
+                    </span>
+                </a>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
 
-            {% if 'superadmin' in roles or 'admin' in roles or 'examen' in permissions %}
-            <a href="{{ url_for('examen.index') }}" class="card">
-                <i class="fa-solid fa-pen-to-square card-icon"></i>
-                <span>EXAMEN</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'dgae' in permissions %}
-            <a href="{{ url_for('dgae.dgae') }}" class="card">
-                <i class="fa-solid fa-landmark card-icon"></i>
-                <span>DGAE</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'dgae_grado' in permissions %}
-            <a href="{{ url_for('dgaeGrado.index') }}" class="card">
-                <i class="fa-solid fa-building-columns card-icon"></i>
-                <span>DGAE GRADO</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'votos_puei' in permissions %}
-            <a href="{{ url_for('votosOficio.index') }}" class="card">
-                <i class="fa-solid fa-ballot-check card-icon"></i>
-                <span>VOTOS (PUEI)</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'actas_grado' in permissions %}
-            <a href="{{ url_for('actas_grado.index') }}" class="card">
-                <i class="fa-solid fa-scroll card-icon"></i>
-                <span>ACTAS GRADO</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'candidatura' in permissions %}
-            <a href="{{ url_for('candidatura.index') }}" class="card">
-                <i class="fa-solid fa-user-graduate card-icon"></i>
-                <span>CANDIDATURA</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'pago_examen' in permissions %}
-            <a href="{{ url_for('pagoExamen.index') }}" class="card">
-                <i class="fa-solid fa-receipt card-icon"></i>
-                <span>PAGO EXAMEN</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles or 'admin' in roles or 'captura' in permissions %}
-            <a href="{{ url_for('captura.index') }}" class="card">
-                <i class="fa-solid fa-database card-icon"></i>
-                <span>CAPTURA</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles %}
-            <a href="{{ url_for('register') }}" class="card admin-card">
-                <i class="fa-solid fa-user-plus card-icon"></i>
-                <span>CREAR USUARIO</span>
-            </a>
-            {% endif %}
-
-            {% if 'superadmin' in roles %}
-            <a href="{{ url_for('manage_users') }}" class="card admin-card">
-                <i class="fa-solid fa-users-gear card-icon"></i>
-                <span>ADMINISTRAR USUARIOS</span>
-            </a>
-            {% endif %}
+        {% if es_superadmin %}
+        <section class="seccion" aria-labelledby="sec-admin">
+            <div class="seccion-encabezado">
+                <h2 id="sec-admin"><i class="fa-solid fa-user-shield"></i> Administración</h2>
+                <p>Cuentas y permisos de quienes usan el sistema.</p>
+            </div>
+            <div class="grid grid--2">
+                <a href="{{ url_for('register') }}" class="card card--admin">
+                    <i class="fa-solid fa-user-plus card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Crear usuario</span>
+                        <span class="card-desc">Nueva cuenta con sus permisos</span>
+                    </span>
+                </a>
+                <a href="{{ url_for('manage_users') }}" class="card card--admin">
+                    <i class="fa-solid fa-users-gear card-icon"></i>
+                    <span class="card-texto">
+                        <span class="card-nombre">Administrar usuarios</span>
+                        <span class="card-desc">Editar permisos o eliminar cuentas</span>
+                    </span>
+                </a>
+            </div>
+        </section>
+        {% endif %}
 
         </div>
-    </div>
+        {% endif %}
 
+        {% if not hay_documentos and not hay_registro and not es_superadmin %}
+        <p class="sin-modulos">
+            <i class="fa-solid fa-circle-info"></i>
+            Tu cuenta todavía no tiene módulos asignados. Pide a la persona administradora que te dé permisos.
+        </p>
+        {% endif %}
+    </main>
 
     <script>
         function confirmarCerrarSesion() {
@@ -166,6 +247,6 @@
             if (e.target === this) this.style.display = "none";
         });
     </script>
-    
+
 </body>
 </html>

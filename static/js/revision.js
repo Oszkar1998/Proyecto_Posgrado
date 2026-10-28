@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     obtenerContador();
     bindBusquedaAutomatica();
-    bindNuevoUsuarioForm();
     resetUI();
 });
 
@@ -98,7 +97,8 @@ async function consultarRevision(numCuenta) {
 
         if (data.no_encontrado) {
             spinner.hide();
-            mostrarModalConfirmacion(numCuenta);
+            resetUI();
+            toast.warn(`El número de cuenta ${numCuenta} no está registrado. Captúralo primero en el módulo Captura.`);
             return;
         }
 
@@ -258,86 +258,6 @@ function actualizarCoordinador() {
 }
 
 /* =========================
-   USUARIO NO ENCONTRADO
-========================= */
-function mostrarModalConfirmacion(numCuenta) {
-    const modal = document.getElementById("modal-confirmar-nuevo");
-    if (modal) {
-        modal.dataset.cuentaTemp = numCuenta;
-        openModal("modal-confirmar-nuevo");
-    }
-}
-
-function cerrarModalConfirmacion() {
-    closeModal("modal-confirmar-nuevo");
-}
-
-/* =========================
-   NUEVO USUARIO
-========================= */
-function mostrarModalNuevoUsuario() {
-    cerrarModalConfirmacion();
-
-    const modalConfirmacion = document.getElementById("modal-confirmar-nuevo");
-    const cuentaTemp = modalConfirmacion?.dataset?.cuentaTemp || "";
-
-    const inputCuenta = document.getElementById("nuevoNumCuenta");
-    if (inputCuenta) inputCuenta.value = cuentaTemp;
-
-    openModal("modalNuevoUsuario");
-}
-
-function cerrarModalNuevoUsuario() {
-    closeModal("modalNuevoUsuario");
-}
-
-function bindNuevoUsuarioForm() {
-    const form = document.getElementById("nuevoUsuarioForm");
-    if (!form) return;
-
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const payload = {
-            nombre: (document.getElementById("nuevoNombre")?.value || "").trim(),
-            cuenta: (document.getElementById("nuevoNumCuenta")?.value || "").trim(),
-            plan: (document.getElementById("nuevoPlan")?.value || "").trim(),
-            clave: (document.getElementById("nuevoClave")?.value || "").trim(),
-            programa: (document.getElementById("nuevoPrograma")?.value || "").trim(),
-            genero: (document.getElementById("nuevoGenero")?.value || "").trim()
-        };
-
-        if (!payload.nombre || !payload.cuenta || !payload.plan || !payload.clave || !payload.programa || !payload.genero) {
-            toast.warn("Todos los campos son obligatorios.");
-            return;
-        }
-
-        try {
-            const res = await fetch("/revision/registrar_usuario", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                toast.ok("Usuario registrado correctamente.");
-                cerrarModalNuevoUsuario();
-                window.location.reload();
-            } else {
-                toast.error("Error al registrar usuario: " + (data.error || "Desconocido"));
-            }
-        } catch (error) {
-            console.error("❌ Error al registrar usuario:", error);
-            toast.error("Ocurrió un error al registrar el usuario.");
-        }
-    });
-}
-
-/* =========================
    SELECCIÓN DE PLAN
 ========================= */
 function mostrarModalSeleccion(opciones, numCuenta, resumenBackend) {
@@ -416,8 +336,6 @@ document.addEventListener("keydown", (event) => {
     [
         "modal-contador",
         "modal-coordinador",
-        "modal-confirmar-nuevo",
-        "modalNuevoUsuario",
         "modalSeleccionPlan"
     ].forEach(id => closeModal(id));
 });

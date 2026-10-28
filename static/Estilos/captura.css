@@ -256,14 +256,22 @@ button[type="submit"]:hover,
 .grid-opciones{
   margin-top: 50px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card-opcion:focus-visible{
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
 }
 
 /* Mediano */
 @media (max-width: 980px){
   .grid-opciones{
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

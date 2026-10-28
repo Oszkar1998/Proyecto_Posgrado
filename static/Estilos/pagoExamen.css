@@ -29,3 +29,27 @@ body {
 #regresar-PagPrincipal:hover {
     background: #c82333;
 }
+
+/* Aviso de módulo en desarrollo */
+.en-desarrollo {
+    margin: auto 16px;
+    max-width: 440px;
+    padding: 36px 28px;
+    text-align: center;
+    color: #e8e8e8;
+    background: rgba(20, 20, 20, 0.92);
+    border: 1px solid rgba(242, 201, 76, 0.25);
+    border-radius: 18px;
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.12);
+}
+.en-desarrollo__icono { font-size: 44px; color: #f2c94c; }
+.en-desarrollo h1 { margin: 14px 0 8px; font-size: 28px; color: #f2c94c; }
+.en-desarrollo p { margin: 6px 0; font-size: 16px; line-height: 1.5; }
+.en-desarrollo__nota { color: #b9b9b9; font-size: 14px !important; }
+.en-desarrollo__boton {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 22px; padding: 10px 18px;
+    background: #f2c94c; color: #111; font-weight: bold;
+    border-radius: 10px; text-decoration: none;
+}
+.en-desarrollo__boton:hover, .en-desarrollo__boton:focus-visible { background: #ffd966; outline: none; box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.35); }

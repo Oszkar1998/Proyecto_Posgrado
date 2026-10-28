@@ -6,7 +6,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actas Candidatura</title>
+    <title>Actas de Candidatura — Posgrado FI</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/actasCandidatura.css') }}">
     <script src="{{ url_for('static', filename='js/actasCandidatura.js') }}" defer></script>
@@ -18,14 +18,18 @@
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
 </head>
 
 <body>
 
     <!-- Botón Menú principal -->
-    <div id="regresar-PagPrincipal" onclick="window.location.href='/home'">
-        <span><i class="fa-solid fa-house"></i> Menú Principal</span>
-    </div>
+    <nav id="regresar-PagPrincipal" aria-label="Ubicación">
+            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
+            <span class="migas-sep" aria-hidden="true">›</span>
+            <span class="migas-actual">Actas de Candidatura</span>
+        </nav>
 
     <!-- Flash mensajes del backend -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -44,15 +48,19 @@
     <!-- ====== PÁGINA PRINCIPAL: BÚSQUEDA ====== -->
     <div class="container">
         <div class="card">
-            <h1><i class="fa-solid fa-file-contract"></i> Búsqueda de Actas Candidatura</h1>
-            <p class="descripcion">
-                Puede buscar actas ingresando el número de cuenta, el nombre del alumno, un sinodal o un rango de fechas.
-                <br>● Si ingresa <strong>número de cuenta</strong>, se listarán todos sus registros.
-                <br>● Si ingresa <strong>nombre del alumno</strong>, se buscarán coincidencias.
-                <br>● Si ingresa <strong>Sinodal</strong>, se listarán todas las actas donde aparezca en el jurado.
-                <br>● Si ingresa <strong>rango de fechas</strong>, se mostrarán las actas dentro de ese periodo.
-                <br>● Puede combinar sinodal o nombre con un rango de fechas para acotar resultados.
-            </p>
+            <h1><i class="fa-solid fa-file-contract"></i> Actas de Candidatura</h1>
+            <div class="ayuda-busqueda">
+                <p class="ayuda-resumen">Llena uno o varios campos y presiona <strong>Buscar actas</strong>. Puedes combinar nombre o sinodal con fechas.</p>
+                <details>
+                    <summary><i class="fa-solid fa-circle-question"></i> ¿Cómo buscar?</summary>
+                    <ul>
+                        <li>Con <strong>número de cuenta</strong> se listan todos sus registros.</li>
+                        <li>Con <strong>nombre del alumno</strong> se buscan coincidencias.</li>
+                        <li>Con <strong>sinodal</strong> se listan las actas donde aparece en el jurado.</li>
+                        <li>Con <strong>rango de fechas</strong> se muestran las actas de ese periodo.</li>
+                    </ul>
+                </details>
+            </div>
 
             <form id="searchForm" method="POST">
                 <div class="input-group">
@@ -75,8 +83,8 @@
                     <input type="date" id="fechaFin" name="fechaFin">
                 </div>
 
-                <button type="submit" class="btn">
-                    <i class="fa-solid fa-magnifying-glass"></i> Obtener Documentos
+                <button type="submit" class="btn btn-principal">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar actas
                 </button>
             </form>
         </div>

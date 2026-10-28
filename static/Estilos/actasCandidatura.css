@@ -13,6 +13,7 @@ body {
 }
 
 .card {
+    box-sizing: border-box;   /* evita que se salga en celular */
     background: rgba(20, 20, 20, 0.7);
     padding: 30px;
     border-radius: 16px;
