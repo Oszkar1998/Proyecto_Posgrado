@@ -16,17 +16,17 @@ Sistema web desarrollado en Flask para la gestión de procesos académicos.
 - HTML, CSS, JavaScript
 - SQLite (base de datos)
 
-## ⚙️ Configuracion del Git-Hub
+## ⚙️ Configuración de Git
 
-- Usuario: Oszkar1998
-- Correo: compi98occ@gmail.com
-- Password: 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
+Antes de subir cambios por primera vez en un equipo nuevo, configura tu identidad local
+(sustituye por tu propio usuario y correo de GitHub; nunca pongas aquí tu contraseña ni tokens):
+- git config --global user.name "tu-usuario"
+- git config --global user.email "tu-correo@ejemplo.com"
 
-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
-
-Configuro el entorno antes de subir si es necesario:
-- git config --global user.name "Oszkar1998"
-- git config --global user.email "compi98occ@gmail.com"
+> **Autenticación:** GitHub ya no acepta contraseña normal por HTTPS. Usa un
+> [Personal Access Token](https://github.com/settings/tokens) como contraseña al hacer push/pull,
+> o configura una llave SSH. El token **nunca debe escribirse en este archivo ni en ningún
+> archivo del repositorio** — guárdalo en tu gestor de contraseñas o en el *credential manager* de Git.
 
 Para verificar que si estoy en mi GitHub:
 - git config --list
