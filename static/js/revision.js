@@ -330,12 +330,6 @@ function seleccionarPlan(numCuenta, seleccionId) {
         });
 }
 
-document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-
-    [
-        "modal-contador",
-        "modal-coordinador",
-        "modalSeleccionPlan"
-    ].forEach(id => closeModal(id));
-});
+// ESC, clic fuera y foco: modal.js
+["modal-contador", "modal-coordinador", "modalSeleccionPlan"]
+    .forEach(id => Modal.registrar(id, closeModal));

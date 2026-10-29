@@ -84,12 +84,12 @@ async function buscarPagoSinodales() {
   contenedor.innerHTML = "";
 
   if (!sinodal) {
-    contenedor.innerHTML = `<p style="color:#ff8080;">Ingresa el nombre del sinodal.</p>`;
+    contenedor.innerHTML = `<p class="msg-error">Ingresa el nombre del sinodal.</p>`;
     return;
   }
 
   if ((fechaInicio && !fechaFin) || (!fechaInicio && fechaFin)) {
-    contenedor.innerHTML = `<p style="color:#ff8080;">Si usas rango de fechas, coloca inicio y fin.</p>`;
+    contenedor.innerHTML = `<p class="msg-error">Si usas rango de fechas, coloca inicio y fin.</p>`;
     return;
   }
 
@@ -111,41 +111,34 @@ async function buscarPagoSinodales() {
 
     data = await resp.json();
   } catch (error) {
-    contenedor.innerHTML = `<p style="color:#ff8080;">Error al conectar con el servidor.</p>`;
+    contenedor.innerHTML = `<p class="msg-error">Error al conectar con el servidor.</p>`;
     return;
   }
 
   if (!resp.ok || !data.ok) {
-    contenedor.innerHTML = `<p style="color:#ff8080;">${data.error || "Error en la búsqueda."}</p>`;
+    contenedor.innerHTML = `<p class="msg-error">${escHTML(data.error || "Error en la búsqueda.")}</p>`;
     return;
   }
 
   if (data.resultados.length === 0) {
-    contenedor.innerHTML = `<p style="color:#f7c948;">No se encontraron coincidencias.</p>`;
+    contenedor.innerHTML = `<p class="msg-aviso">No se encontraron coincidencias.</p>`;
     return;
   }
 
   let html = `
-    <h3 style="color:#f7c948;">${data.resultados.length} resultado(s)</h3>
-    <div style="max-height:260px; overflow:auto;">
+    <h3 class="titulo-seccion">${data.resultados.length} resultado(s)</h3>
+    <div class="lista-resultados">
   `;
 
   data.resultados.forEach(r => {
     html += `
-      <div style="
-        background:#1f2a37;
-        border:1px solid rgba(247,201,72,.25);
-        border-radius:10px;
-        padding:12px;
-        margin-bottom:10px;
-        color:white;
-      ">
-        <strong>${r.nombreCompleto}</strong><br>
-        Nùmero de Cuenta: <strong>${r.numCuenta}</strong><br>
-        Folio: <strong>${r.folio}</strong><br>
-        Fecha del Acta: <strong>${r.fechaActa}</strong><br>
-        Fecha Examen: <strong>${r.pagoSinodales}</strong><br>
-        Fecha Entrega DGAE: <strong>${r.dgaeEntregaCarpeta}</strong>
+      <div class="tarjeta-resultado">
+        <strong>${escHTML(r.nombreCompleto)}</strong><br>
+        Número de cuenta: <strong>${escHTML(r.numCuenta)}</strong><br>
+        Folio: <strong>${escHTML(r.folio)}</strong><br>
+        Fecha del Acta: <strong>${escHTML(r.fechaActa)}</strong><br>
+        Fecha Examen: <strong>${escHTML(r.pagoSinodales)}</strong><br>
+        Fecha Entrega DGAE: <strong>${escHTML(r.dgaeEntregaCarpeta)}</strong>
       </div>
     `;
   });
@@ -262,13 +255,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (open === "pagoSinodales") abrirModalFechaExtra("pagoSinodales");
   if (open === "dgaeEntregaCarpeta") abrirModalFechaExtra("dgaeEntregaCarpeta");
 
-  // 3) Cerrar con ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    cerrarModal("modal-capturar-acta");
-    cerrarModal("modal-buscar-acta");
-    cerrarModal("modal-modificar-acta");
-    cerrarModal("modal-fecha-extra-acta");
-    cerrarFlash();
-  });
+  // 3) ESC, clic fuera y foco: modal.js
+  ["modal-capturar-acta", "modal-modificar-acta", "modal-fecha-extra-acta"]
+    .forEach(id => Modal.registrar(id, cerrarModal));
+  Modal.registrar("flash-overlay", cerrarFlash);
 });

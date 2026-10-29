@@ -4,29 +4,19 @@
    Se carga AL FINAL del <head> de cada módulo, después de su
    propio CSS, para que estas reglas manden sobre las de cada uno.
    Aquí solo va lo que debe verse igual en todo el sistema:
-     1. Colores y tipografía
+     1. Tipografía (la paleta está en tokens.css)
      2. Barra "Menú principal › Módulo"
      3. Campos de texto, fecha y listas
      4. Botón principal de búsqueda
      5. Ayuda plegable "¿Cómo buscar?"
+     6. Piezas comunes (títulos de ventana, separadores, botones,
+        mensajes y tarjetas de resultados). Úsalas en lugar de
+        escribir style="..." en el HTML o en el JS.
    Lo propio de cada módulo se queda en su CSS.
    ============================================================ */
 
-/* ---------- 1. Colores y tipografía ---------- */
-:root {
-    --oro: #f2c94c;
-    --oro-hover: #ffd966;
-    --oro-tenue: rgba(242, 201, 76, 0.35);
-    --tinta: #141414;
-    --texto: #f5f5f5;
-    --texto-suave: #c4c4c4;
-    --campo-fondo: #17191d;
-    --campo-borde: #4b4f57;
-    --campo-placeholder: #8f939b;
-    --superficie: rgba(255, 255, 255, 0.07);
-    --superficie-borde: rgba(255, 255, 255, 0.18);
-    --fuente: system-ui, "Segoe UI", Ubuntu, Roboto, "Helvetica Neue", Arial, sans-serif;
-}
+/* ---------- 1. Tipografía ---------- */
+/* La paleta y la fuente viven en tokens.css (se carga antes que este archivo). */
 
 body {
     font-family: var(--fuente);
@@ -148,7 +138,7 @@ body select:not([multiple]):focus,
 body textarea:focus {
     outline: none;
     border-color: var(--oro);
-    box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.22);
+    box-shadow: 0 0 0 3px rgba(var(--oro-rgb), 0.22);
 }
 
 body input[type="date"]::-webkit-calendar-picker-indicator {
@@ -242,7 +232,95 @@ body button.btn-principal:focus-visible {
 
 .ayuda-busqueda strong { color: var(--texto); }
 
+/* ---------- 6. Piezas comunes ---------- */
+
+/* Títulos y textos dentro de ventanas */
+.titulo-modal      { color: var(--oro); margin-top: 0; }
+.titulo-seccion    { color: var(--oro); }
+.titulo-pagina     { margin-top: 3px; font-size: 28px; color: var(--oro); }
+.subtitulo-modal   { margin-top: -6px; }
+.nota              { opacity: .8; }
+.nota-suave        { color: var(--texto-suave); font-size: 13px; margin-bottom: 10px; }
+.nota-clic         { margin-top: 6px; font-size: 13px; color: var(--texto-tenue); }
+.ayuda-campo       { margin-top: 8px; color: var(--oro-oscuro); }
+.texto-centro-oro  { color: var(--oro); text-align: center; }
+
+/* Ventanas más anchas (formularios largos) */
+.ventana-ancha { max-width: 720px; width: 95%; max-height: 85vh; overflow: auto; }
+.ventana-media { max-width: 680px; width: 95%; }
+.lista-scroll  { max-height: 400px; overflow-y: auto; }
+
+/* Separador horizontal */
+hr.separador {
+    border: 0;
+    border-top: 1px solid var(--superficie-borde);
+    margin: 16px 0;
+}
+hr.separador-amplio { margin: 24px 0; }
+
+/* Espaciado vertical */
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 14px; }
+.mt-3 { margin-top: 20px; }
+
+/* Fila de botones y rejillas de campos */
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+}
+.rejilla-2 { grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }   /* el display lo pone el JS */
+.rejilla-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* Botones */
+.btn-ancho      { width: 200px; max-width: 100%; }
+.btn.btn-rojo   { background: var(--rojo); color: #fff; }
+.btn.btn-rojo:hover { background: var(--rojo-hover); }
+
+/* Mensajes en listas de resultados (los pinta el JS) */
+.msg-error { color: var(--rojo-claro); }
+.msg-aviso { color: var(--oro); }
+.msg-error-fuerte { color: var(--rojo-claro); font-weight: 700; }
+
+/* Resultados de búsqueda */
+.lista-resultados { max-height: 260px; overflow: auto; }
+.resultado-busqueda { margin-bottom: 8px; }
+.tarjeta-resultado {
+    background: var(--panel-azul);
+    border: 1px solid rgba(var(--oro-rgb), .25);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
 /* ---------- Celular ---------- */
+@media (max-width: 600px) {
+    .rejilla-3, .rejilla-2 { grid-template-columns: 1fr; }
+
+    /* Ventanas modales: el ancho incluye el relleno y quedan 12 px de margen
+       a cada lado (modal.js pone la clase modal-sistema al abrir). */
+    .modal-sistema > * {
+        box-sizing: border-box;
+        max-width: calc(100vw - 24px);
+    }
+}
+
+/* Barra de navegación en pantallas angostas: solo la casita, para que
+   "Menú principal › Módulo" quepa en una línea. El texto sigue ahí para
+   lectores de pantalla. */
+@media (max-width: 420px) {
+    .migas-inicio .migas-texto {
+        position: absolute;
+        width: 1px; height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
+
 @media (max-width: 560px) {
     body > #regresar-PagPrincipal,
     body > header > #regresar-PagPrincipal:only-child {

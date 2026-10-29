@@ -125,6 +125,7 @@ def index():
 
 
 @actas_candidatura_bp.route("/ver_pdf/<int:registro_id>")
+@permission_required("actas_candidatura")
 def ver_pdf(registro_id):
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -138,6 +139,7 @@ def ver_pdf(registro_id):
 
 
 @actas_candidatura_bp.route("/guardar", methods=["POST"])
+@permission_required("actas_candidatura")
 def guardar_acta():
     numeroCuenta       = (request.form.get("numeroCuenta") or "").strip()
     nombre             = (request.form.get("nombre") or "").strip()
@@ -208,6 +210,7 @@ def guardar_acta():
 
 
 @actas_candidatura_bp.route("/get_acta", methods=["POST"])
+@permission_required("actas_candidatura")
 def get_acta_json():
     data = request.get_json(silent=True) or {}
     registro_id = data.get("id")
@@ -235,6 +238,7 @@ def get_acta_json():
 
 
 @actas_candidatura_bp.route("/buscar_por_cuenta", methods=["POST"])
+@permission_required("actas_candidatura")
 def buscar_por_cuenta():
     data = request.get_json(silent=True) or {}
     numeroCuenta = (data.get("numeroCuenta") or "").strip()
@@ -259,6 +263,7 @@ def buscar_por_cuenta():
 
 
 @actas_candidatura_bp.route("/actualizar", methods=["POST"])
+@permission_required("actas_candidatura")
 def actualizar_acta():
     registro_id        = (request.form.get("id") or "").strip()
     numeroCuenta       = (request.form.get("numeroCuenta") or "").strip()

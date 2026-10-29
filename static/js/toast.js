@@ -12,6 +12,25 @@
  *   <script src="/static/js/toast.js"></script>
  */
 
+/**
+ * escHTML(valor) — Convierte un valor en texto seguro para meterlo en HTML.
+ * Úsalo SIEMPRE que pongas datos de la base o del servidor dentro de un
+ * template string que vaya a innerHTML (nombres, títulos, folios, etc.).
+ *   div.innerHTML = `<strong>${escHTML(r.nombre)}</strong>`;
+ * Sirve también dentro de atributos: value="${escHTML(x)}".
+ * Es global porque toast.js se carga en todas las páginas.
+ */
+function escHTML(valor) {
+    if (valor === null || valor === undefined) return "";
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+window.escHTML = escHTML;
+
 const toast = (() => {
 
     // Crear contenedor si no existe
@@ -37,10 +56,12 @@ const toast = (() => {
 
         const toast = document.createElement("div");
         toast.className = `toast toast-${tipo}`;
+        // Errores y avisos se anuncian de inmediato a lectores de pantalla
+        toast.setAttribute("role", tipo === "ok" ? "status" : "alert");
         toast.innerHTML = `
             <i class="${icons[tipo]} toast-icon"></i>
-            <span class="toast-msg">${mensaje}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()">
+            <span class="toast-msg">${escHTML(mensaje)}</span>
+            <button type="button" class="toast-close" aria-label="Cerrar notificación" onclick="this.parentElement.remove()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         `;

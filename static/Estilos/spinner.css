@@ -29,8 +29,8 @@
 .spinner-ring {
     width: 64px;
     height: 64px;
-    border: 6px solid rgba(242, 201, 76, 0.2);
-    border-top-color: #f2c94c;
+    border: 6px solid rgba(var(--oro-rgb), 0.2);
+    border-top-color: var(--oro);
     border-radius: 50%;
     animation: spin 0.85s linear infinite;
 }
@@ -41,8 +41,8 @@
 
 /* Texto */
 .spinner-msg {
-    color: #f2c94c;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--oro);
+    font-family: var(--fuente);
     font-size: 18px;
     font-weight: 600;
     margin: 0;
@@ -50,8 +50,8 @@
 }
 
 .spinner-submsg {
-    color: #aaa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--texto-tenue);
+    font-family: var(--fuente);
     font-size: 13px;
     margin: 0;
     text-align: center;

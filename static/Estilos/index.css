@@ -5,7 +5,7 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     background-attachment: fixed;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--fuente);
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -38,7 +38,7 @@ body {
     padding: 35px 30px;
     border-radius: 18px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(242, 201, 76, 0.22);
+    border: 1px solid rgba(var(--oro-rgb), 0.22);
     width: 420px;              /* 360px de contenido + 60px de relleno */
     box-sizing: border-box;    /* el relleno ya no hace que se salga en celular */
     max-width: calc(100% - 32px);
@@ -63,7 +63,7 @@ input {
 }
 
 input:focus {
-    border-color: #d6bb1f;
+    border-color: var(--oro-oscuro);
     outline: none;
     box-shadow: 0 0 0 3px rgba(214, 187, 31, 0.18);
 }
@@ -71,7 +71,7 @@ input:focus {
 button {
     width: 100%;
     padding: 12px;
-    background-color: #d6bb1f;
+    background-color: var(--oro-oscuro);
     color: rgb(0, 0, 0);
     border: none;
     border-radius: 10px;
@@ -81,7 +81,7 @@ button {
 }
 
 button:hover {
-    background-color: #e6c300;
+    background-color: var(--oro-oscuro);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -93,7 +93,7 @@ p {
 }
 
 a {
-    color: #f2d200;
+    color: var(--oro);
     text-decoration: none;
     font-weight: 500;
 }
@@ -103,8 +103,8 @@ a:hover {
 }
 
 .mensaje-error {
-    background-color: rgba(220, 53, 69, 0.15);
-    border: 1px solid rgba(220, 53, 69, 0.45);
+    background-color: rgba(var(--rojo-rgb), 0.15);
+    border: 1px solid rgba(var(--rojo-rgb), 0.45);
     padding: 10px 12px;
     border-radius: 8px;
     color: #fff;
@@ -126,7 +126,7 @@ a:hover {
 
 .login-subtitle {
     text-align: center;
-    color: #d9d9d9;
+    color: var(--texto-suave);
     font-size: 14px;
     margin-bottom: 18px;
 }
@@ -166,7 +166,7 @@ a:hover {
 .login-icon {
     text-align: center;
     margin-bottom: 12px;
-    color: #f2c94c;
+    color: var(--oro);
     font-size: 40px;
 }
  
@@ -189,7 +189,7 @@ a:hover {
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #aaa;
+    color: var(--texto-tenue);
     font-size: 15px;
     pointer-events: none;
 }
@@ -220,3 +220,9 @@ a:hover {
     to   { opacity: 1; transform: translateY(0); }
 }
  
+/* ===== Pantallas de usuarios (antes eran estilos dentro del HTML) ===== */
+.auth-box--600 { width: 600px; max-width: 95%; }
+.auth-box--650 { width: 650px; max-width: 95%; }
+.auth-box--750 { width: 750px; max-width: 95%; }
+.texto-blanco  { color: #fff; }
+.mt-20         { margin-top: 20px; }

@@ -1,32 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pago Examen — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
+{% block title %}Pago Examen{% endblock %}
+
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/pagoExamen.css') }}" />
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/pagoExamen.js') }}" defer></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-<body>
+{% block content %}
 
     <!-- Botón Menú principal -->
     <header class="header">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Pago Examen</span>
-        </nav>
+        {{ migas("Pago Examen") }}
     </header>
 
     <main class="en-desarrollo">
@@ -36,6 +25,4 @@
         <p class="en-desarrollo__nota">Pronto podrás registrar y consultar aquí los pagos de examen.</p>
         <a href="/home" class="en-desarrollo__boton"><i class="fa-solid fa-house"></i> Volver al menú principal</a>
     </main>
-
-</body>
-</html>
+{% endblock %}

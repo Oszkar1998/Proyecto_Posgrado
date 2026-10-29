@@ -7,9 +7,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/tokens.css') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar usuario — Posgrado FI</title>
+    <link rel="icon" href="{{ url_for('static', filename='Imagenes/favicon.ico') }}" sizes="any">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='Imagenes/favicon-180.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/index.css') }}">
 
     <style>
@@ -116,17 +119,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-6.5.0/css/all.min.css') }}">
 </head>
 <body>
     <header class="header-login">
         <img src="{{ url_for('static', filename='Imagenes/Logo.PNG') }}" alt="Logo UNAM">
     </header>
 
-    <div class="auth-box" style="width: 650px; max-width: 95%;">
+    <div class="auth-box auth-box--650">
         <div class="form-container">
             <h2><i class="fa-solid fa-pen-to-square"></i> Editar privilegios</h2>
-            <p style="color:white;"><strong>Usuario:</strong> {{ user['email'] }}</p>
+            <p class="texto-blanco"><strong>Usuario:</strong> {{ user['email'] }}</p>
 
             <form method="POST">
 

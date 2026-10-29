@@ -1,35 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DGAE Grado — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
+{% block title %}DGAE Grado{% endblock %}
+
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/dgaeGrado.css') }}" />
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/dgaeGrado.js') }}" defer></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-
-<body>
+{% block content %}
     <!-- Barra superior -->
     <header class="topbar">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">DGAE Grado</span>
-        </nav>
+        {{ migas("DGAE Grado") }}
     </header>
 
     <!-- Contenido principal -->
@@ -64,7 +49,7 @@
                     />
                 </div>
 
-                <div id="estado-validacion" class="estado-validacion info">
+                <div id="estado-validacion" class="estado-validacion info" aria-live="polite">
                     Escribe tu número de cuenta.
                 </div>
             </form>
@@ -89,7 +74,7 @@
             </div>
 
             <!-- Separador -->
-            <hr style="margin: 24px 0; border-color: rgba(255,255,255,0.1);">
+            <hr class="separador separador-amplio">
 
             <!-- ====== BÚSQUEDA POR NOMBRE / FECHAS (ABAJO) ====== -->
             <form id="form-busqueda" method="GET" action="/dgaeGrado/" autocomplete="off">
@@ -145,6 +130,4 @@
 
         </section>
     </main>
-</body>
-</html>
-
+{% endblock %}

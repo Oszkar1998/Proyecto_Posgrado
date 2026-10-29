@@ -23,7 +23,9 @@ from modules.pagoExamen import pagoExamen_bp
 from modules.actasCandidatura import actas_candidatura_bp
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-key-cambiar-en-produccion")
+app.secret_key = os.environ.get("SECRET_KEY")
+if not app.secret_key:
+    raise RuntimeError("Falta la variable de entorno SECRET_KEY. Revisa /etc/flask-login.env")
 
 # ── Manejadores de error ──────────────────────────────
 @app.errorhandler(400)

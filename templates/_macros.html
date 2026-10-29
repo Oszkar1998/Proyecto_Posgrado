@@ -1,0 +1,15 @@
+{#-
+  _macros.html — Piezas de HTML reutilizables.
+  Uso en un template:
+      {% from "_macros.html" import migas %}
+      {{ migas("Actas de Grado") }}
+-#}
+
+{# Barra "Menú principal › Módulo" (estilos en base.css, sección 2) #}
+{% macro migas(actual) -%}
+<nav id="regresar-PagPrincipal" aria-label="Ubicación">
+    <a href="/home" class="migas-inicio"><i class="fa-solid fa-house" aria-hidden="true"></i> <span class="migas-texto">Menú principal</span></a>
+    <span class="migas-sep" aria-hidden="true">›</span>
+    <span class="migas-actual">{{ actual }}</span>
+</nav>
+{%- endmacro %}

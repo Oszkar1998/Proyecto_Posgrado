@@ -1,35 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revisión — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
+{% block title %}Revisión{% endblock %}
+
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/revision.css') }}">
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/revision.js') }}" defer></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-
-<body>
+{% block content %}
     <!-- Barra superior -->
     <header class="topbar">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Revisión</span>
-        </nav>
+        {{ migas("Revisión") }}
 
         <div class="top-actions">
             <button id="contador-container" type="button" onclick="mostrarModalContador()">
@@ -65,7 +50,7 @@
             </form>
         </section>
 
-        <p id="hint" class="hint-text">
+        <p id="hint" class="hint-text" aria-live="polite">
             Escribe tu número de cuenta (9 dígitos). Validaremos automáticamente.
         </p>
     </main>
@@ -74,7 +59,7 @@
     <div class="modal-contador" id="modal-contador">
         <div class="modal-content2">
             <h2>Actualizar Contador</h2>
-            <input type="number" id="nuevoContador" min="1" required>
+            <input type="number" id="nuevoContador" aria-label="Nuevo número de oficio" min="1" required>
             <div class="modal-actions">
                 <button type="button" onclick="actualizarContador()">
                     <i class="fa-solid fa-check"></i> Guardar
@@ -90,8 +75,8 @@
     <div class="modal-coordinador" id="modal-coordinador">
         <div class="modal-content3">
             <h2>Actualizar Coordinador</h2>
-            <input type="text" id="nombreCoordinador" placeholder="Nombre completo">
-            <select id="sexoCoordinador">
+            <input aria-label="Nombre completo del coordinador" type="text" id="nombreCoordinador" placeholder="Nombre completo">
+            <select aria-label="Sexo del coordinador" id="sexoCoordinador">
                 <option value="">Selecciona el sexo</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
@@ -120,6 +105,4 @@
             </div>
         </div>
     </div>
-
-</body>
-</html>
+{% endblock %}

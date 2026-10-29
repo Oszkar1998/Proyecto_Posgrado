@@ -831,7 +831,7 @@ def index():
 @revision_bp.route("/ver_pdf/<filename>")
 @permission_required("revision")
 def ver_pdf(filename):
-    return send_from_directory("static/Documentos", filename, mimetype="application/pdf", as_attachment=False)
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
 
 ########## CONTADOR ##########
 @revision_bp.route("/obtener_contador", methods=["GET"])

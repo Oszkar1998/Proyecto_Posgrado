@@ -1,7 +1,7 @@
 /* Fondo general */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    font-family: var(--fuente);
+    background: linear-gradient(120deg, var(--fondo), var(--fondo-2));
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     margin: 0;
     padding: 0;
@@ -16,7 +16,7 @@ body {
     position: absolute;
     top: 20px;
     left: 30px;
-    background: #dc3545;
+    background: var(--rojo);
     color: white;
     padding: 10px 15px;
     border-radius: 10px;
@@ -27,7 +27,7 @@ body {
 }
 
 #regresar-PagPrincipal:hover {
-    background: #c82333;
+    background: var(--rojo-hover);
 }
 
 /* Aviso de módulo en desarrollo */
@@ -36,20 +36,20 @@ body {
     max-width: 440px;
     padding: 36px 28px;
     text-align: center;
-    color: #e8e8e8;
+    color: var(--texto);
     background: rgba(20, 20, 20, 0.92);
-    border: 1px solid rgba(242, 201, 76, 0.25);
+    border: 1px solid rgba(var(--oro-rgb), 0.25);
     border-radius: 18px;
-    box-shadow: 0 0 24px rgba(255, 215, 0, 0.12);
+    box-shadow: 0 0 24px rgba(var(--oro-rgb), 0.12);
 }
-.en-desarrollo__icono { font-size: 44px; color: #f2c94c; }
-.en-desarrollo h1 { margin: 14px 0 8px; font-size: 28px; color: #f2c94c; }
+.en-desarrollo__icono { font-size: 44px; color: var(--oro); }
+.en-desarrollo h1 { margin: 14px 0 8px; font-size: 28px; color: var(--oro); }
 .en-desarrollo p { margin: 6px 0; font-size: 16px; line-height: 1.5; }
 .en-desarrollo__nota { color: #b9b9b9; font-size: 14px !important; }
 .en-desarrollo__boton {
     display: inline-flex; align-items: center; gap: 8px;
     margin-top: 22px; padding: 10px 18px;
-    background: #f2c94c; color: #111; font-weight: bold;
+    background: var(--oro); color: #111; font-weight: bold;
     border-radius: 10px; text-decoration: none;
 }
-.en-desarrollo__boton:hover, .en-desarrollo__boton:focus-visible { background: #ffd966; outline: none; box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.35); }
+.en-desarrollo__boton:hover, .en-desarrollo__boton:focus-visible { background: var(--oro-claro); outline: none; box-shadow: 0 0 0 3px rgba(var(--oro-rgb), 0.35); }

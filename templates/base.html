@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{#-
+  base.html — Plantilla común de los módulos.
+  ------------------------------------------------------------
+  Cada módulo la usa así:
+
+      {% extends "base.html" %}
+      {% from "_macros.html" import migas %}
+
+      {% block title %}Revisión{% endblock %}
+
+      {% block estilos %}
+          <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/revision.css') }}">
+      {% endblock %}
+
+      {% block scripts %}
+          <script src="{{ url_for('static', filename='js/revision.js') }}" defer></script>
+      {% endblock %}
+
+      {% block content %}
+          {{ migas("Revisión") }}
+          ... contenido del módulo ...
+      {% endblock %}
+
+  Lo que va aquí se carga en TODAS las páginas: si hay que cambiar
+  la versión de Font Awesome, agregar un JS global o un favicon,
+  se cambia una sola vez en este archivo.
+-#}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} — Posgrado FI</title>
+    <link rel="icon" href="{{ url_for('static', filename='Imagenes/favicon.ico') }}" sizes="any">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='Imagenes/favicon-180.png') }}">
+
+    {# Paleta y fuente del sistema: primero que todo #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/tokens.css') }}">
+
+    {# CSS propio del módulo #}
+    {% block estilos %}{% endblock %}
+
+    {# Componentes globales #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-6.5.0/css/all.min.css') }}">
+
+    {# Estilo común: va al final para que mande sobre el CSS del módulo #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
+
+    {# toast.js (incluye escHTML) y spinner.js antes del JS del módulo #}
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+
+    {# JS propio del módulo #}
+    {% block scripts %}{% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+</html>

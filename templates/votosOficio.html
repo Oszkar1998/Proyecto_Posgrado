@@ -1,53 +1,38 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votos PUEI — Posgrado FI</title>
+{% block title %}Votos PUEI{% endblock %}
 
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/votosOficio.css') }}">
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/votosOficio.js') }}" defer></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-
-<body>  
+{% block content %}
+  
    
     <!-- Botón para menú principal -->
     <header class="header">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Votos PUEI</span>
-        </nav>
+        {{ migas("Votos PUEI") }}
     </header>
 
     <!-- Modal para capturar datos -->
     <div class="modal-capturar" id="modal-capturar" style="display: none;">
         <div class="modal-content">
             <h2>CAPTURA DE DATOS</h2>
-            <input type="text" id="nombreCompleto" name="nombreCompleto" placeholder="NOMBRE COMPLETO">
-            <input type="text" id="numeroDeCuentaCap" name="numeroDeCuentaCap" maxlength="9" placeholder="NÚMERO DE CUENTA"/>
+            <input aria-label="Nombre completo" type="text" id="nombreCompleto" name="nombreCompleto" placeholder="NOMBRE COMPLETO">
+            <input aria-label="Número de cuenta" type="text" id="numeroDeCuentaCap" name="numeroDeCuentaCap" maxlength="9" placeholder="NÚMERO DE CUENTA"/>
 
-            <select id="sexoCoordinador">
+            <select aria-label="Género del alumno" id="sexoCoordinador">
                 <option value="">GENERO</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
             </select>
                     
-            <select id="modalidad">
+            <select aria-label="Modalidad" id="modalidad">
                 <option value="">SELECCIONE LA MODALIDAD</option>
                 <option value="Tesina">Tesina</option>
                 <option value="Examen General de Conocimiento">Examen General de Conocimiento</option>
@@ -58,23 +43,23 @@
                 <option value="Tesis">Tesis</option>
             </select>
 
-            <input type="text" id="tituloOtesina" name="tituloOtesina" placeholder="TITULO O TESINA">
-            <input type="text" id="planEstudios" name="planEstudios" placeholder="PLAN DE ESTUDIOS" oninput="this.value = this.value.replace(/[^0-9]/g,'');">
+            <input aria-label="Título o tesina" type="text" id="tituloOtesina" name="tituloOtesina" placeholder="TITULO O TESINA">
+            <input aria-label="Plan de estudios" type="text" id="planEstudios" name="planEstudios" placeholder="PLAN DE ESTUDIOS" oninput="this.value = this.value.replace(/[^0-9]/g,'');">
             
-            <input type="text" id="tutor" name="tutor" placeholder="TUTOR">
-            <select id="sexoTutor">
+            <input aria-label="Tutor" type="text" id="tutor" name="tutor" placeholder="TUTOR">
+            <select aria-label="Género tutor" id="sexoTutor">
                 <option value="">GÉNERO TUTOR</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
             </select>
 
-            <input type="text" id="especializacion" name="especializacion" placeholder="ESPECIALIZACIÓN">
+            <input aria-label="Especialización" type="text" id="especializacion" name="especializacion" placeholder="ESPECIALIZACIÓN">
                     
-            <input type="text" id="presidente" name="presidente" placeholder="PRESIDENTE">
-            <input type="text" id="vocal1" name="vocal1" placeholder="PRIMER VOCAL">
-            <input type="text" id="vocal2" name="vocal2" placeholder="SEGUNDO VOCAL">
-            <input type="text" id="vocal3" name="vocal3" placeholder="TERCER VOCAL">
-            <input type="text" id="secretario" name="secretario" placeholder="SECRETARIO">
+            <input aria-label="Presidente" type="text" id="presidente" name="presidente" placeholder="PRESIDENTE">
+            <input aria-label="Primer vocal" type="text" id="vocal1" name="vocal1" placeholder="PRIMER VOCAL">
+            <input aria-label="Segundo vocal" type="text" id="vocal2" name="vocal2" placeholder="SEGUNDO VOCAL">
+            <input aria-label="Tercer vocal" type="text" id="vocal3" name="vocal3" placeholder="TERCER VOCAL">
+            <input aria-label="Secretario" type="text" id="secretario" name="secretario" placeholder="SECRETARIO">
                     
             <button onclick="actualizarCapturar()">
                 <i class="fa-solid fa-check"></i> Guardar
@@ -96,9 +81,9 @@
     <div class="modal-busquedaNombre" id="modal-busquedaNombre" style="display: none;">
         <div class="modal-content2">
             <h2>BÚSQUEDA POR NOMBRE</h2>
-            <input type="text" id="nombreCompletoBusqueda" name="nombreCompletoBusqueda" placeholder="INGRESE NOMBRE COMPLETO">
+            <input aria-label="Nombre completo a buscar" type="text" id="nombreCompletoBusqueda" name="nombreCompletoBusqueda" placeholder="INGRESE NOMBRE COMPLETO">
                     
-            <div style="margin-top: 15px;">
+            <div class="mt-2">
                 <button onclick="busquedaPorNombre()">
                     <i class="fa-solid fa-magnifying-glass"></i> Buscar
                 </button>
@@ -108,7 +93,7 @@
             </div>
                     
             <!-- Contenedor para mostrar resultados -->
-            <div id="resultadosBusqueda" style="margin-top: 25px;"></div>
+            <div class="mt-3" id="resultadosBusqueda" aria-live="polite"></div>
         </div>
     </div>
 
@@ -123,12 +108,12 @@
     <div class="modal-modificarDatos" id="modal-modificarDatos" style="display: none;">
         <div class="modal-content3">
             <h2>MODIFICAR DATOS</h2>
-            <input type="text" id="numeroCuentaModificar" placeholder="Ingrese número de cuenta">
+            <input aria-label="Número de cuenta a modificar" type="text" id="numeroCuentaModificar" placeholder="Ingrese número de cuenta">
             <button onclick="buscarDatosModificar()">
                 <i class="fa-solid fa-magnifying-glass"></i> Buscar
             </button>
 
-            <div id="datosModificarForm" style="max-height: 400px; overflow-y: auto;"></div>
+            <div class="lista-scroll" id="datosModificarForm"></div>
 
             <button onclick="guardarCambiosModificar()">
                 <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
@@ -146,12 +131,12 @@
           <label for="numeroDeCuenta">Número de Cuenta:</label>
           <input type="text" id="numeroDeCuenta" name="numeroDeCuenta" maxlength="9" placeholder="Ejemplo: 123456789" required />
         </form>
-        <p id="hint" style="margin-top:8px;color:#d1b354;">
+        <p id="hint" class="ayuda-campo" aria-live="polite">
             Escribe tu número (9 dígitos). Validaremos automáticamente.
         </p>
 
         <!-- Solo botón de votos -->
-        <div id="botones-expediente" style="display: none; margin-top: 20px;">
+        <div id="botones-expediente" class="mt-3" style="display: none;">
             <button id="btn-documento-2">
                 <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
             </button>
@@ -174,13 +159,11 @@
         <div class="modal-content">
             <h2><i class="fa-solid fa-circle-exclamation"></i> Cuenta no encontrada</h2>
             <p id="modalErrorMsg">El número de cuenta no se encuentra en la base de datos. Ingresa uno correcto.</p>
-            <div style="margin-top: 12px;">
+            <div class="mt-2">
                 <button onclick="cerrarModalError()">
                     <i class="fa-solid fa-xmark"></i> Cerrar
                 </button>
             </div>
         </div>
-    </div>  
-
-</body>
-</html>
+    </div>
+{% endblock %}

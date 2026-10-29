@@ -1,14 +1,9 @@
 :root {
-    --fondo-oscuro: #0f0f0f;
-    --fondo-secundario: #1c1c1c;
-    --dorado: #f6c343;
-    --dorado-hover: #e0b52e;
-    --rojo: #dc3545;
-    --rojo-hover: #c82333;
-    --verde: #28a745;
-    --verde-hover: #218838;
+    --fondo-oscuro: var(--fondo);
+    --fondo-secundario: var(--fondo-2);
+    --dorado: var(--oro);
+    --dorado-hover: var(--oro-oscuro);
     --texto-claro: #ffffff;
-    --texto-suave: #d6d6d6;
     --borde-suave: rgba(255, 255, 255, 0.18);
     --panel: rgba(255, 255, 255, 0.05);
     --panel-oscuro: rgba(0, 0, 0, 0.35);
@@ -20,7 +15,7 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: var(--fuente);
     background: linear-gradient(120deg, var(--fondo-oscuro), var(--fondo-secundario));
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     background-size: cover;
@@ -149,16 +144,16 @@ select {
 input:focus,
 select:focus {
     border-color: var(--dorado);
-    box-shadow: 0 0 0 3px rgba(246, 195, 67, 0.18);
+    box-shadow: 0 0 0 3px rgba(var(--oro-rgb), 0.18);
 }
 
 input::placeholder {
-    color: #bbb;
+    color: var(--texto-tenue);
 }
 
 .hint-text {
     margin-top: 22px;
-    color: #d1b354;
+    color: var(--oro-oscuro);
     font-size: 16px;
     text-align: center;
     line-height: 1.5;
@@ -209,7 +204,7 @@ input::placeholder {
     inset: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.58);
+    background-color: rgba(0, 0, 0, 0.72);
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -228,7 +223,7 @@ input::placeholder {
     color: white;
     padding: 28px 24px;
     border-radius: 18px;
-    box-shadow: 0 0 24px rgba(255, 215, 0, 0.14);
+    box-shadow: 0 0 24px rgba(var(--oro-rgb), 0.14);
     width: 100%;
     max-width: 440px;
     text-align: center;
@@ -270,7 +265,7 @@ input::placeholder {
 .modal-content input::placeholder,
 .modal-content2 input::placeholder,
 .modal-content3 input::placeholder {
-    color: #bbb;
+    color: var(--texto-tenue);
 }
 
 .modal-actions {
@@ -317,7 +312,7 @@ input::placeholder {
 
 .modal-resumen {
     margin: 8px 0 14px;
-    color: #cfcfcf;
+    color: var(--texto-suave);
     line-height: 1.5;
 }
 

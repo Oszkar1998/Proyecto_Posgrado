@@ -1,36 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Examen de Grado — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
+{% block title %}Examen de Grado{% endblock %}
+
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/examen.css') }}" />
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/examen.js') }}" defer></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-
-<body>
+{% block content %}
 
     <!-- Barra superior -->
     <header class="topbar">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Examen de Grado</span>
-        </nav>
+        {{ migas("Examen de Grado") }}
 
         <div class="top-actions">
             <button id="btn-modificar-datos" type="button" title="Editar datos ya guardados">
@@ -99,10 +84,10 @@
             <input type="time" id="horaExamen" name="horaExamen" required>
 
             <h3>Datos para Acta</h3>
-            <input type="text" id="ingreso" name="ingreso" placeholder="Ingreso (ej. 2024-1)">
-            <input type="text" id="termino" name="termino" placeholder="Término (ej. 2025-2)">
-            <input type="text" id="promedio" name="promedio" placeholder="Promedio (ej. 9.25)">
-            <input type="text" id="folio" name="folio" placeholder="Folio (ej. 001125048E)">
+            <input aria-label="Ingreso (ej. 2024-1)" type="text" id="ingreso" name="ingreso" placeholder="Ingreso (ej. 2024-1)">
+            <input aria-label="Término (ej. 2025-2)" type="text" id="termino" name="termino" placeholder="Término (ej. 2025-2)">
+            <input aria-label="Promedio (ej. 9.25)" type="text" id="promedio" name="promedio" placeholder="Promedio (ej. 9.25)">
+            <input aria-label="Folio (ej. 001125048E)" type="text" id="folio" name="folio" placeholder="Folio (ej. 001125048E)">
 
             <label for="modalidadSede">Sede del examen</label>
             <div class="select-wrapper">
@@ -120,14 +105,14 @@
             </div>
 
             <h3 id="titulo-tutor">Tutor</h3>
-            <input type="text" id="tutor" name="tutor" placeholder="Tutor">
+            <input aria-label="Tutor" type="text" id="tutor" name="tutor" placeholder="Tutor">
 
             <h3 id="titulo-sinodales">Sinodales</h3>
-            <input type="text" id="presidente" name="presidente" placeholder="Presidente">
-            <input type="text" id="vocal1" name="vocal1" placeholder="Primer vocal">
-            <input type="text" id="vocal2" name="vocal2" placeholder="Segundo vocal">
-            <input type="text" id="vocal3" name="vocal3" placeholder="Tercer vocal">
-            <input type="text" id="secretario" name="secretario" placeholder="Secretario">
+            <input aria-label="Presidente" type="text" id="presidente" name="presidente" placeholder="Presidente">
+            <input aria-label="Primer vocal" type="text" id="vocal1" name="vocal1" placeholder="Primer vocal">
+            <input aria-label="Segundo vocal" type="text" id="vocal2" name="vocal2" placeholder="Segundo vocal">
+            <input aria-label="Tercer vocal" type="text" id="vocal3" name="vocal3" placeholder="Tercer vocal">
+            <input aria-label="Secretario" type="text" id="secretario" name="secretario" placeholder="Secretario">
 
             <div class="modal-actions">
                 <button type="button" onclick="guardarFechaHora()">
@@ -153,6 +138,4 @@
             </div>
         </div>
     </div>
-
-</body>
-</html>
+{% endblock %}

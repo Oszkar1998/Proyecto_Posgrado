@@ -1,33 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Captura — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/captura.css') }}" />
-  <script src="{{ url_for('static', filename='js/captura.js') }}" defer></script>
+{% block title %}Captura{% endblock %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-  
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-  <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+{% block estilos %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/captura.css') }}" />
+{% endblock %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/captura.js') }}" defer></script>
+{% endblock %}
 
-<body>
+{% block content %}
 
   <!-- Botón Menú principal -->
   <header class="header">
-    <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Captura</span>
-        </nav>
+    {{ migas("Captura") }}
   </header>
 
   <!-- CONTENIDO -->
@@ -37,16 +25,16 @@
 
     <div class="grid-opciones">
       <!-- Opción 1 -->
-      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuVotos()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">
+      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuVotos()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="icono"><i class="fa-solid fa-square-poll-vertical"></i></div>
         <div class="texto">
-          <h2>VOTOS</h2>
-          <p>Captura y gestión de votos</p>
+          <h2>REGISTRO</h2>
+          <p>Captura y gestión de registro</p>
         </div>
       </div>
 
       <!-- Opción 2 -->
-      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuCandidatura()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">
+      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuCandidatura()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="icono"><i class="fa-solid fa-user-graduate"></i></div>
         <div class="texto">
           <h2>CANDIDATURA</h2>
@@ -55,7 +43,7 @@
       </div>
 
       <!-- Opción 3 -->
-      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuActasGrado()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">
+      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuActasGrado()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="icono"><i class="fa-solid fa-scroll"></i></div>
         <div class="texto">
           <h2>ACTAS GRADO</h2>
@@ -64,7 +52,7 @@
       </div>
 
       <!-- Opción 4 -->
-      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuActasCandidatura()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">
+      <div class="card-opcion" role="button" tabindex="0" onclick="mostrarMenuActasCandidatura()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="icono"><i class="fa-solid fa-file-contract"></i></div>
         <div class="texto">
           <h2>ACTAS CANDIDATURA</h2>
@@ -78,7 +66,7 @@
   <!-- Modal menú VOTOS -->
   <div id="modal-menu-votos" class="modal-menu-votos" style="display:none;">
     <div class="modal-menu-votos-content">
-      <h2>VOTOS (PUEI)</h2>
+      <h2>REGISTRO</h2>
       <p>Selecciona una opción</p>
 
       <div class="menu-votos-grid">
@@ -139,6 +127,4 @@
       <button type="button" class="btn-cerrar" onclick="cerrarMenuActasCandidatura()">Cerrar</button>
     </div>
   </div>
-
-</body>
-</html>
+{% endblock %}

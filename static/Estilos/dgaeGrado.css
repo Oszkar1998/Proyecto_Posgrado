@@ -13,8 +13,8 @@ html, body {
 
 /* ===== BODY ===== */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    font-family: var(--fuente);
+    background: linear-gradient(120deg, var(--fondo), var(--fondo-2));
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     background-size: cover;
     background-position: center;
@@ -36,7 +36,7 @@ body {
 
 /* Botón menú */
 #regresar-PagPrincipal {
-    background: #dc3545;
+    background: var(--rojo);
     color: white;
     padding: 10px 16px;
     border-radius: 10px;
@@ -48,7 +48,7 @@ body {
 }
 
 #regresar-PagPrincipal:hover {
-    background: #c82333;
+    background: var(--rojo-hover);
     transform: translateY(-2px);
 }
 
@@ -77,13 +77,13 @@ body {
 /* ===== TEXTO ===== */
 .card h1 {
     font-size: 22px;
-    color: #facc15;
+    color: var(--oro);
     margin-bottom: 10px;
 }
 
 .descripcion {
     font-size: 14px;
-    color: #d1d5db;
+    color: var(--texto-suave);
     margin-bottom: 25px;
     text-align: left;
 }
@@ -98,7 +98,7 @@ body {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
-    color: #f6c343;
+    color: var(--oro);
 }
 
 .input-group input {
@@ -106,19 +106,19 @@ body {
     padding: 12px;
     border-radius: 10px;
     border: 1px solid #555;
-    background-color: #1f2937;
-    color: #f3f4f6;
+    background-color: var(--panel-azul);
+    color: var(--texto);
     font-size: 15px;
 }
 
 .input-group input::placeholder {
-    color: #9ca3af;
+    color: var(--texto-tenue);
 }
 
 .input-group input:focus {
-    border-color: #facc15;
+    border-color: var(--oro);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+    box-shadow: 0 0 0 3px rgba(var(--oro-rgb), 0.2);
 }
 
 /* ===== MENSAJES ===== */
@@ -167,7 +167,7 @@ body {
 
 /* Botones generales */
 button {
-    background-color: #facc15;
+    background-color: var(--oro);
     color: black;
     border: none;
     border-radius: 10px;
@@ -178,7 +178,7 @@ button {
 }
 
 button:hover {
-    background-color: #eab308;
+    background-color: var(--oro-oscuro);
     transform: translateY(-1px);
 }
 
@@ -204,13 +204,13 @@ button:hover {
 }
 
 .modal-content {
-    background: #1f1f1f;
+    background: var(--fondo-2);
     width: 90%;
     max-width: 540px;
     padding: 28px 26px;
     border-radius: 16px;
-    border: 1px solid rgba(250, 204, 21, 0.65);
-    box-shadow: 0 0 28px rgba(250, 204, 21, 0.25);
+    border: 1px solid rgba(var(--oro-rgb), 0.65);
+    box-shadow: 0 0 28px rgba(var(--oro-rgb), 0.25);
     text-align: center;
     color: white;
 }
@@ -224,7 +224,7 @@ button:hover {
 #resumenProgramasGrado {
     margin: 0 0 20px 0;
     line-height: 1.25;
-    color: #e5e7eb;
+    color: var(--texto);
 }
 
 .opciones-planes {
@@ -240,7 +240,7 @@ button:hover {
     padding: 12px 18px;
     border-radius: 10px;
     border: none;
-    background: #facc15;
+    background: var(--oro);
     color: black;
     font-weight: 700;
     cursor: pointer;
@@ -252,7 +252,7 @@ button:hover {
     padding: 10px 22px;
     border-radius: 10px;
     border: none;
-    background: #facc15;
+    background: var(--oro);
     color: black;
     font-weight: 600;
     cursor: pointer;
@@ -260,7 +260,7 @@ button:hover {
 
 #cerrarModalSeleccionGrado:hover,
 .opciones-planes button:hover {
-    background: #eab308;
+    background: var(--oro-oscuro);
     transform: translateY(-1px);
 }
 
@@ -268,7 +268,7 @@ button:hover {
 .btn-buscar {
     margin-top: 12px;
     padding: 10px 20px;
-    background: #f6c343;
+    background: var(--oro);
     color: #000;
     font-weight: 700;
     border: none;
@@ -279,23 +279,23 @@ button:hover {
     width: 100%;
 }
 
-.btn-buscar:hover { background: #e0b132; }
+.btn-buscar:hover { background: var(--oro-oscuro); }
 
 .resultados { margin-top: 20px; }
-.resultados h2 { color: #f6c343; font-size: 16px; margin-bottom: 12px; }
+.resultados h2 { color: var(--oro); font-size: 16px; margin-bottom: 12px; }
 .resultados ul { list-style: none; padding: 0; }
 .resultados li {
-    background: #1f2a37;
+    background: var(--panel-azul);
     color: #fff;
     padding: 14px;
     margin-bottom: 10px;
     border-radius: 10px;
-    border: 1px solid rgba(246,195,67,0.2);
+    border: 1px solid rgba(var(--oro-rgb), 0.2);
     line-height: 1.6;
 }
-.resultados li strong { color: #f6c343; font-size: 15px; }
+.resultados li strong { color: var(--oro); font-size: 15px; }
 .fecha-dgae { color: #a0c4ff; font-size: 13px; }
-.sin-resultados { color: #f6c343; text-align: center; margin-top: 15px; font-size: 14px; }
+.sin-resultados { color: var(--oro); text-align: center; margin-top: 15px; font-size: 14px; }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);

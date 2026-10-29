@@ -1,0 +1,53 @@
+/* ============================================================
+   tokens.css — Paleta y tipografía únicas del sistema
+   ------------------------------------------------------------
+   Se carga PRIMERO en todas las páginas (base.html, login, menú,
+   usuarios y error). Los demás CSS solo usan estas variables:
+       color: var(--oro);
+       background: rgba(var(--oro-rgb), 0.15);   ← transparencias
+   Para cambiar un color en todo el sistema, se cambia aquí.
+   No redefinas estas variables en el CSS de un módulo.
+   ============================================================ */
+
+:root {
+    /* Dorado institucional (acento principal) */
+    --oro: #f6c343;
+    --oro-rgb: 246, 195, 67;
+    --oro-claro: #ffd966;          /* hover sobre fondo oscuro */
+    --oro-oscuro: #e0b132;         /* hover de botones dorados */
+    --oro-hover: var(--oro-claro); /* nombre usado en base.css */
+    --oro-tenue: rgba(var(--oro-rgb), 0.35);
+
+    /* Estados */
+    --rojo: #dc3545;
+    --rojo-rgb: 220, 53, 69;
+    --rojo-hover: #c82333;
+    --rojo-claro: #ff8080;         /* texto de error sobre fondo oscuro */
+    --verde: #28a745;
+    --verde-rgb: 40, 167, 69;
+    --verde-hover: #218838;
+
+    /* Fondos */
+    --fondo: #0f0f0f;              /* fondo de página */
+    --fondo-2: #1c1c1c;            /* tarjetas y barras */
+    --panel-azul: #1f2937;         /* resultados y listas */
+    --fondo-ventana: #15171b;      /* ventanas modales (sólido) */
+    --tinta: #141414;              /* texto sobre dorado */
+
+    /* Texto */
+    --texto: #f5f5f5;
+    --texto-suave: #c4c4c4;
+    --texto-tenue: #9ca3af;        /* ayudas y placeholders */
+
+    /* Campos de formulario */
+    --campo-fondo: #17191d;
+    --campo-borde: #4b4f57;
+    --campo-placeholder: #8f939b;
+
+    /* Superficies translúcidas */
+    --superficie: rgba(255, 255, 255, 0.07);
+    --superficie-borde: rgba(255, 255, 255, 0.18);
+
+    /* Tipografía */
+    --fuente: system-ui, "Segoe UI", Ubuntu, Roboto, "Helvetica Neue", Arial, sans-serif;
+}

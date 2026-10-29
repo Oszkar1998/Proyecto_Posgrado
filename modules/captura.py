@@ -17,12 +17,14 @@ def index():
     return render_template("captura.html")
 
 @captura_bp.route("/votos", methods=["GET"])
+@permission_required("captura")
 def captura_votos():
     if "user_id" not in session:
         return redirect(url_for("index"))
     return render_template("captura_votos.html")
 
 @captura_bp.route("/actasGrado", methods=["GET"])
+@permission_required("captura")
 def actas_grado():
     if "user_id" not in session:
         return redirect(url_for("index"))

@@ -44,9 +44,9 @@ async function buscarParaModificar() {
       const div = document.createElement("div");
       div.className = "resultado-item";
       div.innerHTML = `
-        <strong>${reg.nombre}</strong><br>
-        Fecha: ${reg.fecha} &nbsp;·&nbsp; Evaluación: ${reg.evaluacion} &nbsp;·&nbsp; Resultado: ${reg.resultadoExamen}
-        <div style="margin-top:6px; font-size:13px; color:#aaa;">Haz clic para editar este registro</div>
+        <strong>${escHTML(reg.nombre)}</strong><br>
+        Fecha: ${escHTML(reg.fecha)} &nbsp;·&nbsp; Evaluación: ${escHTML(reg.evaluacion)} &nbsp;·&nbsp; Resultado: ${escHTML(reg.resultadoExamen)}
+        <div class="nota-clic">Haz clic para editar este registro</div>
       `;
       div.style.cursor = "pointer";
       div.addEventListener("click", () => cargarRegistroParaModificar(reg.id));
@@ -134,10 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (open === "modificar") abrirModal("modal-modificar-actaCandidatura");
   // "verActa" ya no usa modal — lleva directo a la página principal
 
-  // Cerrar con ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    cerrarModal("modal-capturar-actaCandidatura");
-    cerrarModal("modal-modificar-actaCandidatura");
-  });
+  // ESC, clic fuera y foco: modal.js
+  ["modal-capturar-actaCandidatura", "modal-modificar-actaCandidatura"]
+    .forEach(id => Modal.registrar(id, cerrarModal));
 });

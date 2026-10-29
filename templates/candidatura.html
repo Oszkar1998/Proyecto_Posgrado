@@ -1,33 +1,35 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Candidatura — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/candidatura.css') }}" />
-  <script src="{{ url_for('static', filename='js/candidatura.js') }}" defer></script>
+{% block title %}Candidatura{% endblock %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+{% block estilos %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/candidatura.css') }}" />
+{% endblock %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-  <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/candidatura.js') }}" defer></script>
+{% endblock %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
+{% block content %}
 
-<body>
+  <!-- Modal para cambiar folio (fuera de la barra: su desenfoque encerraba al modal) -->
+  <div class="modal-folio" id="modal-folio" style="display:none;">
+    <div class="modal-content2">
+      <h2>Actualizar Folio (Acta)</h2>
+      <input type="number" id="nuevoFolioActa" aria-label="Nuevo folio de acta" min="1" required>
+      <button type="button" onclick="actualizarFolioActa()">
+        <i class="fa-solid fa-check"></i> Guardar
+      </button>
+      <button type="button" onclick="cerrarModalFolioActa()">
+        <i class="fa-solid fa-xmark"></i> Cancelar
+      </button>
+    </div>
+  </div>
 
   <!-- Barra superior -->
   <div class="barra-superior">
-    <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Candidatura</span>
-        </nav>
+    {{ migas("Candidatura") }}
 
     <div class="izquierda">
       <div id="folio-container" onclick="mostrarModalFolioActa()">
@@ -35,19 +37,6 @@
       </div>
     </div>
 
-    <!-- Modal para cambiar folio -->
-    <div class="modal-folio" id="modal-folio" style="display:none;">
-      <div class="modal-content2">
-        <h2>Actualizar Folio (Acta)</h2>
-        <input type="number" id="nuevoFolioActa" min="1" required>
-        <button type="button" onclick="actualizarFolioActa()">
-          <i class="fa-solid fa-check"></i> Guardar
-        </button>
-        <button type="button" onclick="cerrarModalFolioActa()">
-          <i class="fa-solid fa-xmark"></i> Cancelar
-        </button>
-      </div>
-    </div>
 
     <div class="derecha">
       <div id="capturar-container" onclick="mostrarModalCapturar()">CAPTURAR DATOS</div>
@@ -61,22 +50,22 @@
     <div class="modal-content">
       <h2>CAPTURAR DATOS - CANDIDATURA</h2>
 
-      <label>Nombre completo</label>
+      <label for="cap_nombre_completo">Nombre completo</label>
       <input id="cap_nombre_completo" type="text" placeholder="Nombre completo" />
 
-      <label>Número de cuenta</label>
+      <label for="cap_numero_cuenta">Número de cuenta</label>
       <input id="cap_numero_cuenta" type="text" placeholder="9 dígitos" maxlength="9" />
 
-      <label>Especialidad</label>
+      <label for="cap_especialidad">Especialidad</label>
       <input id="cap_especialidad" type="text" placeholder="Especialidad" />
 
-      <label>Título del proyecto</label>
+      <label for="cap_titulo_proyecto">Título del proyecto</label>
       <input id="cap_titulo_proyecto" type="text" placeholder="Título del proyecto" />
 
-      <label>Semestre ingreso</label>
+      <label for="cap_semestre_ingreso">Semestre ingreso</label>
       <input id="cap_semestre_ingreso" type="text" placeholder="Ej: 2023-1" />
 
-      <label>Semestre presentado</label>
+      <label for="cap_semestre_presentado">Semestre presentado</label>
       <select id="cap_semestre_presentado">
         <option value="">Selecciona...</option>
         <option value="TERCER">TERCER</option>
@@ -86,29 +75,29 @@
         <option value="SEPTIMO">SEPTIMO</option>
       </select>
 
-      <label>Evaluación</label>
+      <label for="cap_evaluacion">Evaluación</label>
       <select id="cap_evaluacion">
         <option value="">Selecciona...</option>
         <option value="PRIMERA">PRIMERA</option>
         <option value="SEGUNDA">SEGUNDA</option>
       </select>
 
-      <label>Presidente</label>
+      <label for="cap_presidente">Presidente</label>
       <input id="cap_presidente" type="text" placeholder="Presidente" />
 
-      <label>Secretario</label>
+      <label for="cap_secretario">Secretario</label>
       <input id="cap_secretario" type="text" placeholder="Secretario" />
 
-      <label>Vocal 1</label>
+      <label for="cap_vocal1">Vocal 1</label>
       <input id="cap_vocal1" type="text" placeholder="Vocal 1" />
 
-      <label>Vocal 2</label>
+      <label for="cap_vocal2">Vocal 2</label>
       <input id="cap_vocal2" type="text" placeholder="Vocal 2" />
 
-      <label>Vocal 3</label>
+      <label for="cap_vocal3">Vocal 3</label>
       <input id="cap_vocal3" type="text" placeholder="Vocal 3" />
 
-      <label>Sexo</label>
+      <label for="cap_sexo">Sexo</label>
       <select id="cap_sexo">
         <option value="">Selecciona...</option>
         <option value="F">F</option>
@@ -129,13 +118,13 @@
         </select>
       </div>
 
-      <label>Fecha examen</label>
+      <label for="cap_fecha_examen">Fecha examen</label>
       <input id="cap_fecha_examen" type="date" />
 
-      <label>Hora examen</label>
+      <label for="cap_hora_examen">Hora examen</label>
       <input id="cap_hora_examen" type="time" />
 
-      <div style="margin-top:14px;">
+      <div class="mt-2">
         <button type="button" onclick="guardarCapturaCandidatura()">Guardar</button>
         <button type="button" onclick="cerrarModalCapturar()">Cancelar</button>
       </div>
@@ -147,15 +136,15 @@
     <div class="modal-content2">
       <h2>BUSQUEDA POR NOMBRE - CANDIDATURA</h2>
 
-      <label>Nombre completo</label>
+      <label for="bus_nombre">Nombre completo</label>
       <input id="bus_nombre" type="text" placeholder="Ingresa nombre completo o parte..." />
 
-      <div style="margin-top:10px;">
+      <div class="mt-1">
         <button type="button" onclick="buscarPorNombreCandidatura()">Buscar</button>
         <button type="button" onclick="cerrarModalBusquedaNombre()">Cerrar</button>
       </div>
 
-      <div id="bus_resultados" style="margin-top:14px;"></div>
+      <div class="mt-2" id="bus_resultados" aria-live="polite"></div>
     </div>
   </div>
 
@@ -164,33 +153,33 @@
     <div class="modal-content3">
       <h2>MODIFICAR DATOS - CANDIDATURA</h2>
 
-      <label>Número de cuenta</label>
+      <label for="mod_numero_cuenta_buscar">Número de cuenta</label>
       <input id="mod_numero_cuenta_buscar" type="text" placeholder="9 dígitos" maxlength="9" />
 
-      <div style="margin-top:10px;">
+      <div class="mt-1">
         <button type="button" onclick="cargarCandidaturaPorCuenta()">Cargar</button>
         <button type="button" onclick="cerrarModalModificarDatos()">Cerrar</button>
       </div>
 
       <div id="mod_form_fields" style="display:none;">
-        <hr style="margin:16px 0; opacity:.25;" />
+        <hr class="separador" />
 
-        <label>Nombre completo</label>
+        <label for="mod_nombre_completo">Nombre completo</label>
         <input id="mod_nombre_completo" type="text" />
 
-        <label>Número de cuenta</label>
+        <label for="mod_numero_cuenta">Número de cuenta</label>
         <input id="mod_numero_cuenta" type="text" maxlength="9" readonly class="input-bloqueado">
 
-        <label>Especialidad</label>
+        <label for="mod_especialidad">Especialidad</label>
         <input id="mod_especialidad" type="text" />
 
-        <label>Título del proyecto</label>
+        <label for="mod_titulo_proyecto">Título del proyecto</label>
         <input id="mod_titulo_proyecto" type="text" />
 
-        <label>Semestre ingreso</label>
+        <label for="mod_semestre_ingreso">Semestre ingreso</label>
         <input id="mod_semestre_ingreso" type="text" />
 
-        <label>Semestre presentado</label>
+        <label for="mod_semestre_presentado">Semestre presentado</label>
         <select id="mod_semestre_presentado">
           <option value="">Selecciona...</option>
           <option value="TERCER">TERCER</option>
@@ -200,45 +189,45 @@
           <option value="SEPTIMO">SEPTIMO</option>
         </select>
 
-        <label>Evaluación</label>
+        <label for="mod_evaluacion">Evaluación</label>
         <select id="mod_evaluacion">
           <option value="">Selecciona...</option>
           <option value="PRIMERA">PRIMERA</option>
           <option value="SEGUNDA">SEGUNDA</option>
         </select>
 
-        <label>Presidente</label>
+        <label for="mod_presidente">Presidente</label>
         <input id="mod_presidente" type="text" />
 
-        <label>Secretario</label>
+        <label for="mod_secretario">Secretario</label>
         <input id="mod_secretario" type="text" />
 
-        <label>Vocal 1</label>
+        <label for="mod_vocal1">Vocal 1</label>
         <input id="mod_vocal1" type="text" />
 
-        <label>Vocal 2</label>
+        <label for="mod_vocal2">Vocal 2</label>
         <input id="mod_vocal2" type="text" />
 
-        <label>Vocal 3</label>
+        <label for="mod_vocal3">Vocal 3</label>
         <input id="mod_vocal3" type="text" />
 
-        <label>Sexo</label>
+        <label for="mod_sexo">Sexo</label>
         <select id="mod_sexo">
           <option value="">Selecciona...</option>
           <option value="F">F</option>
           <option value="M">M</option>
         </select>
 
-        <label>Modalidad / Sede</label>
+        <label for="mod_modalidad_sede">Modalidad / Sede</label>
         <input id="mod_modalidad_sede" type="text" />
 
-        <label>Fecha examen</label>
+        <label for="mod_fecha_examen">Fecha examen</label>
         <input id="mod_fecha_examen" type="date" />
 
-        <label>Hora examen</label>
+        <label for="mod_hora_examen">Hora examen</label>
         <input id="mod_hora_examen" type="time" />
 
-        <div style="margin-top:14px;">
+        <div class="mt-2">
           <button type="button" onclick="guardarCambiosCandidatura()">Guardar Cambios</button>
         </div>
       </div>
@@ -252,13 +241,11 @@
     <label for="numeroDeCuenta">Número de Cuenta:</label>
     <input id="numeroDeCuenta" type="text" placeholder="Ejemplo: 123456789" maxlength="9" />
 
-    <div id="estado-validacion" class="estado-validacion"></div>
+    <div id="estado-validacion" class="estado-validacion" aria-live="polite"></div>
 
     <div id="botones-expediente" style="display:none;">
       <button id="btn-documento-1" type="button">ACTA</button>
       <button id="btn-documento-2" type="button">CITATORIO</button>
     </div>
   </div>
-
-</body>
-</html>
+{% endblock %}

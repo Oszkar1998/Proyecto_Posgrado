@@ -312,7 +312,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") cerrarModalSeleccion();
-    });
+    // ESC, clic fuera y foco: modal.js (el modal se crea por código; se detecta al aparecer)
+    Modal.registrar("modalSeleccionPlanGrado", cerrarModalSeleccion);
 });

@@ -459,6 +459,7 @@ def exportar_excel():
     )
 
 @actas_grado_bp.route("/ver_pdf/<num_cuenta>/<folio>")
+@permission_required("actas_grado")
 def ver_pdf(num_cuenta, folio):
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -478,6 +479,7 @@ def disable_cache(response):
     return response
 
 @actas_grado_bp.route("/guardar", methods=["POST"])
+@permission_required("actas_grado")
 def guardar_acta():
     folio = (request.form.get("folio") or "").strip()
     numCuenta = (request.form.get("numCuenta") or "").strip()
@@ -567,6 +569,7 @@ def guardar_acta():
     return redirect(url_for("actas_grado.index"))
 
 @actas_grado_bp.route("/get_acta", methods=["POST"])
+@permission_required("actas_grado")
 def get_acta_json():
     data = request.get_json(silent=True) or {}
     numCuenta = (data.get("numCuenta") or "").strip()
@@ -596,6 +599,7 @@ def get_acta_json():
     return dict(zip(keys, row)), 200
 
 @actas_grado_bp.route("/actualizar", methods=["POST"])
+@permission_required("actas_grado")
 def actualizar_acta():
     old_num = (request.form.get("old_numCuenta") or "").strip()
     old_fol = (request.form.get("old_folio") or "").strip()
@@ -702,6 +706,7 @@ def actualizar_acta():
     return redirect(url_for("actas_grado.index"))
 
 @actas_grado_bp.route("/guardar_fecha_extra", methods=["POST"])
+@permission_required("actas_grado")
 def guardar_fecha_extra():
     numCuenta = (request.form.get("numCuenta") or "").strip()
     folio = (request.form.get("folio") or "").strip()
@@ -754,6 +759,7 @@ def guardar_fecha_extra():
     return redirect(url_for("actas_grado.index"))
 
 @actas_grado_bp.route("/buscar_pago_sinodales", methods=["POST"])
+@permission_required("actas_grado")
 def buscar_pago_sinodales():
     data = request.get_json(silent=True) or {}
 

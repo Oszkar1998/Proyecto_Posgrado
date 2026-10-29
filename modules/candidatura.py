@@ -521,6 +521,7 @@ def index():
     return render_template("candidatura.html")
 
 @candidatura_bp.route("/consultar", methods=["POST"])
+@permission_required("candidatura")
 def consultar():
     if "user_id" not in session:
         return jsonify({"success": False, "error": "Sesión expirada. Inicia sesión de nuevo."}), 401
@@ -547,6 +548,7 @@ def consultar():
     })
 
 @candidatura_bp.route("/generar_pdf", methods=["POST"])
+@permission_required("candidatura")
 def generar_pdf():
     try:
         if "user_id" not in session:
@@ -579,10 +581,12 @@ def generar_pdf():
         return jsonify({"success": False, "error": f"Error al generar PDF: {str(e)}"}), 500 
 
 @candidatura_bp.route("/ver_pdf/<filename>")
+@permission_required("candidatura")
 def ver_pdf(filename):
-    return send_from_directory("static/Documentos", filename, mimetype="application/pdf", as_attachment=False)
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
 
 @candidatura_bp.route("/api/obtener")
+@permission_required("candidatura", "captura_candidatura")
 def obtener_por_cuenta():
     num = request.args.get("numero_cuenta","").strip()
     with get_connection() as conn:
@@ -593,6 +597,7 @@ def obtener_por_cuenta():
     return jsonify(dict(row) if row else {})
 
 @candidatura_bp.route("/api/actualizar", methods=["POST"])
+@permission_required("candidatura", "captura_candidatura")
 def actualizar_por_cuenta():
     data = request.get_json(force=True)
     with get_connection() as conn:
@@ -616,6 +621,7 @@ def actualizar_por_cuenta():
     return jsonify({"ok": True})
 
 @candidatura_bp.route("/api/crear", methods=["POST"])
+@permission_required("candidatura", "captura_candidatura")
 def crear_registro():
     data = request.get_json(force=True)
     numero_cuenta = (data.get("numero_cuenta") or "").strip()
@@ -650,6 +656,7 @@ def crear_registro():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 @candidatura_bp.route("/api/buscar")
+@permission_required("candidatura", "captura_candidatura")
 def buscar_por_nombre():
     nombre = (request.args.get("nombre") or "").strip()
     if not nombre:
@@ -668,6 +675,7 @@ def buscar_por_nombre():
     return jsonify([dict(r) for r in rows])
 
 @candidatura_bp.route("/obtener_folio_acta", methods=["GET"])
+@permission_required("candidatura", "captura_candidatura")
 def obtener_folio_acta_api():
     try:
         folio = obtener_folio_acta()
@@ -676,6 +684,7 @@ def obtener_folio_acta_api():
         return jsonify({"error": str(e)}), 500
 
 @candidatura_bp.route("/actualizar_folio_acta", methods=["POST"])
+@permission_required("candidatura")
 def actualizar_folio_acta_api():
     try:
         nuevo = request.json.get("nuevoFolio")

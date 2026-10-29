@@ -1,7 +1,7 @@
 /* Fondo general */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    font-family: var(--fuente);
+    background: linear-gradient(120deg, var(--fondo), var(--fondo-2));
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     margin: 0;
     padding: 0;
@@ -29,7 +29,7 @@ body {
 .container h2 {
     margin-bottom: 25px;
     font-size: 24px;
-    color: #facc15; /* Dorado */
+    color: var(--oro); /* Dorado */
     font-weight: bold;
 }
 
@@ -38,7 +38,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #f6c343;
+    color: var(--oro);
     text-align: left;
 }
 
@@ -49,17 +49,17 @@ input[type="text"] {
     margin-bottom: 20px;
     border: 1px solid #555;
     border-radius: 8px;
-    background-color: #1f2937;
-    color: #f3f4f6;
+    background-color: var(--panel-azul);
+    color: var(--texto);
     font-size: 16px;
 }
 
 input[type="text"]::placeholder {
-    color: #9ca3af;
+    color: var(--texto-tenue);
 }
 
 input[type="text"]:focus {
-    border-color: #facc15;
+    border-color: var(--oro);
     outline: none;
 }
 
@@ -69,7 +69,7 @@ button[type="submit"],
 #btn-documento-2,
 #btn-doc2-sinX,
 #btn-doc2-conX {
-    background-color: #facc15;
+    background-color: var(--oro);
     color: black;
     border: none;
     border-radius: 10px;
@@ -85,7 +85,7 @@ button[type="submit"]:hover,
 #btn-documento-2:hover,
 #btn-doc2-sinX:hover,
 #btn-doc2-conX:hover {
-    background-color: #eab308;
+    background-color: var(--oro-oscuro);
     transform: scale(1.03);
 }
 
@@ -101,7 +101,7 @@ button[type="submit"]:hover,
     position: absolute;
     top: 20px;
     left: 30px;
-    background: #dc3545;
+    background: var(--rojo);
     color: white;
     padding: 10px 15px;
     border-radius: 10px;
@@ -112,7 +112,7 @@ button[type="submit"]:hover,
 }
 
 #regresar-PagPrincipal:hover {
-    background: #c82333;
+    background: var(--rojo-hover);
 }
 
 /* Mensaje de estado de validación */
@@ -122,7 +122,7 @@ button[type="submit"]:hover,
   text-align: left;
   transition: color .2s ease, opacity .2s ease;
   opacity: 0.95;
-  color: #eab308;
+  color: var(--oro-oscuro);
 }
 
 .estado-validacion.info  { color: #c3dafe; }   /* azul claro */
@@ -139,7 +139,7 @@ button[type="submit"]:hover,
 }
 
 .titulo{
-  color: #f2c94c;
+  color: var(--oro);
   font-size: 52px;
   margin: 0;
   font-weight: 800;
@@ -147,13 +147,13 @@ button[type="submit"]:hover,
 
 .subtitulo{
   margin-top: 10px;
-  color: #e5e7eb;
+  color: var(--texto);
   opacity: 0.9;
 }
 
 
 .card-opcion{
-  background: #f2c94c;
+  background: var(--oro);
   border-radius: 18px;
   padding: 24px 22px;
   cursor: pointer;
@@ -166,7 +166,7 @@ button[type="submit"]:hover,
 }
 
 .card-opcion:hover{
-  background: #f2c94c;
+  background: var(--oro);
   transform: translateY(-3px) scale(1.01);
 }
 
@@ -183,7 +183,7 @@ button[type="submit"]:hover,
 
 .card-opcion .texto p{
   margin: 6px 0 0 0;
-  color: #1f2937;
+  color: var(--panel-azul);
   opacity: 0.9;
   font-size: 14px;
 }
@@ -202,21 +202,22 @@ button[type="submit"]:hover,
 .modal-menu-votos{
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.55);
+  background: rgba(0, 0, 0, 0.72);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+    backdrop-filter: blur(3px);
 }
 
 .modal-menu-votos-content{
   width: min(560px, 92%);
-  background: rgba(0,0,0,.25);
+  background: var(--fondo-ventana);
   border: 1px solid rgba(255,255,255,.15);
   backdrop-filter: blur(8px);
   border-radius: 18px;
   padding: 22px;
-  color: #f6c343;
+  color: var(--oro);
   text-align: center;
   box-shadow: 0 14px 30px rgba(0,0,0,.45);
 }
@@ -229,7 +230,7 @@ button[type="submit"]:hover,
 }
 
 .menu-votos-grid button{
-  background: #f6c343;
+  background: var(--oro);
   color: #111;
   border: none;
   border-radius: 10px;
@@ -239,12 +240,12 @@ button[type="submit"]:hover,
 }
 
 .menu-votos-grid button:hover{
-  background: #e6b933;
+  background: var(--oro-oscuro);
 }
 
 .modal-menu-votos-content .btn-cerrar{
   margin-top: 16px;
-  background: #dc3545;
+  background: var(--rojo);
   color: #fff;
   border: none;
   border-radius: 10px;

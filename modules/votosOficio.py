@@ -147,6 +147,7 @@ def index():
     return render_template("votosOficio.html")
 
 @votos_Oficio_PUEI_bp.route("/guardar_datos", methods=["POST"])
+@permission_required("votos_puei")
 def guardar_datos():
     data = request.get_json()
 
@@ -190,6 +191,7 @@ def guardar_datos():
 
 # --------- BÚSQUEDAS ---------
 @votos_Oficio_PUEI_bp.route("/buscar_cuenta", methods=["POST"])
+@permission_required("votos_puei")
 def buscar_por_cuenta():
     data = request.get_json()
     cuenta = data.get("numeroCuenta")
@@ -207,6 +209,7 @@ def buscar_por_cuenta():
     return jsonify(respuesta)
 
 @votos_Oficio_PUEI_bp.route('/buscar_nombre', methods=['POST'])
+@permission_required("votos_puei")
 def buscar_nombre():
     data = request.get_json()
     nombre = data.get('nombre', '').strip()
@@ -225,6 +228,7 @@ def buscar_nombre():
 
 # --------- GENERAR VOTOS POR ID ---------
 @votos_Oficio_PUEI_bp.route("/votos_id/<int:id>")
+@permission_required("votos_puei")
 def generar_votos_por_id(id):
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -250,6 +254,7 @@ def generar_votos_por_id(id):
 
 # --------- AUTOCOMPLETE SINODALES ---------
 @votos_Oficio_PUEI_bp.route("/sinodales", methods=["GET"])
+@permission_required("votos_puei")
 def sinodales_autocomplete():
     q = (request.args.get("q") or "").strip()
     if not q:
@@ -274,6 +279,7 @@ def sinodales_autocomplete():
 
 # --------- MODIFICAR ---------
 @votos_Oficio_PUEI_bp.route("/obtener_datos", methods=["POST"])
+@permission_required("votos_puei")
 def obtener_datos():
     datos = request.get_json()
     cuenta = (datos.get("numeroCuenta") or "").strip()
@@ -333,6 +339,7 @@ def obtener_datos():
     })
 
 @votos_Oficio_PUEI_bp.route("/modificar_datos", methods=["POST"])
+@permission_required("votos_puei")
 def modificar_datos():
     datos = request.get_json()
     plan = int(datos["planEstudios"])
@@ -359,8 +366,9 @@ def modificar_datos():
 
 # --------- PDFs ---------
 @votos_Oficio_PUEI_bp.route("/ver_pdf/<filename>")
+@permission_required("votos_puei")
 def ver_pdf(filename):
-    return send_from_directory("static/Documentos", filename, mimetype="application/pdf", as_attachment=False)
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
 
 @votos_Oficio_PUEI_bp.after_request
 def disable_cache(response):

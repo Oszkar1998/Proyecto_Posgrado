@@ -150,20 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ✅ Cerrar con ESC (cierra el que esté abierto)
-document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") return;
-
-  const mCapt = document.getElementById("modal-capturar");
-  const mBus  = document.getElementById("modal-busquedaNombre");
-  const mMod  = document.getElementById("modal-modificarDatos");
-  const mFolio = document.getElementById("modal-folio");
-
-  if (mCapt && mCapt.style.display === "flex") cerrarModalCapturar();
-  if (mBus && mBus.style.display === "flex") cerrarModalBusquedaNombre();
-  if (mMod && mMod.style.display === "flex") cerrarModalModificarDatos();
-  if (mFolio && mFolio.style.display === "flex") cerrarModalFolioActa();
-});
+  // ESC, clic fuera y foco: modal.js
+  Modal.registrar("modal-capturar", cerrarModalCapturar);
+  Modal.registrar("modal-busquedaNombre", cerrarModalBusquedaNombre);
+  Modal.registrar("modal-modificarDatos", cerrarModalModificarDatos);
+  Modal.registrar("modal-folio", cerrarModalFolioActa);
 
 
   // estado inicial
@@ -222,13 +213,18 @@ async function buscarPorNombreCandidatura() {
       return;
     }
 
+    // El número de cuenta va en data-cuenta (no dentro del onclick) para que
+    // un valor con comillas no rompa el botón.
     cont.innerHTML = data.map(r => `
-      <div style="margin-bottom:8px;">
-        <b>${r.nombre_completo}</b><br>
-        Cuenta: ${r.numero_cuenta}
-        <button onclick="cargarDesdeBusqueda('${r.numero_cuenta}')">Seleccionar</button>
+      <div class="resultado-busqueda">
+        <b>${escHTML(r.nombre_completo)}</b><br>
+        Cuenta: ${escHTML(r.numero_cuenta)}
+        <button type="button" class="btn-seleccionar-busqueda" data-cuenta="${escHTML(r.numero_cuenta)}">Seleccionar</button>
       </div>
     `).join("");
+    cont.querySelectorAll(".btn-seleccionar-busqueda").forEach(b =>
+      b.addEventListener("click", () => cargarDesdeBusqueda(b.dataset.cuenta))
+    );
   } catch (e) {
     console.error(e);
     cont.innerHTML = "<p>Error al buscar.</p>";
@@ -260,7 +256,7 @@ async function cargarCandidaturaPorCuenta() {
   }
 
   try {
-    const resp = await fetch(`/candidatura/api/obtener?numero_cuenta=${num}`);
+    const resp = await fetch(`/candidatura/api/obtener?numero_cuenta=${encodeURIComponent(num)}`);
     const data = await resp.json();
 
     if (!data || !data.numero_cuenta) {

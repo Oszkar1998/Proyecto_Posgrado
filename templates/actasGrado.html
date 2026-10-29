@@ -1,39 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actas de Grado — Posgrado FI</title>
+{% extends "base.html" %}
+{% from "_macros.html" import migas %}
 
+{% block title %}Actas de Grado{% endblock %}
+
+{% block estilos %}
     <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/actasGrado.css') }}">
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/actasGrado.js') }}"></script>
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/toast.css') }}">
-    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/spinner.css') }}">
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Estilo común: va al final para que mande sobre el CSS del módulo -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='Estilos/base.css') }}">
-</head>
-
-<body>
+{% block content %}
     <!-- Boton para menú principal -->
     <header class="header">
-        <nav id="regresar-PagPrincipal" aria-label="Ubicación">
-            <a href="/home" class="migas-inicio"><i class="fa-solid fa-house"></i> Menú principal</a>
-            <span class="migas-sep" aria-hidden="true">›</span>
-            <span class="migas-actual">Actas de Grado</span>
-        </nav>
+        {{ migas("Actas de Grado") }}
     </header>
     
     <div class="container">
         <div class="card">
-            <h1 style="margin-top: 3px; font-size: 28px; color: #f7c948;"><i class="fa-solid fa-scroll"></i> Actas de Grado</h1>
+            <h1 class="titulo-pagina"><i class="fa-solid fa-scroll"></i> Actas de Grado</h1>
             <div class="ayuda-busqueda">
                 <p class="ayuda-resumen">Llena uno o varios campos y presiona <strong>Buscar actas</strong>. Puedes combinarlos con un rango de fechas.</p>
                 <details>
@@ -85,9 +71,9 @@
 
     <!-- ================= MODAL: CAPTURA DE DATOS (ACTAS GRADO) ================= -->
     <div id="modal-capturar-acta" class="modal-menu-votos" style="display:none;">
-    <div class="modal-menu-votos-content" style="max-width:720px; width:95%; max-height:85vh; overflow:auto;">
-        <h2 style="color:#f7c948; margin-top:0;">CAPTURA DE DATOS</h2>
-        <p style="margin-top:-6px;">Ingresa los datos del acta y adjunta el PDF.</p>
+    <div class="ventana-ancha modal-menu-votos-content">
+        <h2 class="titulo-modal">CAPTURA DE DATOS</h2>
+        <p class="subtitulo-modal">Ingresa los datos del acta y adjunta el PDF.</p>
 
         <form id="formCapturaActa" method="POST"
             action="{{ url_for('actas_grado.guardar_acta') }}"
@@ -118,7 +104,7 @@
             <label for="planCap">Plan de estudios</label>
             <input type="text" id="planCap" name="planEstudios" placeholder="Ej: 2020">
 
-            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <div class="rejilla-3">
             <div>
                 <label for="diaCap">Día *</label>
                 <input type="number" id="diaCap" name="dia" required min="1" max="31" placeholder="24">
@@ -163,12 +149,12 @@
 
             <label for="pdfCap">Acta PDF *</label>
             <input type="file" id="pdfCap" name="actaPDF" accept="application/pdf" required>
-            <small style="opacity:.8;">Solo PDF. Evita escaneos muy pesados.</small>
+            <small class="nota">Solo PDF. Evita escaneos muy pesados.</small>
         </div>
 
-        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:200px;"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-            <button type="button" class="btn" style="background:#d9534f; width:200px;"
+        <div class="acciones">
+            <button type="submit" class="btn-ancho btn"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+            <button type="button" class="btn-rojo btn-ancho btn"
                     onclick="cerrarModal('modal-capturar-acta')">✖ Cancelar</button>
         </div>
         </form>
@@ -178,24 +164,24 @@
     
     <!-- ================= MODAL: MODIFICAR DATOS (ACTAS GRADO) ================= -->
     <div id="modal-modificar-acta" class="modal-menu-votos" style="display:none;">
-    <div class="modal-menu-votos-content" style="max-width:720px; width:95%; max-height:85vh; overflow:auto;">
-        <h2 style="color:#f7c948; margin-top:0;">MODIFICAR DATOS</h2>
-        <p style="margin-top:-6px;">Busca por <strong>Número de cuenta</strong> y <strong>Folio</strong>, luego edita y guarda.</p>
+    <div class="ventana-ancha modal-menu-votos-content">
+        <h2 class="titulo-modal">MODIFICAR DATOS</h2>
+        <p class="subtitulo-modal">Busca por <strong>Número de cuenta</strong> y <strong>Folio</strong>, luego edita y guarda.</p>
 
         <!-- Buscar -->
         <form id="formBuscarModificarActa" method="POST" action="{{ url_for('actas_grado.get_acta_json') }}">
         <div class="input-group">
-            <label>Número de cuenta *</label>
+            <label for="mod_numCuenta_buscar">Número de cuenta *</label>
             <input type="text" name="numCuenta" id="mod_numCuenta_buscar" maxlength="9" inputmode="numeric" required>
 
-            <label>Folio *</label>
+            <label for="mod_folio_buscar">Folio *</label>
             <input type="text" name="folio" id="mod_folio_buscar" required>
 
-            <button type="button" class="btn" style="width:200px;" onclick="buscarActaParaModificar()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+            <button type="button" class="btn-ancho btn" onclick="buscarActaParaModificar()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
         </div>
         </form>
 
-        <hr style="opacity:.2; margin:18px 0;">
+        <hr class="separador">
 
         <!-- Editar -->
         <form id="formGuardarModificarActa" method="POST"
@@ -207,81 +193,81 @@
         <input type="hidden" name="old_folio" id="old_folio">
 
         <div class="input-group">
-            <label>Folio *</label>
+            <label for="mod_folio">Folio *</label>
             <input type="text" name="folio" id="mod_folio" required>
 
-            <label>Número de cuenta *</label>
+            <label for="mod_numCuenta">Número de cuenta *</label>
             <input type="text" name="numCuenta" id="mod_numCuenta" maxlength="9" inputmode="numeric" required>
 
-            <label>Nombre completo *</label>
+            <label for="mod_nombreCompleto">Nombre completo *</label>
             <input type="text" name="nombreCompleto" id="mod_nombreCompleto" required>
 
-            <label>Grado *</label>
+            <label for="mod_grado">Grado *</label>
             <input type="text" name="grado" id="mod_grado" required>
 
-            <label>Semestre ingreso *</label>
+            <label for="mod_semestreIngreso">Semestre ingreso *</label>
             <input type="text" name="semestreIngreso" id="mod_semestreIngreso" required>
 
-            <label>Semestre egreso *</label>
+            <label for="mod_semestreEgreso">Semestre egreso *</label>
             <input type="text" name="semestreEgreso" id="mod_semestreEgreso" required>
 
-            <label>Promedio</label>
+            <label for="mod_promedio">Promedio</label>
             <input type="text" name="promedio" id="mod_promedio">
 
-            <label>Plan de estudios</label>
+            <label for="mod_planEstudios">Plan de estudios</label>
             <input type="text" name="planEstudios" id="mod_planEstudios">
 
-            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <div class="rejilla-3">
             <div>
-                <label>Día *</label>
+                <label for="mod_dia">Día *</label>
                 <input type="number" name="dia" id="mod_dia" min="1" max="31" required>
             </div>
             <div>
-                <label>Mes *</label>
+                <label for="mod_mes">Mes *</label>
                 <input type="number" name="mes" id="mod_mes" min="1" max="12" required>
             </div>
             <div>
-                <label>Año *</label>
+                <label for="mod_anio">Año *</label>
                 <input type="number" name="anio" id="mod_anio" min="1900" max="2100" required>
             </div>
             </div>
 
-            <label>Nacionalidad</label>
+            <label for="mod_nacionalidad">Nacionalidad</label>
             <input type="text" name="nacionalidad" id="mod_nacionalidad">
 
-            <label>Resultado *</label>
+            <label for="mod_resultado">Resultado *</label>
             <input type="text" name="resultado" id="mod_resultado" required>
 
-            <label>Presidente *</label>
+            <label for="mod_presidente">Presidente *</label>
             <input type="text" name="presidente" id="mod_presidente" required>
 
-            <label>Secretario *</label>
+            <label for="mod_secretario">Secretario *</label>
             <input type="text" name="secretario" id="mod_secretario" required>
 
-            <label>Vocal 1 *</label>
+            <label for="mod_vocal1">Vocal 1 *</label>
             <input type="text" name="vocal1" id="mod_vocal1" required>
 
-            <label>Vocal 2</label>
+            <label for="mod_vocal2">Vocal 2</label>
             <input type="text" name="vocal2" id="mod_vocal2">
 
-            <label>Vocal 3</label>
+            <label for="mod_vocal3">Vocal 3</label>
             <input type="text" name="vocal3" id="mod_vocal3">
 
-            <label>Sexo *</label>
+            <label for="mod_sexo">Sexo *</label>
             <select name="sexo" id="mod_sexo" required>
             <option value="">Seleccione…</option>
             <option value="M">M</option>
             <option value="F">F</option>
             </select>
 
-            <label>Reemplazar PDF (opcional)</label>
+            <label for="mod_pdf">Reemplazar PDF (opcional)</label>
             <input type="file" name="actaPDF" id="mod_pdf" accept="application/pdf">
-            <small style="opacity:.8;">Si no subes PDF, se conserva el actual.</small>
+            <small class="nota">Si no subes PDF, se conserva el actual.</small>
         </div>
 
-        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:220px;"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
-            <button type="button" class="btn" style="background:#d9534f; width:200px;"
+        <div class="acciones">
+            <button type="submit" class="btn-ancho btn"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+            <button type="button" class="btn-rojo btn-ancho btn"
                     onclick="cerrarModal('modal-modificar-acta')">✖ Cancelar</button>
         </div>
         </form>
@@ -291,26 +277,26 @@
     <!-- ================= MODAL: FECHAS EXTRA ACTAS GRADO ================= -->
     <!-- ================= MODAL: PAGO SINODALES / DGAE ================= -->
     <div id="modal-fecha-extra-acta" class="modal-menu-votos" style="display:none;">
-    <div class="modal-menu-votos-content" style="max-width:680px; width:95%;">
+    <div class="ventana-media modal-menu-votos-content">
 
-        <h2 id="tituloFechaExtra" style="color:#f7c948; margin-top:0;">
+        <h2 class="titulo-modal" id="tituloFechaExtra">
         REGISTRAR FECHA
         </h2>
 
         <!-- Opciones solo para Pago Sinodales -->
-        <div id="opcionesPagoSinodales" style="display:none; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0;">
+        <div id="opcionesPagoSinodales" class="rejilla-2" style="display:none;">
         <button type="button" class="btn" onclick="mostrarSeccionPagoSinodales('pago')">💰 Pago</button>
         <button type="button" class="btn" onclick="mostrarSeccionPagoSinodales('busqueda')">🔍 Búsqueda</button>
         </div>
 
-        <div id="cerrarOpcionesPago" style="display:none; justify-content:center;">
-        <button type="button" class="btn" style="background:#d9534f; width:180px;"
+        <div id="cerrarOpcionesPago" class="acciones" style="display:none;">
+        <button type="button" class="btn-rojo btn-ancho btn"
                 onclick="cerrarModal('modal-fecha-extra-acta')">✖ Cerrar</button>
         </div>
 
         <!-- SECCIÓN PAGO -->
         <div id="seccionPagoFecha">
-        <p id="descripcionFechaExtra" style="margin-top:-6px;">
+        <p class="subtitulo-modal" id="descripcionFechaExtra">
             Ingresa número de cuenta, folio y fecha.
         </p>
 
@@ -333,10 +319,10 @@
             <input type="date" id="fechaExtraFecha" name="fecha" required>
             </div>
 
-            <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="submit" class="btn" style="width:220px;"><i class="fa-solid fa-floppy-disk"></i> Guardar fecha</button>
+            <div class="acciones">
+            <button type="submit" class="btn-ancho btn"><i class="fa-solid fa-floppy-disk"></i> Guardar fecha</button>
 
-            <button type="button" class="btn" style="background:#d9534f; width:180px;"
+            <button type="button" class="btn-rojo btn-ancho btn"
                     onclick="cerrarModal('modal-fecha-extra-acta')">
                 ✖ Cancelar
             </button>
@@ -359,18 +345,18 @@
             <input type="date" id="buscarPagoFechaFin">
         </div>
 
-        <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
-            <button type="button" class="btn" style="width:220px;" onclick="buscarPagoSinodales()">
+        <div class="acciones">
+            <button type="button" class="btn-ancho btn" onclick="buscarPagoSinodales()">
             🔍 Buscar
             </button>
 
-            <button type="button" class="btn" style="background:#d9534f; width:180px;"
+            <button type="button" class="btn-rojo btn-ancho btn"
                     onclick="cerrarModal('modal-fecha-extra-acta')">
             ✖ Cancelar
             </button>
         </div>
 
-        <div id="resultadosPagoSinodales" style="margin-top:20px;"></div>
+        <div class="mt-3" id="resultadosPagoSinodales" aria-live="polite"></div>
         </div>
 
     </div>
@@ -418,5 +404,4 @@
         </div>
     {% endif %}
     {% endwith %}
-</body>
-</html>
+{% endblock %}

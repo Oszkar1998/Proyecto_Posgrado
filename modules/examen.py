@@ -10,9 +10,7 @@ class MyPDF(FPDF, HTMLMixin):
 
 examen_bp = Blueprint('examen', __name__, template_folder='../templates')
 
-direccionBase = 'static/BaseDeDatos/basePosgrado.db'
-direccionImagen = "static/Imagenes/"
-direccionPDF = "static/Documentos/"
+from config import direccionImagen, direccionPDF
 
 ############################## FUNCIONES NORMALES SIN HTML ##############################
 def opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero):
@@ -1227,7 +1225,7 @@ def creacionDocumento(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
     funcion_generadora(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad) 
     documentos.append("DocumentoFinal.pdf")
 
-    url_documento = url_for('static', filename='Documentos/DocumentoFinal.pdf')
+    url_documento = url_for('examen.ver_pdf', filename='DocumentoFinal.pdf')
     return jsonify({"success": True, "documentos": documentos, "pdf_url": url_documento})
 
 def modificMombreSinodal(cadena):
@@ -1603,7 +1601,13 @@ def disable_cache(response):
     response.headers["Expires"] = "0"
     return response
 
+@examen_bp.route("/ver_pdf/<filename>")
+@permission_required("examen")
+def ver_pdf(filename):
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+
 @examen_bp.route("/datos", methods=["GET"])
+@permission_required("examen")
 def datos_guardados_examen():
     if "user_id" not in session:
         return jsonify(success=False, error="Sesión expirada.")

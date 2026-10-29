@@ -40,30 +40,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 spinner.hide();
                 botonesDocumentos.style.display = "block";
                 botonesDocumentos.innerHTML = `
-                    <div style="
-                        background: rgba(246,195,67,0.08);
-                        border: 1px solid rgba(246,195,67,0.3);
-                        border-radius: 12px;
-                        padding: 16px;
-                        margin-bottom: 14px;
-                        text-align: center;
-                        color: #f6c343;
-                    ">
-                        <p style="font-size:16px; font-weight:700; margin:0 0 6px 0;">
-                            ${data.nombre || ""}
+                    <div class="tarjeta-alumno">
+                        <p class="tarjeta-alumno__nombre">
+                            ${escHTML(data.nombre)}
                         </p>
-                        <p style="font-size:13px; color:#ccc; margin:0 0 4px 0;">
-                            Cuenta: <strong style="color:#fff">${numeroCuenta}</strong>
+                        <p class="tarjeta-alumno__dato">
+                            Cuenta: <strong>${escHTML(numeroCuenta)}</strong>
                         </p>
-                        <p style="font-size:13px; color:#ccc; margin:0;">
-                            ${data.especializacion || ""} ${data.modalidad ? "· " + data.modalidad : ""}
+                        <p class="tarjeta-alumno__dato">
+                            ${escHTML(data.especializacion)} ${data.modalidad ? "· " + escHTML(data.modalidad) : ""}
                         </p>
                     </div>
-                    <button id="btn-documento-2" style="
-                        background:#28a745; color:#fff; border:none;
-                        border-radius:10px; padding:12px 20px;
-                        font-weight:700; font-size:15px; cursor:pointer; width:100%;
-                    ">
+                    <button id="btn-documento-2" type="button" class="btn-votos">
                         <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
                     </button>
                 `;
@@ -113,12 +101,6 @@ function cerrarModalCapturar() {
     document.getElementById("modal-capturar").style.display = "none";
 }
 
-// 🔹 Cerrar el modal si se presiona ESC
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-        cerrarModalCapturar();
-    }
-});
 
 // 🔹 Guardar nuevo Captura de Datos
 function actualizarCapturar() {
@@ -185,12 +167,6 @@ function cerrarModalBusquedaNombre() {
     document.getElementById("modal-busquedaNombre").style.display = "none";
 }
 
-// 🔹 Cerrar el modal si se presiona ESC
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-        cerrarModalBusquedaNombre();
-    }
-});
 
 function busquedaPorNombre() {
     const nombre = document.getElementById("nombreCompletoBusqueda").value.trim();
@@ -213,7 +189,7 @@ function busquedaPorNombre() {
         contenedor.innerHTML = "";
 
         if (data.length === 0) {
-            contenedor.innerHTML = "<p style='color: red; font-weight: bold;'>❌ No se encontraron resultados.</p>";
+            contenedor.innerHTML = "<p class='msg-error-fuerte'>❌ No se encontraron resultados.</p>";
             return;
         }
 
@@ -222,11 +198,11 @@ function busquedaPorNombre() {
             div.classList.add("resultado-item");
 
             div.innerHTML = `
-              <p><strong>${item.nombreCompleto}</strong></p>
-              <p><strong>Número de cuenta:</strong> ${item.numeroCuenta}</p>
-              <p>Especialización: ${item.especializacion}</p>
-              <p>Modalidad: ${item.modalidad}</p>
-              <button onclick="generarVotosPorId(${item.id})">Votos (5 formatos)</button>
+              <p><strong>${escHTML(item.nombreCompleto)}</strong></p>
+              <p><strong>Número de cuenta:</strong> ${escHTML(item.numeroCuenta)}</p>
+              <p>Especialización: ${escHTML(item.especializacion)}</p>
+              <p>Modalidad: ${escHTML(item.modalidad)}</p>
+              <button onclick="generarVotosPorId(${Number(item.id)})">Votos (5 formatos)</button>
           `;
 
             contenedor.appendChild(div);
@@ -234,6 +210,7 @@ function busquedaPorNombre() {
     })
     .catch(error => {
         console.error("Error en búsqueda:", error);
+        toast.error("No se pudo completar la búsqueda. Revisa tu conexión e intenta de nuevo.");
     });
 }
 
@@ -268,7 +245,7 @@ function busquedaPorCuenta() {
         contenedor.innerHTML = ""; // Limpiar
 
         if (data.length === 0) {
-            contenedor.innerHTML = "<p style='color: red;'>❌ No se encontraron registros.</p>";
+            contenedor.innerHTML = "<p class='msg-error'>❌ No se encontraron registros.</p>";
             return;
         }
 
@@ -277,10 +254,10 @@ function busquedaPorCuenta() {
             div.classList.add("resultado-item");
 
             div.innerHTML = `
-                <p><strong>${item.nombreCompleto}</strong></p>
-                <p>Especialización: ${item.especializacion}</p>
-                <p>Modalidad: ${item.modalidad}</p>
-                <button onclick="generarVotosPorId(${item.id})">Votos (5 formatos)</button>
+                <p><strong>${escHTML(item.nombreCompleto)}</strong></p>
+                <p>Especialización: ${escHTML(item.especializacion)}</p>
+                <p>Modalidad: ${escHTML(item.modalidad)}</p>
+                <button onclick="generarVotosPorId(${Number(item.id)})">Votos (5 formatos)</button>
             `;
 
             contenedor.appendChild(div);
@@ -288,6 +265,7 @@ function busquedaPorCuenta() {
     })
     .catch(error => {
         console.error("Error:", error);
+        toast.error("No se pudo completar la búsqueda. Revisa tu conexión e intenta de nuevo.");
     });
 }
 
@@ -302,12 +280,6 @@ function cerrarModalModificarDatos() {
     document.getElementById("modal-modificarDatos").style.display = "none";
 }
 
-// 🔹 Cerrar el modal si se presiona ESC
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-        cerrarModalModificarDatos();
-    }
-});
 
 function buscarDatosModificar() {
   const numeroCuenta = document.getElementById("numeroCuentaModificar").value.trim();
@@ -399,7 +371,7 @@ function setupAutocomplete(inputSelector) {
 
   function render(items) {
     if (!items || !items.length) { list.style.display = "none"; return; }
-    list.innerHTML = items.map(n => `<div class="ac-item" data-v="${n}">${n}</div>`).join("");
+    list.innerHTML = items.map(n => `<div class="ac-item" data-v="${escHTML(n)}">${escHTML(n)}</div>`).join("");
     list.style.display = "block";
   }
 
@@ -492,11 +464,12 @@ function cerrarModalError() {
   }
 }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Escape') return;
-  cerrarModalError();
-  cerrarModalSeleccionVotos();
-});
+// ESC, clic fuera y foco: modal.js
+Modal.registrar("modal-capturar", cerrarModalCapturar);
+Modal.registrar("modal-busquedaNombre", cerrarModalBusquedaNombre);
+Modal.registrar("modal-modificarDatos", cerrarModalModificarDatos);
+Modal.registrar("modalSeleccionPlanVotos", cerrarModalSeleccionVotos);
+Modal.registrar("modalError", cerrarModalError);
 
 // Crea (si no existe) y devuelve el panel donde mostramos info
 function ensureInfoPanel() {
@@ -519,7 +492,7 @@ function renderKeyVals(obj) {
     .filter(([k, v]) => v != null && v !== '')
     .map(([k, v]) => {
       const key = String(k).replace(/_/g, ' ').toUpperCase();
-      return `<div class="kv"><span class="k">${key}:</span> <span class="v">${v}</span></div>`;
+      return `<div class="kv"><span class="k">${escHTML(key)}:</span> <span class="v">${escHTML(v)}</span></div>`;
     })
     .join('');
   return `<div class="kv-list">${rows || '<p>(Sin detalles)</p>'}</div>`;
@@ -603,8 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Si ya tienes la info del alumno, solo deja que el backend renderice su tarjeta normal
       if (data.info || data.alumno || data.registro || data.detalles || data.datos) {
-        console.log('Información del alumno cargada.');
-      }
+          }
 
       // Guardamos la URL del PDF si existe, pero sin mostrar botón adicional
       ultimaVotosURL = data.votos_url || data.voto_url || null;
@@ -671,7 +643,7 @@ function mostrarOpcionesModificar(opciones) {
   const form = document.getElementById("datosModificarForm");
 
   form.innerHTML = `
-    <h3 style="color:#f6c343;">Selecciona el plan que deseas modificar</h3>
+    <h3 class="titulo-seccion">Selecciona el plan que deseas modificar</h3>
   `;
 
   opciones.forEach(op => {
@@ -705,45 +677,38 @@ function pintarFormularioModificar(data) {
   const form = document.getElementById("datosModificarForm");
 
   form.innerHTML = `
-    <input type="hidden" id="mod-id" value="${data.id}" />
-    <input type="hidden" id="mod-sexo" value="${data.sexo}" />
-    <input type="hidden" id="mod-numeroCuenta" value="${data.numeroCuenta}" />
+    <input type="hidden" id="mod-id" value="${escHTML(data.id)}" />
+    <input type="hidden" id="mod-sexo" value="${escHTML(data.sexo)}" />
+    <input type="hidden" id="mod-numeroCuenta" value="${escHTML(data.numeroCuenta)}" />
 
     <label>Nombre Completo:</label>
-    <input type="text" id="mod-nombre" value="${data.nombreCompleto || ''}" />
+    <input type="text" id="mod-nombre" value="${escHTML(data.nombreCompleto)}" />
     <label>Plan de Estudios:</label>
-    <input type="text" id="mod-planEstudios" value="${data.planEstudios || ''}" />
+    <input type="text" id="mod-planEstudios" value="${escHTML(data.planEstudios)}" />
     <label>Especialización:</label>
-    <input type="text" id="mod-especializacion" value="${data.especializacion || ''}" />
+    <input type="text" id="mod-especializacion" value="${escHTML(data.especializacion)}" />
     <label>Tesina o Título:</label>
-    <input type="text" id="mod-tituloTesina" value="${data.tituloTesina || ''}" />
+    <input type="text" id="mod-tituloTesina" value="${escHTML(data.tituloTesina)}" />
     <label>Tutor:</label>
-    <input type="text" id="mod-tutor" value="${data.tutor || ''}" />
+    <input type="text" id="mod-tutor" value="${escHTML(data.tutor)}" />
     <select id="mod-sexoTutor">
       <option value="">Seleccionar</option>
       <option value="M" ${data.sexoTutor === 'M' ? 'selected' : ''}>Masculino</option>
       <option value="F" ${data.sexoTutor === 'F' ? 'selected' : ''}>Femenino</option>
     </select>
     <label>Presidente:</label>
-    <input type="text" id="mod-presidente" value="${data.presidente || ''}" />
+    <input type="text" id="mod-presidente" value="${escHTML(data.presidente)}" />
     <label>Secretario:</label>
-    <input type="text" id="mod-secretario" value="${data.secretario || ''}" />
+    <input type="text" id="mod-secretario" value="${escHTML(data.secretario)}" />
     <label>Vocal 1:</label>
-    <input type="text" id="mod-vocal1" value="${data.vocal1 || ''}" />
+    <input type="text" id="mod-vocal1" value="${escHTML(data.vocal1)}" />
     <label>Vocal 2:</label>
-    <input type="text" id="mod-vocal2" value="${data.vocal2 || ''}" />
+    <input type="text" id="mod-vocal2" value="${escHTML(data.vocal2)}" />
     <label>Vocal 3:</label>
-    <input type="text" id="mod-vocal3" value="${data.vocal3 || ''}" />
+    <input type="text" id="mod-vocal3" value="${escHTML(data.vocal3)}" />
     <label>Modalidad:</label>
-    <input type="text" id="mod-modalidad" value="${data.modalidad || ''}" />
+    <input type="text" id="mod-modalidad" value="${escHTML(data.modalidad)}" />
   `;
 }
 
-document.addEventListener("click", function(e) {
-    ["modal-capturar", "modal-busquedaNombre", "modal-modificarDatos",
-     "modalSeleccionPlanVotos", "modalError"].forEach(id => {
-        const modal = document.getElementById(id);
-        if (modal && modal.style.display === "flex" && e.target === modal)
-            modal.style.display = "none";
-    });
-});
+

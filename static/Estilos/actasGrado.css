@@ -1,6 +1,6 @@
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    font-family: var(--fuente);
+    background: linear-gradient(120deg, var(--fondo), var(--fondo-2));
     margin: 0;
     min-height: 100vh;
     display: flex;
@@ -17,12 +17,12 @@ body {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     max-width: 720px;
     width: 100%;
-    color: #f7c948;
+    color: var(--oro);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 h1 {
-    color: #f7c948;
+    color: var(--oro);
     font-size: 24px;
     margin-bottom: 15px;
     text-align: center;
@@ -30,7 +30,7 @@ h1 {
 
 .descripcion {
     font-size: 15px;
-    color: #dddddd;
+    color: var(--texto-suave);
     margin-bottom: 20px;
     text-align: left;
 }
@@ -42,7 +42,7 @@ h1 {
 
 label {
     font-size: 14px;
-    color: #f7c948;
+    color: var(--oro);
     display: block;
     margin-bottom: 5px;
 }
@@ -51,7 +51,7 @@ input,
 .card select {
     width: 100%;
     padding: 10px;
-    background-color: #1f2a37;
+    background-color: var(--panel-azul);
     color: #fff;
     border: 1px solid #3c4b5c;
     border-radius: 8px;
@@ -71,8 +71,8 @@ input,
 .btn {
     width: auto;
     padding: 10px 20px;
-    background-color: #f7c948;
-    color: #1c1c1c;
+    background-color: var(--oro);
+    color: var(--fondo-2);
     font-weight: bold;
     font-size: 14px;
     border-radius: 8px;
@@ -85,7 +85,7 @@ input,
 }
 
 .btn:hover {
-    background-color: #e0b132;
+    background-color: var(--oro-oscuro);
 }
 
 .mensaje {
@@ -99,7 +99,7 @@ input,
     position: fixed;
     top: 20px;
     left: 30px;
-    background: #dc3545;
+    background: var(--rojo);
     color: white;
     padding: 10px 15px;
     border-radius: 8px;
@@ -110,7 +110,7 @@ input,
 }
 
 #regresar-PagPrincipal:hover {
-    background: #c82333;
+    background: var(--rojo-hover);
 }
 
 .resultados {
@@ -120,12 +120,12 @@ input,
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
-    color: #f7c948; /* texto dorado */
+    color: var(--oro); /* texto dorado */
 }
 
 .resultados h2 {
     font-size: 18px;
-    color: #f7c948;
+    color: var(--oro);
     margin-bottom: 15px;
     text-align: center;
 }
@@ -151,7 +151,7 @@ input,
 
 .form-excel small {
     display: block;
-    color: #bbbbbb;
+    color: var(--texto-tenue);
     font-size: 12px;
 }
 
@@ -161,7 +161,7 @@ input,
 }
 
 .resultados li {
-    background: #1f2a37;
+    background: var(--panel-azul);
     color: #ffffff;
     padding: 15px;
     margin-bottom: 12px;
@@ -201,8 +201,8 @@ input,
     max-width: 750px;
     max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 0 35px rgba(247, 201, 72, 0.35);
-    border: 1px solid rgba(247, 201, 72, 0.4);
+    box-shadow: 0 0 35px rgba(var(--oro-rgb), 0.35);
+    border: 1px solid rgba(var(--oro-rgb), 0.4);
     animation: fadeInModal 0.25s ease;
 }
 
@@ -222,13 +222,13 @@ input,
 
 .modal-menu-votos-content input:focus,
 .modal-menu-votos-content select:focus {
-    border-color: #f7c948;
-    box-shadow: 0 0 8px rgba(247, 201, 72, 0.4);
+    border-color: var(--oro);
+    box-shadow: 0 0 8px rgba(var(--oro-rgb), 0.4);
 }
 
 /* Botones */
 .modal-menu-votos-content .btn {
-    background: #f7c948;
+    background: var(--oro);
     border: none;
     padding: 12px 18px;
     border-radius: 10px;
@@ -264,7 +264,7 @@ input,
 .flash-box{
   width: min(520px, 92%);
   background: #0f1116;
-  border: 1px solid rgba(247, 201, 72, .35);
+  border: 1px solid rgba(var(--oro-rgb), .35);
   box-shadow: 0 0 30px rgba(0,0,0,.6);
   border-radius: 16px;
   padding: 20px;
@@ -282,15 +282,15 @@ input,
 
 /* verde */
 .flash-msg.success{
-  background: rgba(40, 167, 69, .15);
-  border: 1px solid rgba(40, 167, 69, .45);
+  background: rgba(var(--verde-rgb), .15);
+  border: 1px solid rgba(var(--verde-rgb), .45);
   color: #c8f7d2;
 }
 
 /* rojo */
 .flash-msg.error{
-  background: rgba(220, 53, 69, .15);
-  border: 1px solid rgba(220, 53, 69, .45);
+  background: rgba(var(--rojo-rgb), .15);
+  border: 1px solid rgba(var(--rojo-rgb), .45);
   color: #ffd0d6;
 }
 
@@ -301,7 +301,7 @@ input,
   border: none;
   cursor: pointer;
   font-weight: bold;
-  background: #f7c948;
+  background: var(--oro);
   color: #111;
 }
 
@@ -326,5 +326,5 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 #seccionBusquedaPagoSinodales label {
-    color: #f7c948 !important;
+    color: var(--oro) !important;
 }

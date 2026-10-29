@@ -19,7 +19,7 @@
     padding: 14px 16px;
     border-radius: 10px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--fuente);
     font-size: 14px;
     font-weight: 500;
     color: #fff;
@@ -42,7 +42,7 @@
 
 .toast-warn {
     background-color: #92600a;
-    border-left-color: #f2c94c;
+    border-left-color: var(--oro);
 }
 
 .toast-error {

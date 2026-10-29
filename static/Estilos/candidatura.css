@@ -1,7 +1,7 @@
 /* Fondo general */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(120deg, #0f0f0f, #1c1c1c);
+    font-family: var(--fuente);
+    background: linear-gradient(120deg, var(--fondo), var(--fondo-2));
     background-image: url('/static/Imagenes/fondo_oscuro_claro.jpg');
     margin: 0;
     padding: 0;
@@ -30,7 +30,7 @@ body {
 .container h2 {
     margin-bottom: 25px;
     font-size: 24px;
-    color: #facc15; /* Dorado */
+    color: var(--oro); /* Dorado */
     font-weight: bold;
 }
 
@@ -39,7 +39,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #f6c343;
+    color: var(--oro);
     text-align: left;
 }
 
@@ -50,17 +50,17 @@ input[type="text"] {
     margin-bottom: 20px;
     border: 1px solid #555;
     border-radius: 8px;
-    background-color: #1f2937;
-    color: #f3f4f6;
+    background-color: var(--panel-azul);
+    color: var(--texto);
     font-size: 16px;
 }
 
 input[type="text"]::placeholder {
-    color: #9ca3af;
+    color: var(--texto-tenue);
 }
 
 input[type="text"]:focus {
-    border-color: #facc15;
+    border-color: var(--oro);
     outline: none;
 }
 
@@ -70,7 +70,7 @@ button[type="submit"],
 #btn-documento-2,
 #btn-doc2-sinX,
 #btn-doc2-conX {
-    background-color: #facc15;
+    background-color: var(--oro);
     color: black;
     border: none;
     border-radius: 10px;
@@ -86,7 +86,7 @@ button[type="submit"]:hover,
 #btn-documento-2:hover,
 #btn-doc2-sinX:hover,
 #btn-doc2-conX:hover {
-    background-color: #eab308;
+    background-color: var(--oro-oscuro);
     transform: scale(1.03);
 }
 
@@ -102,7 +102,7 @@ button[type="submit"]:hover,
     position: absolute;
     top: 20px;
     left: 30px;
-    background: #dc3545;
+    background: var(--rojo);
     color: white;
     padding: 10px 15px;
     border-radius: 10px;
@@ -113,7 +113,7 @@ button[type="submit"]:hover,
 }
 
 #regresar-PagPrincipal:hover {
-    background: #c82333;
+    background: var(--rojo-hover);
 }
 
 /* Mensaje de estado de validación */
@@ -123,7 +123,7 @@ button[type="submit"]:hover,
   text-align: left;
   transition: color .2s ease, opacity .2s ease;
   opacity: 0.95;
-  color: #eab308;
+  color: var(--oro-oscuro);
 }
 
 .estado-validacion.info  { color: #c3dafe; }   /* azul claro */
@@ -167,7 +167,7 @@ button[type="submit"]:hover,
 #capturar-container,
 #busquedaNombre-container,
 #modificarDatos-container{
-  background: #f6c343;
+  background: var(--oro);
   color: #000;
   padding: 10px 15px;
   border-radius: 10px;
@@ -184,7 +184,7 @@ button[type="submit"]:hover,
 #capturar-container:hover,
 #busquedaNombre-container:hover,
 #modificarDatos-container:hover{
-  background: #eab308;
+  background: var(--oro-oscuro);
   transform: translateY(-1px);
 }
 
@@ -205,10 +205,11 @@ button[type="submit"]:hover,
   display: none;              /* <-- clave: ocultos por defecto */
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.72);
   z-index: 9999;
   padding: 16px;
   overflow: hidden;
+    backdrop-filter: blur(3px);
 }
 
 /* contenedores internos */
@@ -219,11 +220,11 @@ button[type="submit"]:hover,
   max-height: 90vh;
   overflow-y: auto;
 
-  background: rgba(0,0,0,0.25);
+  background: var(--fondo-ventana);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 16px;
   padding: 22px;
-  color: #f6c343;
+  color: var(--oro);
   backdrop-filter: blur(8px);
   box-shadow: 0 14px 30px rgba(0,0,0,0.45);
 }
@@ -239,8 +240,8 @@ button[type="submit"]:hover,
   border: 1px solid #555;
   border-radius: 8px;
   box-sizing: border-box;
-  background-color: #1f2937;
-  color: #f3f4f6;
+  background-color: var(--panel-azul);
+  color: var(--texto);
 }
 
 /* títulos pegados arriba al scrollear dentro del modal */
@@ -248,7 +249,7 @@ button[type="submit"]:hover,
 #modal-busquedaNombre h2,
 #modal-modificarDatos h2{
   margin-top: 0;
-  color: #facc15;
+  color: var(--oro);
 }
 
 /* scroll bonito */
@@ -260,7 +261,7 @@ button[type="submit"]:hover,
 #modal-capturar .modal-content::-webkit-scrollbar-thumb,
 #modal-busquedaNombre .modal-content2::-webkit-scrollbar-thumb,
 #modal-modificarDatos .modal-content3::-webkit-scrollbar-thumb{
-  background: #f6c343;
+  background: var(--oro);
   border-radius: 10px;
 }
 
@@ -282,11 +283,11 @@ button[type="submit"]:hover,
   display: none;                 /* se abre por JS -> display:flex */
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.72);
   z-index: 9999;
   padding: 16px;
   overflow: hidden;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 
 /* Caja interna */
@@ -297,13 +298,13 @@ button[type="submit"]:hover,
   max-height: 90vh;
   overflow-y: auto;
 
-  background: rgba(0,0,0,0.22);
-  border: 1px solid rgba(255, 204, 0, 0.35);
+  background: var(--fondo-ventana);
+  border: 1px solid rgba(var(--oro-rgb), 0.35);
   border-radius: 18px;
 
   padding: 22px 22px 18px;
-  color: #f6c343;
-  box-shadow: 0 0 30px rgba(255, 204, 0, 0.12);
+  color: var(--oro);
+  box-shadow: 0 0 30px rgba(var(--oro-rgb), 0.12);
 }
 
 /* Scroll bonito */
@@ -315,7 +316,7 @@ button[type="submit"]:hover,
 #modal-capturar .modal-content::-webkit-scrollbar-thumb,
 #modal-busquedaNombre .modal-content2::-webkit-scrollbar-thumb,
 #modal-modificarDatos .modal-content3::-webkit-scrollbar-thumb{
-  background: #f6c343;
+  background: var(--oro);
   border-radius: 10px;
 }
 #modal-capturar .modal-content::-webkit-scrollbar-track,
@@ -335,10 +336,10 @@ button[type="submit"]:hover,
   padding: 14px 0 14px;
   text-align: center;
 
-  background: rgba(0,0,0,0.35);
+  background: var(--fondo-ventana);
   border-bottom: 1px solid rgba(255,255,255,0.15);
 
-  color: #f6c343;
+  color: var(--oro);
   font-weight: 800;
   letter-spacing: 0.6px;
 }
@@ -351,7 +352,7 @@ button[type="submit"]:hover,
   margin-top: 12px;
   margin-bottom: 6px;
   font-weight: 700;
-  color: #f6c343;
+  color: var(--oro);
   text-align: left;
 }
 
@@ -366,22 +367,22 @@ button[type="submit"]:hover,
   border: 1px solid rgba(255,255,255,0.25);
   border-radius: 10px;
   box-sizing: border-box;
-  background: #1f2937;
-  color: #f3f4f6;
+  background: var(--panel-azul);
+  color: var(--texto);
 }
 
 #modal-capturar input::placeholder,
 #modal-busquedaNombre input::placeholder,
 #modal-modificarDatos input::placeholder{
-  color: #9ca3af;
+  color: var(--texto-tenue);
 }
 
 #modal-capturar input:focus, #modal-capturar select:focus,
 #modal-busquedaNombre input:focus, #modal-busquedaNombre select:focus,
 #modal-modificarDatos input:focus, #modal-modificarDatos select:focus{
   outline: none;
-  border-color: #f6c343;
-  box-shadow: 0 0 6px rgba(246,195,67,0.55);
+  border-color: var(--oro);
+  box-shadow: 0 0 6px rgba(var(--oro-rgb), 0.55);
 }
 
 /* Botones dentro de modales (base) */
@@ -406,24 +407,24 @@ button[type="submit"]:hover,
 }
 
 /* CAPTURAR: Guardar verde / Cancelar rojo */
-#modal-capturar button:first-of-type{ background:#28a745; color:#fff; }
-#modal-capturar button:last-of-type{ background:#dc3545; color:#fff; }
+#modal-capturar button:first-of-type{ background:var(--verde); color:#fff; }
+#modal-capturar button:last-of-type{ background:var(--rojo); color:#fff; }
 
 /* BUSCAR: Buscar verde / Cancelar rojo */
-#modal-busquedaNombre button:first-of-type{ background:#28a745; color:#fff; }
-#modal-busquedaNombre button:last-of-type{ background:#dc3545; color:#fff; }
+#modal-busquedaNombre button:first-of-type{ background:var(--verde); color:#fff; }
+#modal-busquedaNombre button:last-of-type{ background:var(--rojo); color:#fff; }
 
 /* MODIFICAR: (tú tienes 2 botones arriba: Cargar/Cerrar) */
-#modal-modificarDatos button:first-of-type{ background:#28a745; color:#fff; }
-#modal-modificarDatos button:last-of-type{ background:#dc3545; color:#fff; }
+#modal-modificarDatos button:first-of-type{ background:var(--verde); color:#fff; }
+#modal-modificarDatos button:last-of-type{ background:var(--rojo); color:#fff; }
 
 /* Si quieres que el botón "Guardar Cambios" se vea especial (el que está dentro de mod_form_fields) */
 #modal-modificarDatos #mod_form_fields button{
-  background:#28a745;
+  background:var(--verde);
   color:#fff;
 }
 #modal-modificarDatos #mod_form_fields button:hover{
-  background:#23923d;
+  background:var(--verde-hover);
 }
 
 /* Resultados de búsqueda (cuando pintes resultados) */
@@ -443,7 +444,7 @@ button[type="submit"]:hover,
   display: block;
   font-size: 15px;
   margin-bottom: 6px;
-  color: #facc15;
+  color: var(--oro);
 }
 
 /* Responsive */
@@ -457,7 +458,7 @@ button[type="submit"]:hover,
 }
 
 #folio-container{
-  background:#f6c343;
+  background:var(--oro);
   color:#000;
   padding:10px 15px;
   border-radius:10px;
@@ -476,12 +477,12 @@ button[type="submit"]:hover,
   display: none;
   justify-content: center;
   align-items: center;
-  padding: 290px;
-  background: rgba(0,0,0,0.55);
+  padding: 16px;   /* antes 290px: en celular no dejaba espacio a la ventana */
+  background: rgba(0, 0, 0, 0.72);
   z-index: 9999;
 
   /* esto evita que se vea “borroso” el contenido */
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(2px);
 }
 
@@ -491,18 +492,18 @@ button[type="submit"]:hover,
   max-height: 80vh;
   overflow: auto;
 
-  background: rgba(0,0,0,0.85);   /* más sólido = menos “borroso” */
-  border: 1px solid rgba(255, 204, 0, 0.35);
+  background: var(--fondo-ventana);   /* más sólido = menos “borroso” */
+  border: 1px solid rgba(var(--oro-rgb), 0.35);
   border-radius: 18px;
   padding: 22px;
-  color: #f6c343;
-  box-shadow: 0 0 30px rgba(255, 204, 0, 0.12);
+  color: var(--oro);
+  box-shadow: 0 0 30px rgba(var(--oro-rgb), 0.12);
 }
 
 .modal-folio .modal-content2 h2{
   margin: 0 0 14px 0;
   text-align: center;
-  color: #facc15;
+  color: var(--oro);
   font-weight: 800;
 }
 
@@ -514,8 +515,8 @@ button[type="submit"]:hover,
   border: 1px solid rgba(255,255,255,0.25);
   border-radius: 10px;
   box-sizing: border-box;
-  background: #1f2937;
-  color: #f3f4f6;
+  background: var(--panel-azul);
+  color: var(--texto);
 }
 
 .modal-folio button{
@@ -528,5 +529,5 @@ button[type="submit"]:hover,
   font-size: 14px;
 }
 
-.modal-folio button:first-of-type{ background:#28a745; color:#fff; }
-.modal-folio button:last-of-type{ background:#dc3545; color:#fff; }
+.modal-folio button:first-of-type{ background:var(--verde); color:#fff; }
+.modal-folio button:last-of-type{ background:var(--rojo); color:#fff; }

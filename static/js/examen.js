@@ -50,13 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
             btnModificar.addEventListener("click", abrirModoModificar);
         }
 
-        document.addEventListener("keydown", (ev) => {
-            if (ev.key === "Escape") {
-                cerrarModal("modal-fecha-hora");
-                cerrarModal("modalSeleccionPlan");
-                setStatus("Modal cerrado.");
-            }
-        });
+        // ESC, clic fuera y foco: modal.js
+        ["modal-fecha-hora", "modalSeleccionPlan"].forEach(id =>
+            Modal.registrar(id, (x) => { cerrarModal(x); setStatus("Modal cerrado."); })
+        );
 
         const botones = [
             { id: "btn-documento-2", tipo: "2" },
@@ -84,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             status = document.createElement("div");
             status.id = "status-cuenta";
             status.className = "status-cuenta";
+            status.setAttribute("aria-live", "polite");  // se anuncia al cambiar
 
             const form = document.getElementById("login-form");
             if (form) {
@@ -527,8 +525,8 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.innerHTML = `
                 <span class="icono-plan">🎓</span>
                 <span>
-                    <span class="nivel-plan">${op.programa} · plan ${op.planEstudios}</span>
-                    <span class="nombre-plan">${op.especializacion || ""}</span>
+                    <span class="nivel-plan">${escHTML(op.programa)} · plan ${escHTML(op.planEstudios)}</span>
+                    <span class="nombre-plan">${escHTML(op.especializacion)}</span>
                 </span>
                 <span class="flecha-plan">›</span>
             `;
@@ -665,10 +663,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-window.addEventListener("click", (e) => {
-    ["modal-fecha-hora", "modalSeleccionPlan"].forEach(id => {
-        const modal = document.getElementById(id);
-        if (modal && e.target === modal)
-            modal.classList.remove("active");
-    });
-});

@@ -1692,3 +1692,10 @@ def disable_cache(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
+
+
+# --------- ABRIR PDF (protegido) ---------
+@dgae_bp.route("/ver_pdf/<filename>")
+@permission_required("dgae")
+def ver_pdf(filename):
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)

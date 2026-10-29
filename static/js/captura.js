@@ -62,11 +62,8 @@ function abrirActasCandidatura(accion){
   }
 }
 
-// ESC para cerrar todos
-document.addEventListener("keydown", function(e){
-  if (e.key !== "Escape") return;
-  cerrarMenuVotos();
-  cerrarMenuCandidatura();
-  cerrarMenuActasGrado();
-  cerrarMenuActasCandidatura();
-});
+// ESC, clic fuera y foco: modal.js
+Modal.registrar("modal-menu-votos", cerrarMenuVotos);
+Modal.registrar("modal-menu-candidatura", cerrarMenuCandidatura);
+Modal.registrar("modal-menu-actas-grado", cerrarMenuActasGrado);
+Modal.registrar("modal-menu-actas-candidatura", cerrarMenuActasCandidatura);

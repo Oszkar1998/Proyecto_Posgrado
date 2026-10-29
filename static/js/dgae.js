@@ -22,9 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.cerrarModalSeleccion = cerrarModalSeleccion;
 
-    document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") cerrarModalSeleccion();
-    });
+    // ESC, clic fuera y foco: modal.js
+    Modal.registrar("modalSeleccionPlan", cerrarModalSeleccion);
 
     function mostrarBotonesDocumentos() {
         if (btnIngresar) btnIngresar.style.display = "none";
