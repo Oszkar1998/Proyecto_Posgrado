@@ -481,7 +481,7 @@ async function generarDocumentoRevision(id, tipo, btn) {
     toast.error("No se identificó el registro del alumno. Vuelve a buscarlo.");
     return;
   }
-  btn.disabled = true;   // evita doble clic (la prórroga consume un número de oficio)
+  btn.disabled = true;   // evita doble clic mientras se genera
   spinner.show("Generando documento...");
   try {
     const res = await fetch("/votosOficio/documento_revision", {

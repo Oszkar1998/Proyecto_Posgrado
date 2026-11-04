@@ -199,8 +199,11 @@ def prorroga(pdf, Plan_estudios, Nomb_alu, No_cuenta_str, clave_str, genero, pro
     pdf.set_x(72)
     pdf.cell(0, 10, programa, 0, 0)
     pdf.cell(0, 10, "", 0, 1)  # Salto de línea
-    pdf.set_x(107)
-    pdf.cell(0, 10, "OF." + contador + "/" + año + "/SEDEPFI-60.2", 0, 1)
+    # Número de oficio: solo cuando se genera desde Revisión.
+    # Desde Votos la prórroga sale sin esta línea (contador=None).
+    if contador is not None:
+        pdf.set_x(107)
+        pdf.cell(0, 10, "OF." + contador + "/" + año + "/SEDEPFI-60.2", 0, 1)
 
     # Cuerpo
     pdf.set_font("Arial", size=12)
@@ -641,8 +644,8 @@ def _config_programa(programa):
 
 def generar_documento_suelto(tipo, registro_id):
     """Genera solo la prórroga o solo el oficio de jurado de un registro de
-    posgrado. Devuelve (nombre_pdf, error). La prórroga consume un número
-    de oficio del mismo contador que usa Revisión."""
+    posgrado (los usa Votos PUEI). Devuelve (nombre_pdf, error). Ninguno de
+    los dos lleva número de oficio ni avanza el contador de Revisión."""
     if tipo not in DOCUMENTOS_SUELTOS:
         return None, "Tipo de documento no válido."
 
@@ -675,9 +678,9 @@ def generar_documento_suelto(tipo, registro_id):
     pdf = FPDF()
 
     if tipo == "prorroga":
-        contador = verificarContador(reservar_contador())
+        # Desde Votos: sin número de oficio y sin tocar el contador de Revisión
         prorroga(pdf, especializacion, nombre, str(numeroCuenta), str(plan_int), genero,
-                 cfg["programa"], cfg["grado"], contador, cfg["nombreCoor"],
+                 cfg["programa"], cfg["grado"], None, cfg["nombreCoor"],
                  cfg["sexoCoor"], cfg["gradoEstudios"])
         prefijo = "Prorroga"
     else:
