@@ -89,10 +89,12 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, gener
 def ingles(pdf, Plan_estudios, Nomb_alu, programa, genero, contador, nombreCoor, sexoCoor, grado, gradoEstudios):
     dia, mes, año = fecha()
 
-    if genero == "el alumno":
-        inscrito = "inscrito"
-    elif genero == "la alumna":
+    if genero == "la alumna":
         inscrito = "inscrita"
+    elif genero == "elle alumne":
+        inscrito = "inscrite"
+    else:
+        inscrito = "inscrito"
 
     # Agregar una página
     pdf.add_page()
