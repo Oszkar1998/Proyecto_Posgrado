@@ -579,7 +579,7 @@ button:hover {
 .tarjeta-alumno__dato   { font-size: 13px; color: var(--texto-suave); margin: 0 0 4px 0; }
 .tarjeta-alumno__dato:last-child { margin: 0; }
 .tarjeta-alumno__dato strong { color: #fff; }
-#btn-documento-2.btn-votos {
+#btn-generar-doc.btn-votos {
     background: var(--verde);
     color: #fff;
     border: none;
@@ -589,5 +589,60 @@ button:hover {
     font-size: 15px;
     cursor: pointer;
     width: 100%;
+    margin: 0;
 }
-#btn-documento-2.btn-votos:hover { background: var(--verde-hover); }
+#btn-generar-doc.btn-votos:hover { background: var(--verde-hover); }
+
+/* Votos: paso 1, elegir documento (botones uno debajo de otro) */
+.selector-documento {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.selector-documento .ayuda-campo { margin: 0 0 4px 0; }
+.opcion-doc {
+    width: 100%;
+    margin: 0;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    background: transparent;
+    color: var(--oro);
+    border: 1px solid rgba(var(--oro-rgb), 0.6);
+    box-shadow: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.opcion-doc:hover { background: var(--oro); color: #111; }
+.opcion-doc--votos { background: var(--verde); color: #fff; border-color: var(--verde); }
+.opcion-doc--votos:hover { background: var(--verde-hover); color: #fff; }
+
+/* Votos: paso 2, documento elegido + botón para cambiarlo */
+.doc-elegido {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: rgba(var(--oro-rgb), 0.08);
+    border: 1px solid rgba(var(--oro-rgb), 0.3);
+    color: var(--oro);
+    font-weight: 700;
+    font-size: 14px;
+}
+.btn-cambiar {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 13px;
+    background: transparent;
+    color: var(--texto-suave);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+    white-space: nowrap;
+}
+.btn-cambiar:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+#btn-generar-doc:disabled { opacity: 0.6; cursor: wait; }

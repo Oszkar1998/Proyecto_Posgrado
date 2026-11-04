@@ -147,9 +147,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 toast.error(data.error || "No se pudo generar el documento.");
                 return;
             }
-            data.documentos.forEach(doc => {
-                window.open(`/static/Documentos/${doc}`, "_blank");
-            });
+            if (data.pdf_url) {
+                window.open(data.pdf_url, "_blank");
+            }
         })
         .catch(error => {
             spinner.hide();

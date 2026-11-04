@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.success && data.documentos) {
                 spinner.hide();
                 (data.documentos || []).forEach((doc) => {
-                    const url = `/static/Documentos/${doc}`;
+                    const url = `/examen/ver_pdf/${doc}`;
                     window.open(url, "_blank");
                 });
                 return;

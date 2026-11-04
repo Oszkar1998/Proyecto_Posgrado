@@ -4,6 +4,7 @@ from datetime import datetime
 from fpdf import FPDF, HTMLMixin
 from auth import permission_required
 from db import get_connection
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
 
 class MyPDF(FPDF, HTMLMixin):
     pass
@@ -41,9 +42,7 @@ def opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa,
         return
 
     # **Guardar el PDF en la carpeta correcta**
-    nombre_pdf=pdf.output(direccionPDF + "DocumentoFinal.pdf", "F")
-    
-    return nombre_pdf  # Devolver el nombre del documento
+    return guardar_pdf_temporal(pdf, "Examen")  # Devuelve el nombre único del PDF
   
 def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA UNICO DE ESPECIALIZACIONES DE INGENIERIA"
@@ -51,7 +50,7 @@ def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, ge
     coordinadorNombre = "DRA. AIDA HUERTA BARRIENTOS"
     coordinadorGenero = "LA COORDINADORA DEL PROGRAMA"
 
-    opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
+    return opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
 
 def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
@@ -59,7 +58,7 @@ def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero
     coordinadorNombre = "DR. GABRIEL EDUARDO SANDOVAL ROMERO"
     coordinadorGenero = "COORDINADOR DEL PROGRAMA"
 
-    opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
+    return opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
 
 def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad):
     encabezado = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
@@ -67,7 +66,7 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, gener
     coordinadorNombre = "DR. GABRIEL EDUARDO SANDOVAL ROMERO"
     coordinadorGenero = "COORDINADOR DEL PROGRAMA"
     
-    opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
+    return opciones_de_Doc(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, encabezado, opcion, grado, tituloTesina, modalidad, coordinadorNombre, coordinadorGenero)
 
 
 ########## DOCUMENTOS ##########
@@ -1222,10 +1221,12 @@ def creacionDocumento(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
     if not opcion:
         return jsonify({"success": False, "error": "Tipo de documento no válido."})
 
-    funcion_generadora(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad) 
-    documentos.append("DocumentoFinal.pdf")
+    nombre_pdf = funcion_generadora(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, opcion, tituloTesina, modalidad)
+    if not nombre_pdf:
+        return jsonify({"success": False, "error": "No se pudo generar el documento."})
+    documentos.append(nombre_pdf)
 
-    url_documento = url_for('examen.ver_pdf', filename='DocumentoFinal.pdf')
+    url_documento = url_for('examen.ver_pdf', filename=nombre_pdf)
     return jsonify({"success": True, "documentos": documentos, "pdf_url": url_documento})
 
 def modificMombreSinodal(cadena):
@@ -1604,7 +1605,7 @@ def disable_cache(response):
 @examen_bp.route("/ver_pdf/<filename>")
 @permission_required("examen")
 def ver_pdf(filename):
-    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+    return enviar_pdf_temporal(filename)
 
 @examen_bp.route("/datos", methods=["GET"])
 @permission_required("examen")

@@ -1,13 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_from_directory, session, send_file
-import uuid
-import os
-import glob
-import time
 from fpdf import FPDF
 from io import BytesIO
 from auth import permission_required
 from config import direccionBase, direccionImagen, direccionPDF
 from db import get_connection
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
+from modules.revision import generar_documento_suelto
 
 votos_Oficio_PUEI_bp = Blueprint('votosOficio', __name__, template_folder='../templates')
 
@@ -17,17 +15,6 @@ def _etiqueta_genero(s):
 
 def _validar_rango_plan(plan_int: int) -> bool:
     return 3000 <= plan_int <= 5999
-
-def _limpiar_votos_antiguos():
-    """Elimina PDFs de votos con más de 10 minutos de antigüedad."""
-    patron = direccionPDF + "Votos_*.pdf"
-    ahora = time.time()
-    for archivo in glob.glob(patron):
-        if ahora - os.path.getmtime(archivo) > 600:
-            try:
-                os.remove(archivo)
-            except Exception:
-                pass
 
 # --------------------------- PDF ---------------------------
 def programaEspecializacion(pdf, nombreCompleto, planEstudios, especializacion, trabajo, persona, genero):
@@ -129,16 +116,13 @@ def index():
         for persona in [presidente, secretario, v1, v2, v3]:
             programaEspecializacion(pdf_votos, nombre, plan, espec, trabajo, persona, genero)
 
-        # Nombre único por sesión para evitar sobreescritura entre usuarios simultáneos
-        votos_filename = f"Votos_{uuid.uuid4().hex[:8]}.pdf"
-        pdf_votos.output(direccionPDF + votos_filename, "F")
-
-        # Limpiar PDFs antiguos (más de 10 minutos)
-        _limpiar_votos_antiguos()
+        # Nombre único para evitar sobreescritura entre usuarios simultáneos
+        votos_filename = guardar_pdf_temporal(pdf_votos, "Votos")
 
         return jsonify({
             "success": True,
             "votos_url": f"/votosOficio/ver_pdf/{votos_filename}",
+            "id": id_,
             "nombre": nombre,
             "especializacion": espec or "",
             "modalidad": modalidad or ""
@@ -199,13 +183,14 @@ def buscar_por_cuenta():
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad
+            SELECT id, numeroCuenta, nombreCompleto, especializacion, modalidad, planEstudios
             FROM posgrado WHERE numeroCuenta = ? ORDER BY planEstudios
         """, (cuenta,))
         resultados = cursor.fetchall()
 
     respuesta = [{"id": r[0], "numeroCuenta": r[1], "nombreCompleto": r[2],
-                  "especializacion": r[3], "modalidad": r[4]} for r in resultados]
+                  "especializacion": r[3], "modalidad": r[4], "planEstudios": r[5]}
+                 for r in resultados]
     return jsonify(respuesta)
 
 @votos_Oficio_PUEI_bp.route('/buscar_nombre', methods=['POST'])
@@ -251,6 +236,22 @@ def generar_votos_por_id(id):
         programaEspecializacion(pdf, nombre, plan, espec, trabajo, persona, genero)
 
     return _pdf_response(pdf, "Votos.pdf")
+
+# --------- PRÓRROGA Y OFICIO DE JURADO (formatos de Revisión) ---------
+@votos_Oficio_PUEI_bp.route("/documento_revision", methods=["POST"])
+@permission_required("votos_puei")
+def documento_revision():
+    data = request.get_json(silent=True) or {}
+    try:
+        registro_id = int(data.get("id"))
+    except (TypeError, ValueError):
+        return jsonify({"success": False, "error": "Falta el registro del alumno."}), 400
+
+    nombre_pdf, error = generar_documento_suelto(data.get("tipo"), registro_id)
+    if error:
+        return jsonify({"success": False, "error": error}), 400
+
+    return jsonify({"success": True, "pdf_url": f"/votosOficio/ver_pdf/{nombre_pdf}"})
 
 # --------- AUTOCOMPLETE SINODALES ---------
 @votos_Oficio_PUEI_bp.route("/sinodales", methods=["GET"])
@@ -368,7 +369,7 @@ def modificar_datos():
 @votos_Oficio_PUEI_bp.route("/ver_pdf/<filename>")
 @permission_required("votos_puei")
 def ver_pdf(filename):
-    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+    return enviar_pdf_temporal(filename)
 
 @votos_Oficio_PUEI_bp.after_request
 def disable_cache(response):

@@ -85,7 +85,7 @@ async function consultarRevision(numCuenta) {
             if (data.pdf_url) {
                 spinner.hide();
                 window.open(data.pdf_url, "_blank");
-                await actualizarContadorAutomaticamente();
+                // El servidor ya avanzó el contador al generar; recargamos para mostrarlo
                 setTimeout(() => window.location.reload(), 500);
                 return;
             }
@@ -316,7 +316,7 @@ function seleccionarPlan(numCuenta, seleccionId) {
                     window.open(data.pdf_url, "_blank");
                 }
                 cerrarModalSeleccion();
-                await actualizarContadorAutomaticamente();
+                // El servidor ya avanzó el contador al generar; recargamos para mostrarlo
                 setTimeout(() => window.location.reload(), 500);
             } else {
                 spinner.hide();

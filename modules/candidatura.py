@@ -5,13 +5,13 @@ from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
 from db import get_connection
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
 
 candidatura_bp = Blueprint('candidatura', __name__, template_folder='../templates')
 
 #################################################################################################################################
 def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int) -> str:
 
-    filename = "ActaCandidatura.pdf"
     
     idPos, nombreCompletoPos, numeroCuentaPos, especializacionPos, tituloProyectoPos, semestreIngresoPos, semestrePresentadoPos, evaluacionPos, presidentePos, secretarioPos, vocal1Pos, vocal2Pos, vocal3Pos, sexoPos, modalidadSedepos, fechaExamenPos, horaExamenPos = obtenerDatosCandidatura(fila_pos[2])
 
@@ -177,15 +177,14 @@ def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int
 
     parrafo_html = (
         f"<p>No. Folio del Programa<br>"
-        f"PMDI/AOPP/AC/{folio_acta}/2026</p>"
+        f"PMDI/AOPP/AC/{folio_acta}/{datetime.now().year}</p>"
     )
     pdf.set_font("Arial", size=9)
     pdf.set_xy(15, 249)
     pdf.write_html(parrafo_html)
 
 
-    pdf.output(direccionPDF + filename, "F")
-    return filename
+    return guardar_pdf_temporal(pdf, "ActaCandidatura")
 
 def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
 
@@ -194,7 +193,6 @@ def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
     dia, mes, año = fechaActual()
     diaExa, mesExa, anoExa = fecha(fechaExamenPos)
 
-    filename = "CitatorioCandidatura.pdf"
 
     if sexoPos == "F":
         grado = "DOCTORA"
@@ -344,9 +342,7 @@ def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
     pdf.set_xy(6, 254)
     pdf.multi_cell(80, 5, "Coordinador del Programa", align="C")
 
-    pdf.output(direccionPDF + filename, "F")
-    
-    return filename
+    return guardar_pdf_temporal(pdf, "CitatorioCandidatura")
 
 #################################################################################################################################
 def obtenerDatosCandidatura(numero_cuenta: str):
@@ -478,6 +474,19 @@ def incrementar_folio_acta() -> int:
         conn.commit()
     return nuevo
 
+def reservar_folio_acta() -> int:
+    """Toma el folio actual y deja el contador en el siguiente, en una sola
+    transacción, para que dos actas nunca salgan con el mismo folio."""
+    with get_connection() as conn:
+        _ensure_contador_acta(conn)
+        cur = conn.cursor()
+        cur.execute("BEGIN IMMEDIATE")
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_ACTA_ID,))
+        actual = int(cur.fetchone()[0])
+        cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (actual + 1, CONTADOR_ACTA_ID))
+        conn.commit()
+    return actual
+
 def folio_3_digitos(n: int) -> str:
     return str(int(n)).zfill(3)
 
@@ -567,10 +576,8 @@ def generar_pdf():
         pdf = FPDF(orientation='P', unit='mm', format='letter')
 
         if tipo == "acta":
-            folio_actual = obtener_folio_acta()
-            # pásalo al PDF (ver punto 4)
+            folio_actual = reservar_folio_acta()
             filename = generar_acta_candidatura(pdf, fila, "Doctorado", folio_actual)
-            incrementar_folio_acta()
         else:
             filename = generar_citatorio_candidatura(pdf, fila, "Doctorado")
     
@@ -583,7 +590,7 @@ def generar_pdf():
 @candidatura_bp.route("/ver_pdf/<filename>")
 @permission_required("candidatura")
 def ver_pdf(filename):
-    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+    return enviar_pdf_temporal(filename)
 
 @candidatura_bp.route("/api/obtener")
 @permission_required("candidatura", "captura_candidatura")

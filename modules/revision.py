@@ -5,6 +5,7 @@ from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
 from db import get_connection
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
 
 revision_bp = Blueprint('revision', __name__, template_folder='../templates')
 
@@ -15,8 +16,8 @@ def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, ge
     gradoEstudios = "ESPECIALISTA EN "
    
     # Obtener Número de Oficio 
-    contador = obtener_contador()
-    contador = verificarContador(contador)
+    # Toma el número y deja el contador en el siguiente, en un solo paso
+    contador = verificarContador(reservar_contador())
 
     # Obtener Nombre del coordinador 
     nombreCoor, sexoCoor = obtener_coordinador()
@@ -28,7 +29,7 @@ def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, ge
     prorroga(pdf,Plan_estudios, Nomb_alu, No_cuenta_str, clave_str, genero, programa, grado, contador, nombreCoor, sexoCoor, gradoEstudios) 
     dictamen(pdf,Plan_estudios, Nomb_alu, No_cuenta_str, genero, grado, nombreCoor, sexoCoor, gradoEstudios)  
     oficioJurado(pdf, Nomb_alu, Plan_estudios, clave_str, trabajo, presidente, secretario, vocal1, vocal2, vocal3, genero, modalidad, nombreCoor, sexoCoor, programa, gradoEstudios)
-    pdf.output(direccionPDF + "DocumentoEspecialidad.pdf", "F")
+    return guardar_pdf_temporal(pdf, "Revision")
 
 def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, trabajo, presidente, secretario, vocal1, vocal2, vocal3, modalidad):
     programa = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
@@ -36,8 +37,8 @@ def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero
     gradoEstudios = "MAESTRIA EN "
     
     # Obtener Número de Oficio 
-    contador = obtener_contador()
-    contador = verificarContador(contador)
+    # Toma el número y deja el contador en el siguiente, en un solo paso
+    contador = verificarContador(reservar_contador())
 
     # Obtener Nombre del coordinador 
     #nombreCoor, sexoCoor = obtener_coordinador()
@@ -53,7 +54,7 @@ def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero
     prorroga(pdf,Plan_estudios, Nomb_alu, No_cuenta_str, clave_str, genero, programa, grado, contador, nombreCoor, sexoCoor, gradoEstudios) 
     dictamen(pdf,Plan_estudios, Nomb_alu, No_cuenta_str, genero, grado, nombreCoor, sexoCoor, gradoEstudios)  
     oficioJurado(pdf, Nomb_alu, Plan_estudios, clave_str, trabajo, presidente, secretario, vocal1, vocal2, vocal3, genero, modalidad, nombreCoor, sexoCoor, programa, gradoEstudios)
-    pdf.output(direccionPDF + "DocumentoMaestria.pdf", "F")
+    return guardar_pdf_temporal(pdf, "Revision")
 
 def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, genero, articulo, revista, trabajo, presidente, secretario, vocal1, vocal2, vocal3, modalidad    ):
     programa = "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA"
@@ -61,8 +62,8 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, gener
     gradoEstudios = "DOCTORADO EN "
 
     # Obtener Número de Oficio 
-    contador = obtener_contador()
-    contador = verificarContador(contador)
+    # Toma el número y deja el contador en el siguiente, en un solo paso
+    contador = verificarContador(reservar_contador())
 
     # Obtener Nombre del coordinador 
     #nombreCoor, sexoCoor = obtener_coordinador()
@@ -80,7 +81,7 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, gener
     oficioJurado(pdf, Nomb_alu, Plan_estudios, clave_str, trabajo, presidente, secretario, vocal1, vocal2, vocal3, genero, modalidad, nombreCoor, sexoCoor, programa, gradoEstudios)
     articuloRevista(pdf,No_cuenta_str, Plan_estudios, Nomb_alu, genero, articulo, revista, contador, nombreCoor, sexoCoor, gradoEstudios)
     examenDoctorado(pdf,No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, genero, contador, nombreCoor, sexoCoor, gradoEstudios)
-    pdf.output(direccionPDF + "DocumentoDoctorado.pdf", "F")
+    return guardar_pdf_temporal(pdf, "Revision")
 
 
 ########## DOCUMENTOS ##########
@@ -170,11 +171,13 @@ def ingles(pdf, Plan_estudios, Nomb_alu, programa, genero, contador, nombreCoor,
 def prorroga(pdf, Plan_estudios, Nomb_alu, No_cuenta_str, clave_str, genero, programa, grado, contador, nombreCoor, sexoCoor, gradoEstudios):
     dia, mes, año = fecha()
 
-    if genero == "el alumno":
-        inscrito = "inscrito"
-    elif genero == "la alumna":
+    if genero == "la alumna":
         inscrito = "inscrita"
-    
+    elif genero == "elle alumne":
+        inscrito = "inscrite"
+    else:
+        inscrito = "inscrito"
+
     # Agregar una página
     pdf.add_page()
 
@@ -467,6 +470,13 @@ def _pie_line(pdf, txt, line_h=6):
     pdf.multi_cell(0, line_h, txt, align="L")
 
 def oficioJurado(pdf, nombreCompleto, planEstudios, especializacion, trabajo, presidente, secretario, vocal1, vocal2, vocal3, genero, modalidad, nombreCoor, sexoCoor, programa, gradoEstudios):
+    # Valores por defecto (lenguaje incluyente) para cuando el género no es M ni F;
+    # antes estas variables quedaban sin definir y el PDF fallaba.
+    grado = {"ESPECIALISTA EN ": "ESPECIALISTA EN",
+             "MAESTRIA EN ": "MAESTRE EN",
+             "DOCTORADO EN ": "DOCTORE EN"}.get(gradoEstudios, gradoEstudios.strip())
+    mencionado = "Le mencionade alumne"
+    interesado = "le interesade"
 
     if gradoEstudios == "ESPECIALISTA EN ":
         grado = "ESPECIALISTA EN"
@@ -602,6 +612,82 @@ def oficioJurado(pdf, nombreCompleto, planEstudios, especializacion, trabajo, pr
     if str(modalidad) == "Tesina":
         _pie_line(pdf, "Anexos: votos originales")
 
+########## DOCUMENTOS SUELTOS (los usa también Votos PUEI) ##########
+DOCUMENTOS_SUELTOS = ("prorroga", "jurado")
+
+def _config_programa(programa):
+    """Encabezado, grado y coordinador que usa cada programa (igual que en
+    especialidad(), maestria() y doctorado())."""
+    if programa == "Especialidad":
+        nombreCoor, sexoCoor = obtener_coordinador()
+        return {
+            "programa": "PROGRAMA UNICO DE ESPECIALIZACIONES DE INGENIERIA",
+            "grado": "la ESPECIALIZACIÓN",
+            "gradoEstudios": "ESPECIALISTA EN ",
+            "nombreCoor": (nombreCoor or "").upper(),
+            "sexoCoor": verificarCoordinador(sexoCoor),
+        }
+    if programa in ("Maestria", "Doctorado"):
+        return {
+            "programa": "PROGRAMA DE MAESTRÍA Y DOCTORADO EN INGENIERÍA",
+            "grado": "la MAESTRIA" if programa == "Maestria" else "el DOCTORADO",
+            "gradoEstudios": "MAESTRIA EN " if programa == "Maestria" else "DOCTORADO EN ",
+            "nombreCoor": "DR. GABRIEL EDUARDO SANDOVAL ROMERO",
+            "sexoCoor": "EL COORDINADOR",
+        }
+    return None
+
+def generar_documento_suelto(tipo, registro_id):
+    """Genera solo la prórroga o solo el oficio de jurado de un registro de
+    posgrado. Devuelve (nombre_pdf, error). La prórroga consume un número
+    de oficio del mismo contador que usa Revisión."""
+    if tipo not in DOCUMENTOS_SUELTOS:
+        return None, "Tipo de documento no válido."
+
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT numeroCuenta, nombreCompleto, planEstudios, especializacion,
+                   tituloTesina, presidente, secretario, vocal1, vocal2, vocal3,
+                   sexo, modalidad
+            FROM posgrado WHERE id = ? LIMIT 1
+        """, (registro_id,))
+        fila = cur.fetchone()
+    if not fila:
+        return None, "No se encontró el registro del alumno."
+
+    (numeroCuenta, nombre, plan, especializacion, titulo,
+     presidente, secretario, vocal1, vocal2, vocal3, sexo, modalidad) = fila
+
+    try:
+        plan_int = int(plan)
+    except (TypeError, ValueError):
+        return None, "El plan de estudios no es numérico."
+
+    cfg = _config_programa(_infer_programa(plan_int))
+    if not cfg:
+        return None, "Plan de estudios fuera de rango (3000–5999)."
+
+    genero = {"F": "la alumna", "X": "elle alumne"}.get(sexo, "el alumno")
+    especializacion = especializacion or ""
+    pdf = FPDF()
+
+    if tipo == "prorroga":
+        contador = verificarContador(reservar_contador())
+        prorroga(pdf, especializacion, nombre, str(numeroCuenta), str(plan_int), genero,
+                 cfg["programa"], cfg["grado"], contador, cfg["nombreCoor"],
+                 cfg["sexoCoor"], cfg["gradoEstudios"])
+        prefijo = "Prorroga"
+    else:
+        oficioJurado(pdf, nombre, especializacion, str(plan_int), titulo or "",
+                     presidente, secretario, vocal1, vocal2, vocal3, genero,
+                     modalidad or "", cfg["nombreCoor"], cfg["sexoCoor"],
+                     cfg["programa"], cfg["gradoEstudios"])
+        prefijo = "Jurado"
+
+    return guardar_pdf_temporal(pdf, prefijo), None
+
+
 ########## FUNCIONES AUXILIARES ##########
 def _infer_programa(plan_int: int) -> str:
     if 3000 <= plan_int <= 3999: return "Especialidad"
@@ -677,6 +763,19 @@ def incrementar_contador():
         cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (nuevo, CONTADOR_REVISION_ID))
         conn.commit()
     return nuevo
+
+def reservar_contador() -> int:
+    """Toma el número de oficio actual y deja el contador en el siguiente,
+    en una sola transacción, para que dos usuarios nunca reciban el mismo número."""
+    with get_connection() as conn:
+        _ensure_contador_revision(conn)
+        cur = conn.cursor()
+        cur.execute("BEGIN IMMEDIATE")
+        cur.execute("SELECT valor FROM contador WHERE id = ?", (CONTADOR_REVISION_ID,))
+        actual = int(cur.fetchone()[0])
+        cur.execute("UPDATE contador SET valor = ? WHERE id = ?", (actual + 1, CONTADOR_REVISION_ID))
+        conn.commit()
+    return actual
 
 def verificarContador(contador):
     
@@ -798,32 +897,32 @@ def index():
         genero_txt = "elle alumne"
 
     if programa.lower() == "especialidad":
-        especialidad(
+        nombre_pdf = especialidad(
             str(numeroCuenta), especializacion, str(planEstudios),
             nombreCompleto, "Especialidad", genero_txt, tituloTesina,
             presidente, secretario, vocal1, vocal2, vocal3, modalidad
         )
-        return jsonify({"success": True, "pdf_url": "/revision/ver_pdf/DocumentoEspecialidad.pdf"})
+        return jsonify({"success": True, "pdf_url": f"/revision/ver_pdf/{nombre_pdf}"})
 
     if programa.lower() == "maestria":
-        maestria(
+        nombre_pdf = maestria(
             str(numeroCuenta), especializacion, str(planEstudios),
             nombreCompleto, "Maestria", genero_txt, tituloTesina,
             presidente, secretario, vocal1, vocal2, vocal3, modalidad
         )
-        return jsonify({"success": True, "pdf_url": "/revision/ver_pdf/DocumentoMaestria.pdf"})
+        return jsonify({"success": True, "pdf_url": f"/revision/ver_pdf/{nombre_pdf}"})
 
     if programa.lower() == "doctorado":
         # Por ahora estos campos no se están usando
         articulo = ""
         revista = ""
 
-        doctorado(
+        nombre_pdf = doctorado(
             str(numeroCuenta), especializacion, str(planEstudios),
             nombreCompleto, "Doctorado", genero_txt, articulo, revista,
             tituloTesina, presidente, secretario, vocal1, vocal2, vocal3, modalidad
         )
-        return jsonify({"success": True, "pdf_url": "/revision/ver_pdf/DocumentoDoctorado.pdf"})
+        return jsonify({"success": True, "pdf_url": f"/revision/ver_pdf/{nombre_pdf}"})
 
     return jsonify({"success": False, "error": "Programa no reconocido."}), 400
 
@@ -831,7 +930,7 @@ def index():
 @revision_bp.route("/ver_pdf/<filename>")
 @permission_required("revision")
 def ver_pdf(filename):
-    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+    return enviar_pdf_temporal(filename)
 
 ########## CONTADOR ##########
 @revision_bp.route("/obtener_contador", methods=["GET"])

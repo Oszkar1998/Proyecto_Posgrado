@@ -5,6 +5,7 @@ from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
 from db import get_connection
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
 
 dgae_bp = Blueprint('dgae', __name__, template_folder='../templates')
 
@@ -16,9 +17,9 @@ def especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, op
     gradoAux = "ESPECIALIZACIÓN EN "
 
     if opcion=="1":
-        documentoUnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, modalidad, gradoAux)
+        return documentoUnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, modalidad, gradoAux)
     elif opcion=="2":
-        documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, tipo, modalidad, gradoAux)
+        return documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, tipo, modalidad, gradoAux)
     else:
         raise ValueError("No se encontró una opción válida para generar el documento.")
 
@@ -29,9 +30,9 @@ def maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion
     gradoAux = "MAESTRÍA EN "
 
     if opcion=="1":
-        documentoUnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, modalidad, gradoAux)
+        return documentoUnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, modalidad, gradoAux)
     elif opcion=="2":
-        documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, tipo, modalidad, gradoAux)
+        return documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, tipo, modalidad, gradoAux)
     else:
         raise ValueError("No se encontró una opción válida para generar el documento.")
 
@@ -42,9 +43,9 @@ def doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcio
     gradoAux = "DOCTORADO EN "
     
     if opcion=="1":
-        documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux) 
+        return documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux) 
     elif opcion=="2":
-        documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux, tipo) 
+        return documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux, tipo) 
     else:
         raise ValueError("No se encontró una opción válida para generar el documento.")
 
@@ -298,7 +299,7 @@ def documentoUnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa
     pdf.set_xy(180,268);  pdf.multi_cell(18, 5, "Rev.", align="C")
     pdf.set_xy(180,271.5);pdf.multi_cell(18, 5, "Octubre_2024", align="J")
 
-    pdf.output(direccionPDF+"DocumentoDGAE.pdf", "F")
+    return guardar_pdf_temporal(pdf, "DGAE")
 
 def documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, tipo, modalidad, gradoAux):
     dia, mes, año = fecha()
@@ -602,7 +603,7 @@ def documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
     pdf.set_xy(148,271.5); pdf.multi_cell(32, 5, "Rev. Octubre_2024", align="J")
 
     # Guardar
-    pdf.output(direccionPDF+"DocumentoDGAE.pdf", "F")
+    return guardar_pdf_temporal(pdf, "DGAE")
 
 ########## DOCUMENTOS DOCTORADO ##########
 def documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux):
@@ -955,7 +956,7 @@ def documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, prog
     pdf.multi_cell(18, 5, "Octubre_2024", align="J")
 
     # Guardar el PDF
-    pdf.output(direccionPDF+"DocumentoDGAE.pdf", "F")
+    return guardar_pdf_temporal(pdf, "DGAE")
 
 def documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux,tipo):
     dia,mes,año= fecha()
@@ -1450,7 +1451,7 @@ def documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pro
     pdf.multi_cell(32, 5, "Rev. Octubre_2024", align="J")
 
     # Guardar el PDF
-    pdf.output(direccionPDF+"DocumentoDGAE.pdf", "F")
+    return guardar_pdf_temporal(pdf, "DGAE")
 
 
 ########## FUNCIONES AUXILIARES ##########
@@ -1670,11 +1671,11 @@ def dgae():
 
     try:
         if grado == "Especialidad":
-            especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            nombre_pdf = especialidad(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         elif grado == "Maestría":
-            maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            nombre_pdf = maestria(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         elif grado == "Doctorado":
-            doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
+            nombre_pdf = doctorado(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, opcion, tipo, modalidad)
         else:
             return jsonify(success=False, error="Grado no identificado.")
 
@@ -1684,7 +1685,8 @@ def dgae():
     except Exception as e:
         return jsonify(success=False, error=f"Error al generar PDF: {e}")
 
-    return jsonify(success=True, documentos=["DocumentoDGAE.pdf"])
+    return jsonify(success=True, documentos=[nombre_pdf],
+                   pdf_url=f"/dgae/ver_pdf/{nombre_pdf}")
         
 @dgae_bp.after_request
 def disable_cache(response):
@@ -1698,4 +1700,4 @@ def disable_cache(response):
 @dgae_bp.route("/ver_pdf/<filename>")
 @permission_required("dgae")
 def ver_pdf(filename):
-    return send_from_directory(direccionPDF, filename, mimetype="application/pdf", as_attachment=False)
+    return enviar_pdf_temporal(filename)

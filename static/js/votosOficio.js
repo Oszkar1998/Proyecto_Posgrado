@@ -1,93 +1,101 @@
 
 
+// ================== FLUJO PRINCIPAL ==================
+// 1) Elegir documento  2) Escribir número de cuenta  3) Confirmar alumno y generar
+const DOCUMENTOS_VOTOS = {
+  votos:    { nombre: "VOTOS - 5 FORMATOS", icono: "fa-file-contract" },
+  prorroga: { nombre: "PRÓRROGA",           icono: "fa-clock-rotate-left" },
+  jurado:   { nombre: "OFICIO DE JURADO",   icono: "fa-users" },
+};
+let documentoElegido = null;
+
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("login-form");
-  const cuentaInput = document.getElementById("numeroDeCuenta");
-  const hint = document.getElementById("hint");
-  const botonesDocumentos = document.getElementById("botones-expediente");
-  const btnDocumento2 = document.getElementById("btn-documento-2");
+  const pasoDocumento = document.getElementById("paso-documento");
+  const pasoCuenta    = document.getElementById("paso-cuenta");
+  const textoElegido  = document.getElementById("doc-elegido-texto");
+  const form          = document.getElementById("login-form");
+  const cuentaInput   = document.getElementById("numeroDeCuenta");
+  const hint          = document.getElementById("hint");
+  const resultado     = document.getElementById("botones-expediente");
+  if (!pasoDocumento || !pasoCuenta || !cuentaInput) return;
 
   function setHint(msg) { if (hint) hint.textContent = msg || ""; }
 
-  function resetUI() {
-    botonesDocumentos.style.display = "none";
-    botonesDocumentos.innerHTML = `<button id="btn-documento-2"><i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS</button>`;
-    const m = document.getElementById("modalSeleccionPlanVotos");
-    if (m) m.style.display = "none";
-    setHint("Escribe tu número completo (9 dígitos)...");
+  function limpiarResultado() {
+    resultado.style.display = "none";
+    resultado.innerHTML = "";
   }
 
-  async function consultarYMostrar(numeroCuenta) {
-    spinner.show("Buscando...");
+  function elegirDocumento(tipo) {
+    documentoElegido = tipo;
+    const doc = DOCUMENTOS_VOTOS[tipo];
+    textoElegido.innerHTML = `<i class="fa-solid ${doc.icono}"></i> ${doc.nombre}`;
+    pasoDocumento.style.display = "none";
+    pasoCuenta.style.display = "block";
+    cuentaInput.value = "";
+    limpiarResultado();
+    setHint("Escribe el número de cuenta (9 dígitos).");
+    cuentaInput.focus();
+  }
+
+  function volverAElegir() {
+    documentoElegido = null;
+    pasoCuenta.style.display = "none";
+    pasoDocumento.style.display = "flex";
+    limpiarResultado();
+  }
+
+  async function buscarAlumno(numeroCuenta) {
+    setHint("Buscando…");
     try {
-        const res = await fetch("/votosOficio/", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `numeroDeCuenta=${encodeURIComponent(numeroCuenta)}`
-        });
-        const data = await res.json();
+      const res = await fetch("/votosOficio/buscar_cuenta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ numeroCuenta: numeroCuenta })
+      });
+      const registros = await res.json();
+      // Si mientras tanto cambió el número escrito, ignoramos esta respuesta
+      if (cuentaInput.value.trim() !== numeroCuenta) return;
 
-        if (data.success) {
-            setHint("");
-
-            if (data.multiples && data.multiples.length > 1) {
-                spinner.hide();
-                mostrarModalSeleccionVotos(data.multiples);
-                return;
-            }
-
-            if (data.votos_url) {
-                spinner.hide();
-                botonesDocumentos.style.display = "block";
-                botonesDocumentos.innerHTML = `
-                    <div class="tarjeta-alumno">
-                        <p class="tarjeta-alumno__nombre">
-                            ${escHTML(data.nombre)}
-                        </p>
-                        <p class="tarjeta-alumno__dato">
-                            Cuenta: <strong>${escHTML(numeroCuenta)}</strong>
-                        </p>
-                        <p class="tarjeta-alumno__dato">
-                            ${escHTML(data.especializacion)} ${data.modalidad ? "· " + escHTML(data.modalidad) : ""}
-                        </p>
-                    </div>
-                    <button id="btn-documento-2" type="button" class="btn-votos">
-                        <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
-                    </button>
-                `;
-                const btn = document.getElementById("btn-documento-2");
-                if (btn) btn.onclick = () => window.open(data.votos_url, "_blank");
-                return;
-            }
-
-            spinner.hide();
-            toast.error("No se pudo generar el documento.");
-        } else {
-            spinner.hide();
-            resetUI();
-        }
+      if (!Array.isArray(registros) || registros.length === 0) {
+        setHint("");
+        mostrarModalError("El número de cuenta no se encuentra en la base de datos. Ingresa uno correcto.");
+        return;
+      }
+      setHint("");
+      if (registros.length > 1) {
+        mostrarModalSeleccionVotos(registros);
+        return;
+      }
+      mostrarTarjetaVotos(registros[0]);
     } catch (error) {
-        spinner.hide();
-        console.error(error);
-        toast.error("Error de conexión con el servidor.");
+      console.error(error);
+      setHint("");
+      toast.error("Error de conexión con el servidor.");
     }
   }
 
-  // Sin botón: no usamos submit; validamos al teclear
+  pasoDocumento.querySelectorAll(".opcion-doc").forEach(btn => {
+    btn.addEventListener("click", () => elegirDocumento(btn.dataset.tipo));
+  });
+  document.getElementById("btn-cambiar-doc")?.addEventListener("click", volverAElegir);
+
+  // Validamos al teclear; con 9 dígitos se busca al alumno
   let t;
   cuentaInput.addEventListener("input", function () {
+    cuentaInput.value = cuentaInput.value.replace(/\D/g, "");
     clearTimeout(t);
+    limpiarResultado();
     const v = cuentaInput.value.trim();
-    const ok = /^\d{9}$/.test(v);
-    if (!ok) { resetUI(); return; }
-    setHint("Validando…");
-    t = setTimeout(() => consultarYMostrar(v), 220);
+    if (!/^\d{9}$/.test(v)) {
+      setHint("Escribe el número de cuenta (9 dígitos).");
+      return;
+    }
+    t = setTimeout(() => buscarAlumno(v), 250);
   });
 
-  // Evita que presionar Enter recargue la página
+  // Enter no recarga la página
   form.addEventListener("submit", (e) => e.preventDefault());
-
-  resetUI();
 });
 
 
@@ -424,11 +432,76 @@ function mostrarModalSeleccionVotos(opciones) {
     btn.className = "btn";
     const etiqueta = `${op.nombreCompleto} · plan ${op.planEstudios}` + (op.especializacion ? ` · ${op.especializacion}` : "");
     btn.textContent = etiqueta;
-    btn.onclick = () => generarVotosPorId(op.id);
+    btn.onclick = () => {
+      cerrarModalSeleccionVotos();
+      mostrarTarjetaVotos(op);
+    };
     cont.appendChild(btn);
   });
 
   modal.style.display = "flex";
+}
+
+// 🔹 Tarjeta del alumno con el botón para generar el documento elegido
+function mostrarTarjetaVotos(registro) {
+  const cont = document.getElementById("botones-expediente");
+  if (!cont || !documentoElegido) return;
+  const doc = DOCUMENTOS_VOTOS[documentoElegido];
+  const id = Number(registro.id);
+
+  cont.style.display = "block";
+  cont.innerHTML = `
+    <div class="tarjeta-alumno">
+      <p class="tarjeta-alumno__nombre">${escHTML(registro.nombreCompleto)}</p>
+      <p class="tarjeta-alumno__dato">Cuenta: <strong>${escHTML(registro.numeroCuenta)}</strong>
+        ${registro.planEstudios ? " · Plan " + escHTML(registro.planEstudios) : ""}</p>
+      <p class="tarjeta-alumno__dato">
+        ${escHTML(registro.especializacion)} ${registro.modalidad ? "· " + escHTML(registro.modalidad) : ""}
+      </p>
+    </div>
+    <button id="btn-generar-doc" type="button" class="btn-votos">
+      <i class="fa-solid ${doc.icono}"></i> GENERAR ${doc.nombre}
+    </button>
+  `;
+
+  const btn = cont.querySelector("#btn-generar-doc");
+  btn.onclick = () => {
+    if (documentoElegido === "votos") {
+      window.open(`/votosOficio/votos_id/${id}`, "_blank");
+    } else {
+      generarDocumentoRevision(id, documentoElegido, btn);
+    }
+  };
+  btn.focus();
+}
+
+// 🔹 Genera la prórroga o el oficio de jurado (mismos formatos que Revisión)
+async function generarDocumentoRevision(id, tipo, btn) {
+  if (!id) {
+    toast.error("No se identificó el registro del alumno. Vuelve a buscarlo.");
+    return;
+  }
+  btn.disabled = true;   // evita doble clic (la prórroga consume un número de oficio)
+  spinner.show("Generando documento...");
+  try {
+    const res = await fetch("/votosOficio/documento_revision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ id: id, tipo: tipo })
+    });
+    const data = await res.json();
+    if (data.success && data.pdf_url) {
+      window.open(data.pdf_url, "_blank");
+    } else {
+      toast.error(data.error || "No se pudo generar el documento.");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Error de conexión con el servidor.");
+  } finally {
+    spinner.hide();
+    btn.disabled = false;
+  }
 }
 
 function cerrarModalSeleccionVotos() {
@@ -497,111 +570,6 @@ function renderKeyVals(obj) {
     .join('');
   return `<div class="kv-list">${rows || '<p>(Sin detalles)</p>'}</div>`;
 }
-
-// Guarda la última URL de votos para abrirla al click
-let ultimaVotosURL = null;
-
-// === Lógica principal ===
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('login-form');
-  const inputCuenta = document.getElementById('numeroDeCuenta');
-  if (!form || !inputCuenta) return;
-
-  // 1) Validación “en vivo” PERO solo dispara cuando hay 9 dígitos
-  let t;
-  inputCuenta.addEventListener('input', () => {
-    // opcional: forzar que el input contenga solo dígitos visualmente
-    inputCuenta.value = inputCuenta.value.replace(/\D/g, '');
-
-    clearTimeout(t);
-    t = setTimeout(() => {
-      const val = inputCuenta.value.trim();
-      if (val.length === CUENTA_LEN && soloDigitos(val)) {
-        form.requestSubmit?.(); // dispara el submit (interceptado abajo)
-      } else {
-        // si no tiene 9 dígitos, no hacemos nada (ni fetch ni modal)
-      }
-    }, 350); // debounce corto
-  });
-
-  // 2) Interceptar submit y SOLO continuar si hay 9 dígitos
-  form.addEventListener('submit', async (evt) => {
-    evt.preventDefault();
-
-    const cuenta = inputCuenta.value.trim();
-    if (!(cuenta.length === CUENTA_LEN && soloDigitos(cuenta))) {
-      // nada de modales aquí; simplemente ignora hasta que cumpla 9 dígitos
-      return;
-    }
-
-    // Prepara body como application/x-www-form-urlencoded
-    const formData = new FormData(form);
-    const body = new URLSearchParams();
-    for (const pair of formData.entries()) body.append(pair[0], pair[1]);
-
-    try {
-      const resp = await fetch('/votosOficio/', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body
-      });
-      const data = await resp.json();
-
-      // Caso cuenta NO encontrada
-      if (!data || data.success === false) {
-        const errMsg = (data && data.error) ? data.error : 'Número de cuenta no encontrado.';
-        mostrarModalError(errMsg);
-        return;
-      }
-
-      // Si el backend regresa múltiples coincidencias
-      if (data.multiples) {
-        // aquí puedes abrir tu modal de selección si ya lo manejas
-        toast.warn('Se encontraron múltiples registros. Selecciona el correcto en la lista.');
-        return;
-      }
-
-      // === IMPORTANTE: YA NO redirigimos automáticamente al PDF ===
-      // Mantén la URL (si la manda el backend), y la abrimos sólo al hacer clic en el botón.
-      ultimaVotosURL = data.votos_url || data.voto_url || null;
-
-      // Intenta detectar un objeto "info" razonable en la respuesta
-      const info =
-        data.info ||
-        data.alumno ||
-        data.registro ||
-        data.detalles ||
-        data.datos ||
-        null;
-
-      // Si ya tienes la info del alumno, solo deja que el backend renderice su tarjeta normal
-      if (data.info || data.alumno || data.registro || data.detalles || data.datos) {
-          }
-
-      // Guardamos la URL del PDF si existe, pero sin mostrar botón adicional
-      ultimaVotosURL = data.votos_url || data.voto_url || null;
-
-
-      // Click en botón: abrir en nueva pestaña
-      const btn = document.getElementById('btnVerVotos');
-      btn?.addEventListener('click', async () => {
-        if (ultimaVotosURL) {
-          // Abrimos directamente la URL que ya envió el backend
-          window.open(ultimaVotosURL, '_blank', 'noopener');
-          return;
-        }
-        // Si tu backend NO manda la URL y necesitas generar “on demand”,
-        // podrías hacer aquí otro fetch a una ruta tipo /votosOficio/generar
-        // con los mismos parámetros, y del JSON sacar la url para abrirla.
-        mostrarModalError('No se recibió URL de votos del servidor.');
-      });
-
-    } catch (err) {
-      console.error('Error comprobando número de cuenta:', err);
-      mostrarModalError('Error al verificar. Revisa la conexión o el servidor.');
-    }
-  });
-});
 
 (function(){
   const params = new URLSearchParams(window.location.search);

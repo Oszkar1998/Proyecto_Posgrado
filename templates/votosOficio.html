@@ -127,26 +127,45 @@
     <div class="container">
         <h1><i class="fa-solid fa-check-to-slot"></i> Votos PUEI</h1>
         
-        <form id="login-form" method="POST" action="/votosOficio">
-          <label for="numeroDeCuenta">Número de Cuenta:</label>
-          <input type="text" id="numeroDeCuenta" name="numeroDeCuenta" maxlength="9" placeholder="Ejemplo: 123456789" required />
-        </form>
-        <p id="hint" class="ayuda-campo" aria-live="polite">
-            Escribe tu número (9 dígitos). Validaremos automáticamente.
-        </p>
-
-        <!-- Solo botón de votos -->
-        <div id="botones-expediente" class="mt-3" style="display: none;">
-            <button id="btn-documento-2">
+        <!-- Paso 1: elegir el documento -->
+        <div id="paso-documento" class="selector-documento">
+            <p class="ayuda-campo">Elige el documento que vas a generar:</p>
+            <button type="button" class="opcion-doc opcion-doc--votos" data-tipo="votos">
                 <i class="fa-solid fa-file-contract"></i> VOTOS - 5 FORMATOS
             </button>
+            <button type="button" class="opcion-doc" data-tipo="prorroga">
+                <i class="fa-solid fa-clock-rotate-left"></i> PRÓRROGA
+            </button>
+            <button type="button" class="opcion-doc" data-tipo="jurado">
+                <i class="fa-solid fa-users"></i> OFICIO DE JURADO
+            </button>
+        </div>
+
+        <!-- Paso 2: número de cuenta y generar -->
+        <div id="paso-cuenta" style="display: none;">
+            <div class="doc-elegido">
+                <span id="doc-elegido-texto"></span>
+                <button type="button" id="btn-cambiar-doc" class="btn-cambiar">
+                    <i class="fa-solid fa-arrow-left"></i> Cambiar
+                </button>
+            </div>
+
+            <form id="login-form" autocomplete="off">
+                <label for="numeroDeCuenta">Número de Cuenta:</label>
+                <input type="text" id="numeroDeCuenta" name="numeroDeCuenta" maxlength="9" inputmode="numeric" placeholder="Ejemplo: 123456789" required />
+            </form>
+            <p id="hint" class="ayuda-campo" aria-live="polite">
+                Escribe el número de cuenta (9 dígitos).
+            </p>
+
+            <div id="botones-expediente" class="mt-3" style="display: none;"></div>
         </div>
     </div>
 
     <!-- Modal Selección de Plan para Votos -->
     <div id="modalSeleccionPlanVotos" class="modal" style="display:none;">
         <div class="modal-content">
-            <h2>Selecciona el plan para generar VOTOS</h2>
+            <h2>Este alumno tiene varios planes. ¿Cuál usar?</h2>
             <div id="opcionesPlanesVotos"></div>
             <button class="btn cancel" onclick="cerrarModalSeleccionVotos()">
                 <i class="fa-solid fa-xmark"></i> Cerrar
