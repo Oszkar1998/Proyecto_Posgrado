@@ -24,14 +24,6 @@ def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int
         grado = "DOCTOR"
     else:
         raise ValueError("Sexo no reconocido.")
-    
-    nombreCompletoPos = limpiar_texto(nombreCompletoPos)
-    tituloProyectoPos = limpiar_texto(tituloProyectoPos)
-    presidentePos = limpiar_texto(presidentePos)
-    secretarioPos = limpiar_texto(secretarioPos)
-    vocal1Pos = limpiar_texto(vocal1Pos)
-    vocal2Pos = limpiar_texto(vocal2Pos)
-    vocal3Pos = limpiar_texto(vocal3Pos)
 
     # Agregar una página
     pdf.add_page()
@@ -80,7 +72,7 @@ def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int
     parrafo_html = (
         f"<p>Nombre Completo: <b>{nombreCompletoPos}</b><br>"
         f"Número de cuenta: <b>{numeroCuentaPos}</b><br>"
-        f"Título del proyecto: <b>{tituloProyectoPos.strip().lower().capitalize()}.</b><br>"
+        f"Título del proyecto: <b>{tituloProyectoPos.strip()}.</b><br>"
         f"Semestre de ingreso: <b>{semestreIngresoPos}</b><br>"
         f"Semestre en que se está presentando el examen de candidatura: <b>{semestrePresentadoPos} semestre</b><br>"
         f"Evaluación: <b>{evaluacionPos}</b></p>"
@@ -490,22 +482,6 @@ def reservar_folio_acta() -> int:
 def folio_3_digitos(n: int) -> str:
     return str(int(n)).zfill(3)
 
-def limpiar_texto(texto):
-    if not texto:
-        return ""
-        
-    return (texto
-            .replace("–", "-")
-            .replace("—", "-")
-            .replace("“", '"')
-            .replace("”", '"')
-            .replace("’", "'")
-            .replace("á","a")
-            .replace("é","e")
-            .replace("í","i")
-            .replace("ó","o")
-            .replace("ú","u")
-            )
 
 #################################################################################################################################
 @candidatura_bp.route("/", methods=["GET"])
