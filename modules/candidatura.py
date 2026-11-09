@@ -5,7 +5,7 @@ from fpdf import FPDF
 from auth import permission_required
 from config import direccionBase, direccionImagen,direccionPDF
 from db import get_connection
-from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal
+from pdf_temp import guardar_pdf_temporal, enviar_pdf_temporal, ruta_con_nombre, enviar_pdf_con_nombre
 
 candidatura_bp = Blueprint('candidatura', __name__, template_folder='../templates')
 
@@ -175,8 +175,10 @@ def generar_acta_candidatura(pdf: FPDF, fila_pos, programa: str, folio_acta: int
     pdf.set_xy(15, 249)
     pdf.write_html(parrafo_html)
 
+    partes = nombreCompletoPos.split()
+    resultadoNom = "".join(partes[-2:] + partes[:-2])
 
-    return guardar_pdf_temporal(pdf, "ActaCandidatura")
+    return guardar_pdf_temporal(pdf, "Acta" + resultadoNom)
 
 def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
 
@@ -334,7 +336,11 @@ def generar_citatorio_candidatura(pdf: FPDF, fila_pos, programa: str) -> str:
     pdf.set_xy(6, 254)
     pdf.multi_cell(80, 5, "Coordinador del Programa", align="C")
 
-    return guardar_pdf_temporal(pdf, "CitatorioCandidatura")
+    partes = nombreCompletoPos.split()
+    resultadoNom = "".join(partes[-2:] + partes[:-2])
+
+    return guardar_pdf_temporal(pdf, "Citatorio" + resultadoNom)
+
 
 #################################################################################################################################
 def obtenerDatosCandidatura(numero_cuenta: str):
@@ -557,7 +563,7 @@ def generar_pdf():
         else:
             filename = generar_citatorio_candidatura(pdf, fila, "Doctorado")
     
-        return jsonify({"success": True, "pdf_url": f"/candidatura/ver_pdf/" + filename})
+        return jsonify({"success": True, "pdf_url": f"/candidatura/ver_pdf/" + ruta_con_nombre(filename)})
 
     except Exception as e:
         # Esto evita el error HTML que te tronaba el JSON
@@ -679,3 +685,7 @@ def actualizar_folio_acta_api():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@candidatura_bp.route("/ver_pdf/<codigo>/<nombre>")
+@permission_required("candidatura")
+def ver_pdf_con_nombre(codigo, nombre):
+    return enviar_pdf_con_nombre(codigo, nombre)

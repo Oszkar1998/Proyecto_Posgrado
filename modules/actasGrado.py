@@ -458,16 +458,26 @@ def exportar_excel():
         download_name=nombre_archivo,
     )
 
+@actas_grado_bp.app_template_global()
+def nombre_archivo_acta_grado(nombre):
+    """'RENDÓN JUÁREZ JOSÉ ARMANDO' -> 'ActaGradoRENDONJUAREZJOSEARMANDO.pdf' (mismo orden que en la base, sin acentos)."""
+    nombre = "".join(c for c in unicodedata.normalize("NFKD", nombre or "") if not unicodedata.combining(c))
+    return "ActaGrado" + re.sub(r"[^A-Za-z0-9]", "", nombre) + ".pdf"
+
 @actas_grado_bp.route("/ver_pdf/<num_cuenta>/<folio>")
+@actas_grado_bp.route("/ver_pdf/<num_cuenta>/<folio>/<archivo>")
 @permission_required("actas_grado")
-def ver_pdf(num_cuenta, folio):
+def ver_pdf(num_cuenta, folio, archivo=None):
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT actaPDF FROM actasGrado WHERE numCuenta=? AND folio=?", (num_cuenta, folio))
-        archivo = cursor.fetchone()
+        acta = cursor.fetchone()
 
-    if archivo and archivo[0]:
-        return send_file(io.BytesIO(archivo[0]), mimetype='application/pdf')
+    if acta and acta[0]:
+        # Si la dirección trae el nombre del archivo, el navegador lo muestra y descarga con ese nombre
+        if archivo and re.fullmatch(r"[A-Za-z0-9]+\.pdf", archivo):
+            return send_file(io.BytesIO(acta[0]), mimetype='application/pdf', download_name=archivo)
+        return send_file(io.BytesIO(acta[0]), mimetype='application/pdf')
     else:
         return abort(404)
 

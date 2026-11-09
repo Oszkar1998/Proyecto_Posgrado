@@ -381,7 +381,7 @@
 
             <ul>
                 {% for folio, numCuenta, nombre in resultados %}
-                    {% set enlace = url_for("actas_grado.ver_pdf", num_cuenta=numCuenta, folio=folio) %}
+                    {% set enlace = url_for("actas_grado.ver_pdf", num_cuenta=numCuenta, folio=folio, archivo=nombre_archivo_acta_grado(nombre)) %}
                     <li>
                         <strong>{{ nombre }}</strong> - Cuenta: {{ numCuenta }} - Folio: {{ folio }}
                         <button class="btn abrir-acta" data-url="{{ enlace }}">Ver Acta 📄</button>

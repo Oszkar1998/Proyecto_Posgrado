@@ -23,6 +23,7 @@ import os
 import re
 import time
 import uuid
+import unicodedata
 
 from flask import abort, send_from_directory
 
@@ -47,15 +48,14 @@ def limpiar_pdfs_temporales(edad_maxima=EDAD_MAXIMA):
             # Otro proceso pudo borrarlo primero; no es un error.
             pass
 
-
 def guardar_pdf_temporal(pdf, prefijo):
     """Guarda el objeto FPDF con un nombre único y devuelve solo el nombre."""
+    prefijo = "".join(c for c in unicodedata.normalize("NFKD", prefijo) if not unicodedata.combining(c))
     prefijo = re.sub(r"[^A-Za-z0-9]", "", prefijo) or "Documento"
     nombre = f"tmp_{prefijo}_{uuid.uuid4().hex}.pdf"
     pdf.output(os.path.join(direccionPDF, nombre), "F")
     limpiar_pdfs_temporales()
     return nombre
-
 
 def enviar_pdf_temporal(filename):
     """Entrega un PDF temporal; solo acepta nombres creados por guardar_pdf_temporal."""
@@ -63,3 +63,27 @@ def enviar_pdf_temporal(filename):
         abort(404)
     return send_from_directory(direccionPDF, filename,
                                mimetype="application/pdf", as_attachment=False)
+
+
+# ── Nombre limpio para el usuario ─────────────────────────────────
+# En disco el archivo conserva el código único (tmp_<Nombre>_<código>.pdf),
+# pero la dirección que ve el usuario termina en "<Nombre>.pdf", así la
+# pestaña del navegador y la descarga muestran solo ese nombre.
+_PATRON_PARTES = re.compile(r"^tmp_([A-Za-z0-9]+)_([0-9a-f]{32})\.pdf$")
+
+def ruta_con_nombre(filename):
+    """'tmp_ActaCandidaturaX_<código>.pdf' -> '<código>/ActaCandidaturaX.pdf'"""
+    partes = _PATRON_PARTES.match(filename or "")
+    if not partes:
+        return filename
+    return f"{partes.group(2)}/{partes.group(1)}.pdf"
+
+def enviar_pdf_con_nombre(codigo, nombre):
+    """Entrega el PDF temporal <código> mostrando y descargando como <nombre>."""
+    if not re.fullmatch(r"[0-9a-f]{32}", codigo or "") or not re.fullmatch(r"[A-Za-z0-9]+\.pdf", nombre or ""):
+        abort(404)
+    filename = f"tmp_{nombre[:-4]}_{codigo}.pdf"
+    if not os.path.isfile(os.path.join(direccionPDF, filename)):
+        abort(404)
+    return send_from_directory(direccionPDF, filename, mimetype="application/pdf",
+                               as_attachment=False, download_name=nombre)

@@ -9,6 +9,8 @@ from auth import permission_required
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+# Hace que todos los PDF acepten comillas curvas, guiones largos, etc. (texto pegado de Word)
+import pdf_texto  # noqa: F401
 
 # Importar los Blueprints de los módulos
 from modules.actasGrado import actas_grado_bp
