@@ -605,7 +605,45 @@ def documentoDosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, program
     # Guardar
     return guardar_pdf_temporal(pdf, "DGAE")
 
+
 ########## DOCUMENTOS DOCTORADO ##########
+def caja_datos_doctorado(pdf, programa, plan, nombre, clave_str, No_cuenta_str, titulo):
+    """Caja de datos de Doctorado. Si el plan o el nombre no caben en un renglón,
+    bajan al siguiente y la caja crece (como en Especialidad y Maestría).
+    Con textos cortos queda igual que antes."""
+    X_L, X_ETQ, X_CLAVE, X_VAL, X_R = 10, 49.3, 161, 172.5, 200
+    ANCHO = X_CLAVE - (X_ETQ + 1.2) - 1     # espacio del texto hasta "Clave:"
+    pdf.set_line_width(0.1)
+    pdf.set_font("Arial", size=8.5)
+
+    def fila(y, etiqueta, valor, etq_der, val_der, alto_un_renglon, sube=0.5, h=5):
+        # Cuántos renglones necesita el valor con la letra en 8.5
+        renglones = len(pdf.multi_cell(ANCHO, 4, valor, dry_run=True, output="LINES"))
+        if renglones > 1:
+            sube = 0
+        pdf.set_xy(X_L, y - sube);          pdf.multi_cell(45, 5, etiqueta, align="J")
+        pdf.set_xy(X_ETQ + 1.2, y - sube);  pdf.multi_cell(ANCHO, h if renglones == 1 else 4, valor, align="J")
+        pdf.set_xy(X_CLAVE - 0.5, y - sube); pdf.multi_cell(15, 5, etq_der, align="J")
+        pdf.set_xy(X_VAL, y - sube);        pdf.multi_cell(25, 5, val_der, align="J")
+        return y + (alto_un_renglon if renglones == 1 else 4 * renglones + 0.5)
+
+    y_top = 36
+    y1 = fila(y_top, "Programa:", programa, "Clave:", "125", 4.5, sube=0)
+    y2 = fila(y1, "Plan de estudios:", plan, "Clave:", clave_str, 4.0)
+    y3 = fila(y2, "Nombre de la o del alumno:", nombre, "Cuenta:", No_cuenta_str, 4.5, h=5.3)
+    y4 = y3 + 5.5
+
+    for y in (y_top, y1, y2, y3, y4):
+        pdf.line(X_L, y, X_R, y)
+    pdf.line(X_L, y_top, X_L, y4)
+    pdf.line(X_R, y_top, X_R, y4)
+    for x in (X_ETQ, X_CLAVE, X_VAL):
+        pdf.line(x, y_top, x, y3)
+
+    pdf.set_xy(12, y3)
+    pdf.set_font("Arial", size=10, style="B")
+    pdf.multi_cell(185, 5, titulo, align="C")
+
 def documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, programa, grado, gradoAux):
     dia,mes,año= fecha()
     pdf = FPDF()
@@ -617,17 +655,7 @@ def documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, prog
 
     # Caja de Datos de alumno
     pdf.set_line_width(0.1)  # set the line thickness 
-    pdf.line(10, 36, 200, 36) # lineas horizontales
-    pdf.line(10, 40.5, 200, 40.5) # lineas horizontales
-    pdf.line(10, 44.5, 200, 44.5) # lineas horizontales
-    pdf.line(10, 49, 200, 49) # lineas horizontales
-    pdf.line(10, 54.5, 200, 54.5) # lineas horizontales
-
-    pdf.line(10, 36, 10, 54.5)  # linea izquierda
-    pdf.line(49.3, 36, 49.3, 49)  # l
-    pdf.line(161, 36, 161, 49)  # l
-    pdf.line(172.5, 36, 172.5, 49) # l
-    pdf.line(200, 36, 200, 54.5)  # linea derecha 
+    # (las líneas de esta caja ahora las dibuja caja_datos_doctorado)
 
     #Caja de datos 
     pdf.line(10, 207, 10, 59.5)  # linea izquierda
@@ -702,55 +730,8 @@ def documentoDOC_UnaHoja(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, prog
     pdf.multi_cell(200, 5, "Relación de documentos para Autorización de Exámen de Grado (Doctorado)", align="C")
     pdf.set_line_width(1)  # set the line thickness 
     pdf.line(10, 34, 200, 34)  # draw a line 
-    pdf.set_xy(10,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Programa:", align="J")
-    pdf.set_xy(10,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Plan de estudios:", align="J")
-    pdf.set_xy(10,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Nombre de la o del alumno:", align="J")
-    pdf.set_xy(50.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(95, 5, programa, align="J")
-    pdf.set_xy(50.5,40)
-    if len(Plan_estudios) > 90:
-        pdf.set_font("Arial", size=4)
-
-    else:
-        pdf.set_font("Arial", size=8.5)
-    
-    pdf.multi_cell(95, 5, gradoAux + Plan_estudios, align="J")
-    pdf.set_xy(50.5,44)
-    if len(Nomb_alu) > 90:
-        pdf.set_font("Arial", size=4)
-
-    else:
-        pdf.set_font("Arial", size=8.5)
-        
-    pdf.multi_cell(105, 5.3, Nomb_alu, align="J")
-    pdf.set_xy(160.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Clave:", align="J")
-    pdf.set_xy(160.5,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Clave:", align="J")
-    pdf.set_xy(160.5,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Cuenta:", align="J")
-    pdf.set_xy(172.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, "125", align="J")
-    pdf.set_xy(172.5,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, clave_str, align="J")
-    pdf.set_xy(172.5,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, No_cuenta_str, align="J")
-    pdf.set_xy(12,49)
-    pdf.set_font("Arial", size=10, style="B")
-    pdf.multi_cell(185, 5, "Alumnado con antecedente UNAM en el ciclo inmediato anterior", align="C")
+    caja_datos_doctorado(pdf, programa, gradoAux + Plan_estudios, Nomb_alu, clave_str, No_cuenta_str,
+                         "Alumnado con antecedente UNAM en el ciclo inmediato anterior")
 
     pdf.set_xy(10,64)
     pdf.set_font("Arial", size=6.5, style="B")
@@ -971,17 +952,7 @@ def documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pro
 
     # Caja de Datos de alumno
     pdf.set_line_width(0.1)  # set the line thickness 
-    pdf.line(10, 36, 200, 36) # lineas horizontales
-    pdf.line(10, 40.5, 200, 40.5) # lineas horizontales
-    pdf.line(10, 44.5, 200, 44.5) # lineas horizontales
-    pdf.line(10, 49, 200, 49) # lineas horizontales
-    pdf.line(10, 54.5, 200, 54.5) # lineas horizontales
-
-    pdf.line(10, 36, 10, 54.5)  # linea izquierda
-    pdf.line(49.3, 36, 49.3, 49)  # l
-    pdf.line(161, 36, 161, 49)  # l
-    pdf.line(172.5, 36, 172.5, 49) # l
-    pdf.line(200, 36, 200, 54.5)  # linea derecha 
+    # (las líneas de esta caja ahora las dibuja caja_datos_doctorado)
 
     #Caja de datos ,lineas verticales
     pdf.line(10, 262.5, 10, 59.5)  # linea izquierda
@@ -1045,55 +1016,8 @@ def documentoDOC_DosHojas(No_cuenta_str, Plan_estudios, clave_str, Nomb_alu, pro
     pdf.multi_cell(185, 5, "Relación de documentos para Autorización de Exámenes de Grado (Doctorado)", align="C")
     pdf.set_line_width(1)  # set the line thickness 
     pdf.line(10, 34, 200, 34)  # draw a line 
-    pdf.set_xy(10,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Programa:", align="J")
-    pdf.set_xy(10,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Plan de estudios:", align="J")
-    pdf.set_xy(10,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(45, 5, "Nombre de la o del alumno:", align="J")
-    pdf.set_xy(50.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(95, 5, programa, align="J")
-    pdf.set_xy(50.5,40)
-    if len(Plan_estudios) > 90:
-        pdf.set_font("Arial", size=4)
-
-    else:
-        pdf.set_font("Arial", size=8.5)
-    
-    pdf.multi_cell(95, 5, gradoAux + Plan_estudios, align="J")
-    pdf.set_xy(50.5,44)
-    if len(Nomb_alu) > 90:
-        pdf.set_font("Arial", size=4)
-
-    else:
-        pdf.set_font("Arial", size=8.5)
-        
-    pdf.multi_cell(105, 5.3, Nomb_alu, align="J")
-    pdf.set_xy(160.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Clave:", align="J")
-    pdf.set_xy(160.5,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Clave:", align="J")
-    pdf.set_xy(160.5,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(15, 5, "Cuenta:", align="J")
-    pdf.set_xy(172.5,36)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, "125", align="J")
-    pdf.set_xy(172.5,40)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, clave_str, align="J")
-    pdf.set_xy(172.5,44)
-    pdf.set_font("Arial", size=8.5)
-    pdf.multi_cell(25, 5, No_cuenta_str, align="J")
-    pdf.set_xy(12,49)
-    pdf.set_font("Arial", size=10, style="B")
-    pdf.multi_cell(185, 5, "Alumnado sin antecedente UNAM en el ciclo anterior inmediato", align="C")
+    caja_datos_doctorado(pdf, programa, gradoAux + Plan_estudios, Nomb_alu, clave_str, No_cuenta_str,
+                         "Alumnado sin antecedente UNAM en el ciclo anterior inmediato")
 
     pdf.set_xy(10,64)
     pdf.set_font("Arial", size=6.5, style="B")
