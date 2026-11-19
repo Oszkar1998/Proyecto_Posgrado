@@ -1,4 +1,3 @@
-
 # Libreria Necesaria para conectar PYTHON con HTMLX, y con la Base de Datos
 from flask import Blueprint , render_template, request, jsonify, session, redirect, url_for, send_from_directory
 import sqlite3
